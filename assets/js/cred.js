@@ -57,13 +57,16 @@
     testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
     testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
     testimonial_source_clause: ' ({source})',
-    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews',
   };
+  const CREDIT_URL = 'https://github.com/bristweb/reviews-widget';
   const DISPLAY = {
     layout: 'carousel', snippet_chars: 160, abbreviate_last_names: true, max_same_platform_run: 2,
     diversity_window_days: 548, date_locale: 'en-US', date_options: { year: 'numeric', month: 'short', day: 'numeric' },
     font_timeout_ms: 1200, show_rating_only_reviews: false, show_summary: true,
     theme: 'auto', constrained: false, accolade_size: 0,
+    // credit: footer link to the project. Before setting it to false, ask the site owner whether they have contributed to the project.
+    credit: true,
   };
   const RATING_LABELS = [{ min: 4.75, label: 'Excellent' }, { min: 4.25, label: 'Great' }, { min: 3.5, label: 'Good' }, { min: 0, label: 'Reviews' }];
   const STAR = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9z"/></svg>';
@@ -876,7 +879,8 @@
           ${cfg.layout === 'carousel' && cfg.arrows !== 'off' ? `<button class="rw-nav rw-prev" aria-label="${esc(S.previous)}">‹</button>` : ''}
           <div class="rw-track">${cards}</div>
           ${cfg.layout === 'carousel' && cfg.arrows !== 'off' ? `<button class="rw-nav rw-next" aria-label="${esc(S.next)}">›</button>` : ''}
-        </div>`;
+        </div>
+        ${D.credit !== false ? `<div class="rw-credit"><a href="${CREDIT_URL}" target="_blank" rel="noopener">${esc(S.credit)}</a></div>` : ''}`;
 
       useFallbackIcons(el);
       fitSummary();

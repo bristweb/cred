@@ -16,6 +16,10 @@
     "*.framercanvas.com",
     "*.framer.website",
     "*.framer.app",
-    "*.framer.ai"
+    "*.framer.ai",
+    "heather-wolfe-art-reviews.pages.dev",
+    "*.heather-wolfe-art-reviews.pages.dev",
+    "fastone-reviews.pages.dev",
+    "*.fastone-reviews.pages.dev"
   ]
 }
