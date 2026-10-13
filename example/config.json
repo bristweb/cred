@@ -95,6 +95,22 @@
       "url": "https://example.com/awards/trail-town-best-bike-shop-2024"
     }
   ],
+  "credentials": [
+    {
+      "label": "Certified Bike Mechanic",
+      "issuer": "Example Cycling Mechanics Guild",
+      "icon": "icons/credential-mechanic.svg",
+      "start": "2023-05",
+      "url": "https://example.com/credentials/northwind-cycles-mechanic"
+    },
+    {
+      "label": "E-bike Service Certification",
+      "issuer": "Example E-Bike Institute",
+      "icon": "icons/credential-ebike.svg",
+      "start": "2023-09",
+      "end": "2025-09"
+    }
+  ],
   "testimonials": [
     {
       "title": "June Park",

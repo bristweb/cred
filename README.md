@@ -97,7 +97,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 |---|---|---|
 | `source` | Data repo root URL (trailing `/` added if missing). **Required** on real embeds | — |
 | `layout` | `carousel` \| `grid` | `display.layout` or `carousel` |
-| `platform` | One key from `config.platforms`, or `accolades` / `testimonials` (filters to that tab). Omit for every platform. Clicking the active filter tab again clears it back to All | all platforms |
+| `platform` | One key from `config.platforms`, or `accolades` / `credentials` / `testimonials` (filters to that tab). Omit for every platform. Clicking the active filter tab again clears it back to All | all platforms |
 | `limit` | Max review cards (`0` = no limit) | `0` |
 | `summary` | `off` hides the summary card | shown |
 | `theme` | `light` \| `dark` \| `auto` (follow host page theme) | `display.theme` or `auto` |
@@ -116,7 +116,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 Plain files at the data root, served over HTTPS with CORS open enough for your pages to fetch them (GitHub Pages does this by default with branch `main`, site root, and `.nojekyll`; any static host works). The widget reads only these paths; other folders (e.g. your own `scripts/`) are never loaded.
 
 ```
-config.json              business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, testimonials, reviews.years, …
+config.json              business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, credentials, testimonials, reviews.years, …
 lang/<code>.json         optional UI wording (listed in config.languages; partial OK)
 reviews/<year>.json      reviews dated that year (array, newest first)
 images/reviewers/        optional local avatars (any path/URL works in records)
@@ -140,6 +140,7 @@ theme/fonts/             optional self-hosted fonts
 | `rating_labels` | score words (`[{ min, label }, …]`); overrides language-file labels when set |
 | `summary` | `{ "text", "generated_at" }` for the summary card; optional `title` is the card headline (else language/strings `ai_summary`, e.g. Highlights) |
 | `accolades` | optional award badges merged into the **All** track by date (each sorts as `YYYY-12-31` so it leads that year; newest first). Always at least one accolade before the first review when any exist (newest award promoted if needed). Platform filters omit them. When present, an **Awards** filter tab lists only accolade cards. Each item needs `year` plus `icon` and/or freeform `label` (`name` alias). Optional `url`: when set the card links with a “View award” cue; when omitted the card is not clickable and has no footer cue. Logo fills the card’s free space by default; optional global max: `display.accolade_size` (px). Filter pill icon: built-in trophy, or `display.accolades_icon` (path or URL). Same optional `nofollow` / `noreferrer` / `rel` as platforms |
+| `credentials` | optional licenses and certifications: `label` (or `title`), optional `issuer`, `icon`, `url` (no link text without it), `start` (required) and optional `end` (`YYYY`, `YYYY-MM` or `YYYY-MM-DD`). Cards sit on the **All** track at their start date, and a **Credentials** filter lists only them. The date line reads “Since 2019”, “2019–2024”, or “2019–2024 · Expired” once `end` has passed; expired ones still show. Not counted in ratings or the JSON-LD. Filter pill icon: built-in badge, or `display.credentials_icon` |
 | `testimonials` | optional testimonial cards (review-like) merged into the **All** track by date, newest first. No required platform/source. When present, a **Testimonials** filter tab lists only these cards; platform filters omit them. Each item needs `title` (shown like a reviewer name, not abbreviated), `text`, `date`; optional `subtitle` is a smaller line under the title (e.g. role and company). Filter pill icon: built-in quote bubble, or `display.testimonials_icon` (path or URL). Optional `url`, `link_text` (footer cue; default **Learn more** / `strings.view_testimonial`), `rating`, `reviewer_image`. Optional `source` (`name` required when set; `logo` shown in the avatar slot, reviewer image secondary; `name` is used in the accessible label, not as a visible line). Same optional `nofollow` / `noreferrer` / `rel` Optional `media` list: `{ type: image | audio | video | link, url, thumbnail, poster, caption, alt }` — images and videos open in a lightbox, audio plays inline, links show as a small post card. A card with media is not itself a link; its `url` becomes the footer link. Optional `excerpt` as for reviews |
 | `reviews.years` | year files to fetch, newest first, e.g. `[2026, 2025]` |
 

@@ -13,7 +13,7 @@
  * Usage (JS embed) — one script tag renders the widget right where the tag is (defer/async are fine):
  *   <script src="…/reviews-widget/assets/js/reviews-widget.js"
  *           data-source="…/<your-data-repo>/" defer></script>
- * Public options: data-source (required), data-layout, data-platform (one platforms key, accolades, testimonials, or omit for all),
+ * Public options: data-source (required), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
  *   data-limit, data-summary="off", data-theme="light|dark|auto", data-schema="off", data-constrained="true",
  *   data-lang (ISO language code).
  * Bare pages index.html / embed.html default data via ?source= when the script has no data-source.
@@ -32,10 +32,14 @@
   const SHARED = (window.__reviewsWidget ??= { css: {}, loads: {} });
   const STRINGS = {
     loading: 'Loading reviews…', unavailable: 'Reviews are unavailable right now.',
-    tabs_aria: 'Filter reviews by platform, awards, or testimonials', tab_all: 'All', tab_all_suffix: '',
+    tabs_aria: 'Filter reviews by platform, awards, credentials, or testimonials', tab_all: 'All', tab_all_suffix: '',
     tab_title: '{name}: {count} reviews', tab_aria: '{name}, {count} reviews',
     tab_accolades: 'Awards', tab_accolades_title: '{name}: {count} awards', tab_accolades_aria: '{name}, {count} awards',
     tab_testimonials: 'Testimonials', tab_testimonials_title: '{name}: {count} testimonials', tab_testimonials_aria: '{name}, {count} testimonials',
+    tab_credentials: 'Credentials', tab_credentials_title: '{name}: {count} credentials', tab_credentials_aria: '{name}, {count} credentials',
+    credential_one: 'credential', credential_many: 'credentials', view_credential: 'Verify',
+    credential_since: 'Since {start}', credential_range: '{start}–{end}', credential_expired: '{range} · Expired',
+    credential_card_aria: '{label} ({dates}) — opens in a new tab', credential_card_aria_nolink: '{label} ({dates})',
     tabs_more: 'More', tabs_more_aria: 'More filters',
     write_review: 'Write a review', write_review_short: 'Review',
     based_on: 'Based on ', review_one: 'review', review_many: 'reviews', on_platform: ' on {platform}',
@@ -65,10 +69,11 @@
   const STAR = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9z"/></svg>';
   const SPARKLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2.5l1.9 5.6 5.6 1.9-5.6 1.9L10 17.5l-1.9-5.6L2.5 10l5.6-1.9zM18.5 13l.95 2.55L22 16.5l-2.55.95L18.5 20l-.95-2.55L15 16.5l2.55-.95z"/></svg>';
   const THUMB = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 9h3v9H2zM7 18h7.6a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 15.8 8H12V4.5A2.5 2.5 0 0 0 9.5 2L7 8z"/></svg>';
-  // Default Awards / Testimonials pill icons: Lucide "trophy" and "message-square-quote" (ISC; assets/icons/ATTRIBUTION.md).
-  // Drawn in currentColor so they follow the theme; display.accolades_icon / display.testimonials_icon replace them.
+  // Default Awards / Credentials / Testimonials pill icons: Lucide "trophy", "badge-check" and "message-square-quote"
+  // (ISC; assets/icons/ATTRIBUTION.md). Drawn in currentColor so they follow the theme; display.<kind>_icon replaces them.
   const TAB_ICONS = {
     accolades: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2"/><path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2"/><path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3"/></svg>',
+    credentials: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg>',
     testimonials: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14a2 2 0 0 0 2-2V8h-2"/><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M8 14a2 2 0 0 0 2-2V8H8"/></svg>',
   };
   const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
@@ -392,7 +397,7 @@
       const fallback = SIMPLE_ICONS + encodeURIComponent(P.simple_icon || p);
       return `<img${c ? ` class="${c}"` : ''} src="${esc(url(P.icon || `icons/${p}.svg`))}" data-fallback="${esc(fallback)}" alt="">`;
     };
-    // Awards / Testimonials pills: display.accolades_icon / display.testimonials_icon (path or URL), else the built-in icon.
+    // Awards / Credentials / Testimonials pills: display.<kind>_icon (path or URL), else the built-in icon.
     const tabIcon = p => (D[p + '_icon'] ? `<img src="${esc(url(D[p + '_icon']))}" alt="">` : TAB_ICONS[p]);
     const useFallbackIcons = root => root.querySelectorAll('img[data-fallback]').forEach(img => {
       const swap = () => { if (img.dataset.fallback) { img.src = img.dataset.fallback; delete img.dataset.fallback; } };
@@ -561,6 +566,26 @@
           }))
           .sort((a, b) => String(b.date).localeCompare(String(a.date)))
       : [];
+    // Credentials (licenses, certifications): placed by their start date, so a long-held license sits where it began
+    // instead of leading the track. Expired ones (end before today) stay in place, marked as expired.
+    const DATE_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+    const today = new Date().toISOString().slice(0, 10);
+    const credentialsList = Array.isArray(config.credentials)
+      ? config.credentials
+          .filter(c => c && DATE_RE.test(String(c.start ?? '')) && [c.label, c.title, c.icon].some(v => v != null && String(v).trim()))
+          .map(c => {
+            const end = DATE_RE.test(String(c.end ?? '')) ? String(c.end) : '';
+            const endFull = end.length === 4 ? end + '-12-31' : end.length === 7 ? end + '-31' : end;
+            return { ...c, start: String(c.start), end, sortDate: (String(c.start) + '-01-01').slice(0, 10), expired: Boolean(end) && endFull < today };
+          })
+          .sort((a, b) => b.sortDate.localeCompare(a.sortDate))
+      : [];
+    const fmtPart = d => (d.length === 4 ? d : new Date(d + (d.length === 7 ? '-15' : '') + 'T12:00:00Z').toLocaleDateString(D.date_locale, d.length === 7 ? { year: 'numeric', month: 'short' } : D.date_options));
+    const credentialDates = c => {
+      if (!c.end) return fill(S.credential_since, { start: fmtPart(c.start) });
+      const range = fill(S.credential_range, { start: fmtPart(c.start), end: fmtPart(c.end) });
+      return c.expired ? fill(S.credential_expired, { range, end: fmtPart(c.end) }) : range;
+    };
     const initialsAvatar = name => {
       const words = String(name || '').trim().split(/\s+/).filter(Boolean);
       const letters = ((words[0] && words[0][0] || '') + (words.length > 1 ? words[words.length - 1][0] : '')).toUpperCase() || '?';
@@ -575,12 +600,14 @@
     let active = cfg.platform;
     if (active === 'accolades' && !accoladesList.length) active = 'all';
     if (active === 'testimonials' && !testimonialsList.length) active = 'all';
-    if (!['all', 'accolades', 'testimonials', ...present].includes(active)) active = 'all';
+    if (active === 'credentials' && !credentialsList.length) active = 'all';
+    if (!['all', 'accolades', 'credentials', 'testimonials', ...present].includes(active)) active = 'all';
 
     function render() {
       const onAccolades = active === 'accolades';
       const onTestimonials = active === 'testimonials';
-      const onSpecial = onAccolades || onTestimonials;
+      const onCredentials = active === 'credentials';
+      const onSpecial = onAccolades || onTestimonials || onCredentials;
       // Header rating: platform filter uses that pool; Awards/Testimonials keep the overall business score.
       const pool = onSpecial || active === 'all' ? all : all.filter(r => r.platform === active);
       const rated = pool.filter(r => typeof r.rating === 'number');
@@ -595,25 +622,29 @@
       const tabKeys = [
         'all', ...present,
         ...(accoladesList.length ? ['accolades'] : []),
+        ...(credentialsList.length ? ['credentials'] : []),
         ...(testimonialsList.length ? ['testimonials'] : []),
       ];
-      const showTabs = present.length > 1 || accoladesList.length > 0 || testimonialsList.length > 0;
+      const showTabs = present.length > 1 || accoladesList.length > 0 || testimonialsList.length > 0 || credentialsList.length > 0;
       const tabs = showTabs ? `<div class="rw-tabs" role="tablist" aria-label="${esc(S.tabs_aria)}">
         ${tabKeys.map(p => {
           const isAcc = p === 'accolades';
           const isTes = p === 'testimonials';
-          const n = p === 'all' ? all.length : isAcc ? accoladesList.length : isTes ? testimonialsList.length : all.filter(r => r.platform === p).length;
+          const isCred = p === 'credentials';
+          const n = p === 'all' ? all.length : isAcc ? accoladesList.length : isTes ? testimonialsList.length : isCred ? credentialsList.length : all.filter(r => r.platform === p).length;
           const allSuffix = (S.tab_all_suffix || '').trim();
           const allSuffixSp = allSuffix ? ' ' + allSuffix : '';
-          const name = p === 'all' ? S.tab_all + allSuffixSp : isAcc ? S.tab_accolades : isTes ? S.tab_testimonials : pname(p);
-          const titleTpl = isAcc ? S.tab_accolades_title : isTes ? S.tab_testimonials_title : S.tab_title;
-          const ariaTpl = isAcc ? S.tab_accolades_aria : isTes ? S.tab_testimonials_aria : S.tab_aria;
+          const name = p === 'all' ? S.tab_all + allSuffixSp : isAcc ? S.tab_accolades : isTes ? S.tab_testimonials : isCred ? S.tab_credentials : pname(p);
+          const titleTpl = isAcc ? S.tab_accolades_title : isTes ? S.tab_testimonials_title : isCred ? S.tab_credentials_title : S.tab_title;
+          const ariaTpl = isAcc ? S.tab_accolades_aria : isTes ? S.tab_testimonials_aria : isCred ? S.tab_credentials_aria : S.tab_aria;
           const labelHtml = p === 'all'
             ? `<span class="rw-tab-name">${esc(S.tab_all)}<span class="rw-tab-long">${esc(allSuffixSp)}</span></span>`
             : isAcc
               ? `${tabIcon('accolades')}<span class="rw-tab-name">${esc(S.tab_accolades)}</span>`
               : isTes
                 ? `${tabIcon('testimonials')}<span class="rw-tab-name">${esc(S.tab_testimonials)}</span>`
+                : isCred
+                ? `${tabIcon('credentials')}<span class="rw-tab-name">${esc(S.tab_credentials)}</span>`
                 : `${icon(p)}<span class="rw-tab-name">${esc(name)}</span>`;
           return `<button type="button" role="tab" class="rw-tab ${p === active ? 'is-active' : ''}" data-p="${p}" aria-selected="${p === active}"
             title="${esc(fill(titleTpl, { name, count: n }))}" aria-label="${esc(fill(ariaTpl, { name, count: n }))}">
@@ -628,11 +659,13 @@
         </div>
       </div>` : '';
 
-      const basedCount = onAccolades ? accoladesList.length : onTestimonials ? testimonialsList.length : pool.length;
+      const basedCount = onAccolades ? accoladesList.length : onTestimonials ? testimonialsList.length : onCredentials ? credentialsList.length : pool.length;
       const basedUnit = onAccolades
         ? (basedCount === 1 ? S.accolade_one : S.accolade_many)
         : onTestimonials
           ? (basedCount === 1 ? S.testimonial_one : S.testimonial_many)
+          : onCredentials
+          ? (basedCount === 1 ? S.credential_one : S.credential_many)
           : (basedCount === 1 ? S.review_one : S.review_many);
       const basedPlatform = (!onSpecial && active !== 'all')
         ? esc(fill(S.on_platform, { platform: pname(active) }))
@@ -656,17 +689,20 @@
       let trackItems;
       if (onAccolades) {
         trackItems = accoladesList.map(a => ({ kind: 'accolade', accolade: a, sortDate: accoladeSortDate(a) }));
+      } else if (onCredentials) {
+        trackItems = credentialsList.map(c => ({ kind: 'credential', credential: c, sortDate: c.sortDate }));
       } else if (onTestimonials) {
         trackItems = testimonialsList.map(t => ({ kind: 'testimonial', testimonial: t, sortDate: reviewSortDate(t) }));
       } else {
         const mixed = active === 'all';
         trackItems = [
           ...(mixed ? accoladesList.map(a => ({ kind: 'accolade', accolade: a, sortDate: accoladeSortDate(a) })) : []),
+          ...(mixed ? credentialsList.map(c => ({ kind: 'credential', credential: c, sortDate: c.sortDate })) : []),
           ...(mixed ? testimonialsList.map(t => ({ kind: 'testimonial', testimonial: t, sortDate: reviewSortDate(t) })) : []),
           ...shown.map(r => ({ kind: 'review', review: r, sortDate: reviewSortDate(r) })),
         ].sort((a, b) => {
           if (a.sortDate !== b.sortDate) return a.sortDate < b.sortDate ? 1 : -1;
-          const rank = { accolade: 0, testimonial: 1, review: 2 };
+          const rank = { accolade: 0, credential: 1, testimonial: 2, review: 3 };
           return (rank[a.kind] ?? 9) - (rank[b.kind] ?? 9);
         });
         if (accoladesList.length && trackItems.length) {
@@ -703,6 +739,26 @@
           return `<a class="rw-card rw-accolade-card" href="${esc(a.url)}" target="_blank" rel="${esc(linkRel(a))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
         }
         return `<div class="rw-card rw-accolade-card" role="article" aria-label="${esc(aria)}">${inner}</div>`;
+      };
+      const credentialCard = c => {
+        // Accolade-style card: title, issuer, date range up top; badge in the middle; link cue only when url is set.
+        const title = String(c.label || c.title || S.tab_credentials).trim();
+        const dates = credentialDates(c);
+        const hasUrl = c.url && String(c.url).trim();
+        const aria = fill(hasUrl ? S.credential_card_aria : S.credential_card_aria_nolink, { label: title, dates });
+        const img = c.icon ? `<img class="rw-accolade-badge" src="${esc(url(c.icon))}" alt="" loading="lazy">` : '';
+        const inner = `<div class="rw-card-top">
+            <div class="rw-who">
+              <div class="rw-name">${esc(title)}</div>
+              ${c.issuer ? `<div class="rw-subtitle">${esc(c.issuer)}</div>` : ''}
+              <time datetime="${esc(c.start)}">${esc(dates)}</time>
+            </div>
+          </div>
+          ${img}
+          ${hasUrl ? `<span class="rw-link" aria-hidden="true">${esc(c.link_text || S.view_credential)} <span class="rw-arrow">→</span></span>` : ''}`;
+        const cls = `rw-card rw-accolade-card rw-credential-card${c.expired ? ' rw-expired' : ''}`;
+        if (hasUrl) return `<a class="${cls}" href="${esc(c.url)}" target="_blank" rel="${esc(linkRel(c))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
+        return `<div class="${cls}" role="article" aria-label="${esc(aria)}">${inner}</div>`;
       };
       const mediaItem = (t, m, i) => {
         const cap = m.caption ? String(m.caption) : '';
@@ -814,6 +870,7 @@
       const cards = ai + trackItems.map(item => {
         if (item.kind === 'accolade') return accoladeCard(item.accolade);
         if (item.kind === 'testimonial') return testimonialCard(item.testimonial);
+        if (item.kind === 'credential') return credentialCard(item.credential);
         return reviewCard(item.review);
       }).join('');
 

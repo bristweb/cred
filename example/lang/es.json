@@ -1,7 +1,7 @@
 {
   "loading": "Cargando reseñas…",
   "unavailable": "Las reseñas no están disponibles en este momento.",
-  "tabs_aria": "Filtrar reseñas por plataforma, premios o testimonios",
+  "tabs_aria": "Filtrar reseñas por plataforma, premios, credenciales o testimonios",
   "tab_all": "Todo",
   "tab_all_suffix": "",
   "tab_title": "{name}",
@@ -64,5 +64,20 @@
   "tabs_more": "Más",
   "tabs_more_aria": "Más filtros",
   "accolade_card_aria_nolink": "{label} ({year})",
-  "card_aria_nolink": "Reseña de {name} en {platform}"
+  "card_aria_nolink": "Reseña de {name} en {platform}",
+  "tab_credentials": "Credenciales",
+  "tab_credentials_title": "{name}: {count} credenciales",
+  "tab_credentials_aria": "{name}, {count} credenciales",
+  "credential_one": "credencial",
+  "credential_many": "credenciales",
+  "view_credential": "Verificar",
+  "credential_since": "Desde {start}",
+  "credential_expired": "{range} · Vencida",
+  "credential_card_aria": "{label} ({dates}) — se abre en una pestaña nueva",
+  "credential_card_aria_nolink": "{label} ({dates})",
+  "media_image": "Ver imagen",
+  "media_audio": "Reproducir audio",
+  "media_video": "Reproducir video",
+  "media_link": "Ver publicación",
+  "media_close": "Cerrar"
 }
