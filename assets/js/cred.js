@@ -57,7 +57,7 @@
     testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
     testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
     testimonial_source_clause: ' ({source})',
-    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'CRED: free, open-source review and testimonial widget. Your reviews, your data, no tracking.',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'CRED: the open-source review and testimonial widget. Unlimited, no tracking, your data stays yours.',
   };
   const CREDIT_URL = 'https://cred.bristleconeweb.com/';
   const DISPLAY = {

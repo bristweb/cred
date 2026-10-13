@@ -1,4 +1,6 @@
-# Reviews widget
+# CRED
+
+The open-source (MIT) widget for reviews, testimonials, awards and credentials. Unlimited sources and reviews, no tracking or third-party scripts, schema.org JSON-LD built in, and your data stays in your own repo.
 
 ## <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
 
@@ -18,7 +20,7 @@
 
 Paste to try it. For a real site, keep the script `src` and change only `data-source` to your data store. More patterns: [Embed](#embed).
 
-A static, dependency-free reviews widget. Host the files on any static host (GitHub Pages works out of the box). You are not limited to a vendor supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
+A static, dependency-free reviews widget. Host the files on any static host (GitHub Pages works out of the box). You are not limited to a vendor's supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
 
 Product comparison: [COMPARISON.md](COMPARISON.md).
 
