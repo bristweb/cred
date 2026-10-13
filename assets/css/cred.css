@@ -219,3 +219,6 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
   .rw-fixed .rw-ai{gap:3px}.rw-fixed .rw-ai-top{gap:5px}.rw-fixed .rw-ai-label{font-size:13px}
   .rw-fixed .rw-ai-icon{width:16px;height:16px}.rw-fixed .rw-ai-icon svg{width:10px;height:10px}
   .rw-fixed .rw-ai-text{font-size:12.5px;line-height:1.35}.rw-fixed .rw-media-chip{width:28px;height:28px}.rw-fixed .rw-media-icon{width:24px;height:24px}}
+.rw-credit{flex:none;text-align:end;margin-top:6px;font-size:11px;line-height:1.4}
+.rw-credit a{color:var(--rw-muted,#888);text-decoration:none;opacity:.8}
+.rw-credit a:hover,.rw-credit a:focus-visible{text-decoration:underline;opacity:1}
