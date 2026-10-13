@@ -1,0 +1,1121 @@
+/* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/reviews-widget
+ * The code lives in this repo; everything about a site lives in a separate data repo, named by data-source:
+ *   <source>config.json          business, platforms, display defaults, languages/defaultLanguage/strings, schema,
+ *                                summary card, optional accolades/testimonials, and reviews.years
+ *   <source>lang/<code>.json     optional UI wording files listed in config.languages[{lang,url}]. Partial OK.
+ *   <source>reviews/<year>.json  the reviews (plain records, newest first) — the only copy of the review data
+ *   <source>theme/theme.css      fonts + CSS custom properties (colors, radius)
+ *   <source>icons/, images/      platform icons, reviewer avatars
+ * Counts, averages and the schema.org JSON-LD are computed here on load. The data carries full records;
+ * presentation only: reviewer names are shown as first name + last initial and review text is clipped to a short
+ * snippet (both computed here at render time).
+ *
+ * Usage (JS embed) — one script tag renders the widget right where the tag is (defer/async are fine):
+ *   <script src="…/reviews-widget/assets/js/cred.js"
+ *           data-source="…/<your-data-repo>/" defer></script>
+ * Public options: data-source (required), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
+ *   data-limit, data-summary="off", data-theme="light|dark|auto", data-schema="off", data-constrained="true",
+ *   data-lang (ISO language code).
+ * Bare pages index.html / embed.html default data via ?source= when the script has no data-source.
+ * Optional: data-target="#id" on the script for a non-in-place mount (compatibility / special layouts).
+ * Code root is inferred from the script URL. CSS loads from this repo + <source>theme/theme.css.
+ * data-constrained="true" = tight-box preset (fixed height, arrows inside, overflow hidden, no hover-lift,
+ *   focus rings inside). Further fitting tweaks are CSS classes on .rw-host / .rw-root (see README).
+ * URL params (?layout=&platform=&limit=&summary=off&theme=&constrained=true&lang=) override data attributes.
+ * ?source= applies only when there is no data-source.
+ */
+(function () {
+  // Captured at execution time (works for plain, defer and async scripts; null only for ES modules).
+  const ME = document.currentScript;
+  const DEFAULT_BASE = ME && ME.src ? new URL('../../', ME.src).href : './'; // this repo's root (code + CSS)
+  // Shared across every copy of this script on the page, so data and CSS load once.
+  const SHARED = (window.__reviewsWidget ??= { css: {}, loads: {} });
+  const STRINGS = {
+    loading: 'Loading reviews…', unavailable: 'Reviews are unavailable right now.',
+    tabs_aria: 'Filter reviews by platform, awards, credentials, or testimonials', tab_all: 'All', tab_all_suffix: '',
+    tab_title: '{name}: {count} reviews', tab_aria: '{name}, {count} reviews',
+    tab_accolades: 'Awards', tab_accolades_title: '{name}: {count} awards', tab_accolades_aria: '{name}, {count} awards',
+    tab_testimonials: 'Testimonials', tab_testimonials_title: '{name}: {count} testimonials', tab_testimonials_aria: '{name}, {count} testimonials',
+    tab_credentials: 'Credentials', tab_credentials_title: '{name}: {count} credentials', tab_credentials_aria: '{name}, {count} credentials',
+    credential_one: 'credential', credential_many: 'credentials', view_credential: 'Verify',
+    credential_since: 'Since {start}', credential_range: '{start}–{end}',
+    credential_card_aria: '{label} ({dates}) — opens in a new tab', credential_card_aria_nolink: '{label} ({dates})',
+    tabs_more: 'More', tabs_more_aria: 'More filters',
+    write_review: 'Write a review', write_review_short: 'Review',
+    based_on: 'Based on ', review_one: 'review', review_many: 'reviews', on_platform: ' on {platform}',
+    accolade_one: 'award', accolade_many: 'awards',
+    testimonial_one: 'testimonial', testimonial_many: 'testimonials',
+    stars_aria: '{rating} out of 5 stars', recommends: 'Recommends', view_on: 'View on {platform}', view_accolade: 'View award',
+    view_testimonial: 'Learn more',
+    card_aria: "Read {name}'s review on {platform} (opens in a new tab)", anonymous: 'Anonymous',
+    previous: 'Previous reviews', next: 'Next reviews', ai_summary: 'Summary',
+    ai_summary_aria: 'Summary of {count} reviews', accolades_aria: 'Awards and accolades',
+    accolade_card_aria: '{label} ({year}) — opens in a new tab',
+    accolade_card_aria_nolink: '{label} ({year})',
+    card_aria_nolink: "{name}'s review on {platform}",
+    testimonial_from: '{name} from {source}',
+    testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
+    testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
+    testimonial_source_clause: ' ({source})',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close',
+  };
+  const DISPLAY = {
+    layout: 'carousel', snippet_chars: 160, abbreviate_last_names: true, max_same_platform_run: 2,
+    diversity_window_days: 548, date_locale: 'en-US', date_options: { year: 'numeric', month: 'short', day: 'numeric' },
+    font_timeout_ms: 1200, show_rating_only_reviews: false, show_summary: true,
+    theme: 'auto', constrained: false, accolade_size: 0,
+  };
+  const RATING_LABELS = [{ min: 4.75, label: 'Excellent' }, { min: 4.25, label: 'Great' }, { min: 3.5, label: 'Good' }, { min: 0, label: 'Reviews' }];
+  const STAR = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9z"/></svg>';
+  const SPARKLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2.5l1.9 5.6 5.6 1.9-5.6 1.9L10 17.5l-1.9-5.6L2.5 10l5.6-1.9zM18.5 13l.95 2.55L22 16.5l-2.55.95L18.5 20l-.95-2.55L15 16.5l2.55-.95z"/></svg>';
+  const THUMB = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 9h3v9H2zM7 18h7.6a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 15.8 8H12V4.5A2.5 2.5 0 0 0 9.5 2L7 8z"/></svg>';
+  // Default Awards / Credentials / Testimonials pill icons: Lucide "trophy", "badge-check" and "message-square-quote"
+  // (ISC; assets/icons/ATTRIBUTION.md). Drawn in currentColor so they follow the theme; display.<kind>_icon replaces them.
+  const TAB_ICONS = {
+    accolades: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2"/><path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2"/><path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3"/></svg>',
+    credentials: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg>',
+    testimonials: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14a2 2 0 0 0 2-2V8h-2"/><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M8 14a2 2 0 0 0 2-2V8H8"/></svg>',
+  };
+  const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
+  const MEDIA_ICON = {
+    audio: PLAY, video: PLAY,
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+  };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fill = (tpl, vars) => String(tpl).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  const MEDIA_TYPES = ['image', 'audio', 'video', 'link'];
+  const isBlank = t => !String(t ?? '').replace(/[\s\u200b-\u200d\u2060\ufeff]+/g, '');
+  const SIMPLE_ICONS = 'https://cdn.simpleicons.org/';
+  const byNewest = (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id);
+  // 'true' / '' (bare attribute) / '1' / 'on' / 'yes' -> true; 'false' / '0' / 'off' / 'no' -> false
+  const toBool = v => (typeof v === 'boolean' ? v : v != null && !/^(false|0|off|no)$/i.test(String(v).trim()));
+  // Outbound link rel: always noopener; optional nofollow/noreferrer (or a `rel` token string).
+  // First scope that sets any of those wins (review overrides platform; neither → just noopener).
+  function linkRel(...scopes) {
+    let nofollow = false, noreferrer = false, extra = [];
+    let found = false;
+    for (const scope of scopes) {
+      if (!scope || typeof scope !== 'object') continue;
+      const hasRel = typeof scope.rel === 'string' && scope.rel.trim();
+      const hasNf = typeof scope.nofollow === 'boolean';
+      const hasNr = typeof scope.noreferrer === 'boolean';
+      if (!hasRel && !hasNf && !hasNr) continue;
+      found = true;
+      const toks = new Set();
+      if (hasRel) for (const t of scope.rel.trim().split(/\s+/)) if (t) toks.add(t.toLowerCase());
+      nofollow = hasNf ? scope.nofollow : toks.has('nofollow');
+      noreferrer = hasNr ? scope.noreferrer : toks.has('noreferrer');
+      extra = [...toks].filter(t => t !== 'noopener' && t !== 'nofollow' && t !== 'noreferrer');
+      break;
+    }
+    const parts = ['noopener'];
+    if (found && nofollow) parts.push('nofollow');
+    if (found && noreferrer) parts.push('noreferrer');
+    for (const t of extra) if (!parts.includes(t)) parts.push(t);
+    return parts.join(' ');
+  }
+
+  // ---- loading helpers ----
+  const fetchJson = url => fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status + ' ' + url); return r.json(); });
+  const cssLoads = SHARED.css;
+  // Adds <link rel=stylesheet> unless the page already has it; resolves once it's applied (or failed).
+  function ensureCss(href) {
+    if (cssLoads[href]) return cssLoads[href];
+    let link = [...document.querySelectorAll('link[rel~="stylesheet"]')].find(l => l.href === href);
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      document.head.appendChild(link);
+    } else if (link.sheet) {
+      return (cssLoads[href] = Promise.resolve());
+    }
+    return (cssLoads[href] = new Promise(res => {
+      link.addEventListener('load', res, { once: true });
+      link.addEventListener('error', res, { once: true });
+    }));
+  }
+  const loads = SHARED.loads;
+  // One fetch of config + reviews + CSS per data source, shared by every widget on the page. The stylesheets and
+  // config start at once; every yearly review file listed in config.reviews.years is then fetched in parallel.
+  // Resolve a path/URL relative to a root (data source or widget code root).
+  function resolveUrl(root, rel) {
+    if (rel == null) return null;
+    const s = String(rel).trim();
+    if (!s) return null;
+    if (/^(https?:)?\/\//i.test(s) || s.startsWith('/')) return s;
+    return root + s.replace(/^\.\//, '');
+  }
+  // Split a lang file into string catalog + optional rating_labels. Accepts a flat catalog or { strings, rating_labels }.
+  function pickLang(pack) {
+    if (!pack || typeof pack !== 'object') return { strings: {}, rating_labels: null };
+    if (pack.strings && typeof pack.strings === 'object' && !Array.isArray(pack.strings)) {
+      return { strings: pack.strings, rating_labels: Array.isArray(pack.rating_labels) ? pack.rating_labels : null };
+    }
+    const strings = {}, labels = Array.isArray(pack.rating_labels) ? pack.rating_labels : null;
+    for (const [k, v] of Object.entries(pack)) if (k !== 'rating_labels' && typeof v === 'string') strings[k] = v;
+    return { strings, rating_labels: labels };
+  }
+  const normLang = c => String(c || '').trim().replace(/_/g, '-').toLowerCase();
+  // config.languages: [{ lang, url }, …] — lang is an ISO tag; url is absolute or relative to the data root.
+  function languageEntries(c) {
+    const raw = (c && Array.isArray(c.languages)) ? c.languages : [];
+    const out = [];
+    for (const e of raw) {
+      if (!e || typeof e !== 'object') continue;
+      const lang = normLang(e.lang);
+      const url = e.url != null ? String(e.url).trim() : '';
+      if (lang && url) out.push({ lang, url });
+    }
+    return out;
+  }
+  // Match a request tag to an entry's lang: exact, then primary subtag of either side (en-US↔en, en↔en-us, en-GB↔en-us).
+  function findLanguageEntry(tag, entries) {
+    const n = normLang(tag);
+    if (!n || !entries.length) return null;
+    const exact = entries.find(e => e.lang === n);
+    if (exact) return exact;
+    const primary = n.split('-')[0];
+    const byPrimary = entries.find(e => e.lang === primary);
+    if (byPrimary) return byPrimary;
+    return entries.find(e => {
+      const ep = e.lang.split('-')[0];
+      return n === ep || primary === ep;
+    }) || null;
+  }
+  // Priority: embed lang attr/param → page/browser → config defaultLanguage → null (widget English only).
+  function resolveLanguage(opts, q, entries, config) {
+    const fromEmbed = q.get('lang') || opts.lang;
+    let hit = findLanguageEntry(fromEmbed, entries);
+    if (hit) return hit;
+    const tags = [];
+    const htmlLang = document.documentElement && document.documentElement.lang;
+    if (htmlLang) tags.push(htmlLang);
+    if (navigator.languages && navigator.languages.length) tags.push(...navigator.languages);
+    else if (navigator.language) tags.push(navigator.language);
+    for (const t of tags) { hit = findLanguageEntry(t, entries); if (hit) return hit; }
+    hit = findLanguageEntry(config.defaultLanguage, entries);
+    if (hit) return hit;
+    return null;
+  }
+  const langLoads = (SHARED.lang ??= {});
+  function loadLang(url) {
+    if (!url) return Promise.resolve(null);
+    return (langLoads[url] ??= fetchJson(url).catch(e => {
+      console.warn('[reviews-widget] language file', e);
+      return null;
+    }));
+  }
+  function load(code, src) {
+    return (loads[src] ??= (() => {
+      const css = Promise.all([ensureCss(code + 'assets/css/cred.css'), ensureCss(src + 'theme/theme.css')]);
+      const config = fetchJson(src + 'config.json');
+      const reviews = config.then(c => Promise.all(((c.reviews && c.reviews.years) || []).map(y => fetchJson(`${src}reviews/${y}.json`))))
+        .then(years => [].concat(...years));
+      return Promise.all([config, reviews, css]);
+    })());
+  }
+  // schema.org JSON-LD, built from the reviews on load -> one <script type="application/ld+json"> in <head> per page.
+  // Off when config.schema.enabled is false or any widget script/target has data-schema="off".
+  function injectSchema(json, opts) {
+    if (!json || opts.schema === 'off' || SHARED.schema) return;
+    SHARED.schema = true;
+    if (document.getElementById('reviews-widget-schema')) return;
+    const tag = document.createElement('script');
+    tag.type = 'application/ld+json';
+    tag.id = 'reviews-widget-schema';
+    tag.textContent = JSON.stringify(json).replace(/</g, '\\u003c');
+    document.head.appendChild(tag);
+  }
+  // Resolves when the theme's webfont (first family in the computed font-family) is loaded, or after a timeout
+  // (then the theme's fallback face shows).
+  const GENERIC_FONTS = /^(serif|sans-serif|monospace|cursive|fantasy|math|emoji|system-ui|ui-[a-z-]+|-apple-system|BlinkMacSystemFont)$/i;
+  function fontsReady(el, timeout) {
+    const fam = getComputedStyle(el).fontFamily.split(',')[0].trim();
+    if (!document.fonts || !document.fonts.load || !fam || GENERIC_FONTS.test(fam)) return Promise.resolve();
+    const faces = ['400 15px ' + fam, '700 15px ' + fam, 'italic 300 15px ' + fam];
+    return Promise.race([
+      Promise.all(faces.map(f => document.fonts.load(f))).catch(() => {}),
+      new Promise(r => setTimeout(r, timeout)),
+    ]);
+  }
+
+  // opts: data-* options (layout, platform, limit, base) from the script tag and/or the target element.
+  // DOM: host (inserted container or your target; full-width block, gives the widget an intrinsic width)
+  //        > .rw-sizer (zero-height; max-content = --rw-max-width, min-content tiny, so shrink-to-fit parents
+  //          like centered flex columns, inline-blocks, fit-content or floats size the widget to the available width)
+  //        > .rw-root (the widget; container-type:inline-size for the header/carousel container queries).
+  // Without the sizer, size containment gives the root an intrinsic width of 0 and it collapses in such parents.
+
+  // Active scheme for data-theme="auto": follow the host page (html/body data-theme / dark class /
+  // color-scheme). Only use prefers-color-scheme when the host itself opts into system (color-scheme:
+  // light dark, or data-theme=auto). No bare OS preference when the page is a light-only site.
+  function detectHostTheme() {
+    const roots = [document.documentElement, document.body].filter(Boolean);
+    const attrNames = ['data-theme', 'data-color-scheme', 'data-bs-theme'];
+    for (const el of roots) {
+      for (const a of attrNames) {
+        const v = (el.getAttribute(a) || '').toLowerCase();
+        if (v === 'dark' || v === 'light') return v;
+        if (v === 'auto' || v === 'system') {
+          return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+      }
+      const cls = String(el.className || '');
+      if (/\b(dark|theme-dark|dark-mode|darkmode|scheme-dark)\b/i.test(cls)) return 'dark';
+      if (/\b(light|theme-light|light-mode|lightmode|scheme-light)\b/i.test(cls)) return 'light';
+    }
+    for (const el of roots) {
+      const cs = (getComputedStyle(el).colorScheme || '').trim().toLowerCase();
+      if (!cs || cs === 'normal') continue;
+      const hasL = /\blight\b/.test(cs), hasD = /\bdark\b/.test(cs);
+      if (hasD && !hasL) return 'dark';
+      if (hasL && !hasD) return 'light';
+      if (hasL && hasD) return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  }
+
+  async function mount(host, opts) {
+    const q = new URLSearchParams(location.search);
+    let code = DEFAULT_BASE;
+    if (!code.endsWith('/')) code += '/';
+    // data-source (script tag or target) wins; ?source= is for the bare pages, whose script tag has none.
+    let base = opts.source || q.get('source') || '';
+    if (base && !base.endsWith('/')) base += '/';
+    host.classList.add('rw-host');
+    host.classList.add('rw-clip');
+    host.innerHTML = `<div class="rw-sizer" aria-hidden="true">${'<i></i> '.repeat(24)}</div>`;
+    const el = document.createElement('div');
+    host.appendChild(el);
+    el.classList.add('rw-root');
+    el.style.opacity = '0'; // hidden until CSS, fonts and the first layout are ready (CSS takes over afterwards)
+    // Stay invisible until the webfont is ready AND the first render is laid out, then fade in once, so there's
+    // no font swap or re-fit flash. Header steps are pure CSS container queries.
+    // Constrained / fixed host: fill parent height when definite, else viewport below the widget top.
+    let fixedHeight = false;
+    function fitHeight() {
+      const parent = host.parentElement;
+      if (!parent) return;
+      const probe = document.createElement('div');
+      probe.style.cssText = 'display:block;height:100%;width:0;min-height:0;margin:0;padding:0;border:0;flex:none';
+      parent.insertBefore(probe, host);
+      const definite = probe.getBoundingClientRect().height > 0 && parent !== document.body && parent !== document.documentElement;
+      probe.remove();
+      if (definite) { host.style.height = '100%'; return; }
+      const bs = getComputedStyle(document.body), hs = getComputedStyle(document.documentElement);
+      const top = host.getBoundingClientRect().top + scrollY;
+      const below = (parseFloat(bs.marginBottom) || 0) + (parseFloat(bs.paddingBottom) || 0) + (parseFloat(hs.paddingBottom) || 0);
+      host.style.height = Math.max(120, Math.floor(innerHeight - top - below)) + 'px';
+    }
+    const reveal = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.classList.add('rw-ready');
+      el.style.removeProperty('opacity');
+      if (!fixedHeight) notifyHeight();
+    }));
+    let config, reviews;
+    try {
+      if (!base) throw new Error('[reviews-widget] data-source is required (URL of a data repo root, ending in /)');
+      [config, reviews] = await load(code, base);
+    } catch (e) {
+      console.warn(e);
+      el.innerHTML = `<div class="rw-loading">${esc(STRINGS.unavailable)}</div>`;
+      reveal();
+      return;
+    }
+    // UI copy: built-ins ← widget lang/en.json ← matched language URL file (partial OK) ← inline strings.
+    const entries = languageEntries(config);
+    const selected = resolveLanguage(opts, q, entries, config);
+    const [enPack, selPack] = await Promise.all([
+      loadLang(code + 'lang/en.json'),
+      selected ? loadLang(resolveUrl(base, selected.url)) : Promise.resolve(null),
+    ]);
+    const fromEn = pickLang(enPack);
+    const fromSel = pickLang(selPack);
+    const inline = (config.strings && typeof config.strings === 'object' && !Array.isArray(config.strings)) ? config.strings : {};
+    const S = { ...STRINGS, ...fromEn.strings, ...fromSel.strings, ...inline };
+    const D = { ...DISPLAY, ...(config.display || {}) };
+    {
+      // 0 / unset = badge fills the card’s free space; positive px caps the max edge.
+      const n = Number(D.accolade_size);
+      if (Number.isFinite(n) && n > 0) el.style.setProperty('--rw-accolade-size', Math.round(n) + 'px');
+    }
+    const PLATFORMS = config.platforms || {};
+    const RL = (config.rating_labels || fromSel.rating_labels || fromEn.rating_labels || RATING_LABELS).slice().sort((a, b) => b.min - a.min);
+    // URL param > data-* > config.json display > built-in default.
+    const opt = (param, key, dkey) => (q.get(param) !== null ? q.get(param) : opts[key] != null ? opts[key] : D[dkey]);
+    const constrained = toBool(opt('constrained', 'constrained', 'constrained'));
+    // One platform key from config.platforms, or omit / empty → all. ("all" still accepted.)
+    let platform = String(q.get('platform') || opts.platform || '').trim();
+    if (!platform) platform = 'all';
+    const cfg = {
+      layout: q.get('layout') || opts.layout || D.layout || 'carousel',
+      platform,
+      limit: +(q.get('limit') || opts.limit || 0),
+      summary: (q.get('summary') || opts.summary) !== 'off' && D.show_summary !== false,
+      constrained,
+      // Fitting: only data-constrained toggles these in JS. Further tweaks → CSS classes (README).
+      fixed: constrained,
+      arrows: constrained ? 'inside' : 'outside',
+    };
+    fixedHeight = cfg.fixed;
+    host.classList.toggle('rw-clip', !constrained);
+    host.classList.toggle('rw-overflow-hidden', constrained);
+    el.classList.add('rw-layout-' + cfg.layout);
+    if (constrained) {
+      el.classList.add('rw-arrows-inside', 'rw-nolift', 'rw-focus-inside');
+      host.classList.add('rw-fixed-host');
+      el.classList.add('rw-fixed');
+      fitHeight();
+      addEventListener('resize', fitHeight);
+    }
+    // Theme: light | dark | auto (follow host). Query / data-theme / display.theme.
+    let themePref = String(opt('theme', 'theme', 'theme') || 'auto').toLowerCase();
+    if (!/^(light|dark|auto)$/.test(themePref)) themePref = 'auto';
+    host.dataset.theme = themePref;
+    const applyTheme = () => {
+      const resolved = themePref === 'auto' ? detectHostTheme() : themePref;
+      host.classList.toggle('rw-dark', resolved === 'dark');
+    };
+    applyTheme();
+    if (themePref === 'auto') {
+      const mo = new MutationObserver(applyTheme);
+      [document.documentElement, document.body].filter(Boolean).forEach(el => {
+        mo.observe(el, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-color-scheme', 'data-bs-theme'] });
+      });
+      try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (_) {}
+    }
+    el.innerHTML = `<div class="rw-loading">${esc(S.loading)}</div>`;
+    await fontsReady(el, D.font_timeout_ms);
+
+    const url = p => (/^(https?:|data:|\/)/.test(p) ? p : base + p);
+    const pname = p => (PLATFORMS[p] && PLATFORMS[p].name) || p;
+    const label = avg => (RL.find(x => avg >= x.min) || { label: '' }).label;
+    const fmtDate = d => new Date(d).toLocaleDateString(D.date_locale, D.date_options);
+    const stars = (n, cls = '') => `<span class="rw-stars ${cls}" role="img" aria-label="${fill(S.stars_aria, { rating: n })}">${[1, 2, 3, 4, 5].map(i => `<i class="${i <= Math.round(n) ? 'on' : ''}">${STAR}</i>`).join('')}</span>`;
+    // Icons: the site's own SVG (config `icon`, else <source>icons/<platform>.svg). Only if that file is missing or
+    // fails to load does the widget fall back to the Simple Icons CDN (slug = config `simple_icon` or the platform key).
+    const icon = (p, cls) => {
+      const P = PLATFORMS[p] || {};
+      const c = [cls, P.invert_icon_when_active ? 'rw-icon-invert' : ''].filter(Boolean).join(' ');
+      const fallback = SIMPLE_ICONS + encodeURIComponent(P.simple_icon || p);
+      return `<img${c ? ` class="${c}"` : ''} src="${esc(url(P.icon || `icons/${p}.svg`))}" data-fallback="${esc(fallback)}" alt="">`;
+    };
+    // Awards / Credentials / Testimonials pills: display.<kind>_icon (path or URL), else the built-in icon.
+    const tabIcon = p => (D[p + '_icon'] ? `<img src="${esc(url(D[p + '_icon']))}" alt="">` : TAB_ICONS[p]);
+    const useFallbackIcons = root => root.querySelectorAll('img[data-fallback]').forEach(img => {
+      const swap = () => { if (img.dataset.fallback) { img.src = img.dataset.fallback; delete img.dataset.fallback; } };
+      img.addEventListener('error', swap, { once: true }); // attached in the same task as innerHTML, before any load result
+    });
+
+    // ---- presentation helpers (data stays complete; only the display is abbreviated/clipped) ----
+    const isAllUpper = w => w === w.toUpperCase() && w !== w.toLowerCase();
+    const isAllLower = w => w === w.toLowerCase() && w !== w.toUpperCase();
+    const capitalize = w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    // 'Jane Doe' -> 'Jane D.'; 'Mary Smith (Smith Studio)' -> 'Mary S.'; 'Ann And Bob C.' -> 'Ann & Bob C.'; 'JANE D.' -> 'Jane D.'; 'AA' -> 'AA'
+    function displayName(name) {
+      if (!D.abbreviate_last_names) return (name || '').trim() || S.anonymous;
+      const words = (name || '').replace(/\(.*?\)/g, ' ').trim().split(/\s+/).filter(Boolean);
+      if (!words.length) return S.anonymous;
+      const fix = w => (isAllUpper(w) && w.length <= 2 ? w : isAllUpper(w) || isAllLower(w) ? capitalize(w) : w); // 'AA' (initials) stays
+      if (words.length === 1) return fix(words[0]);
+      let first = words.slice(0, -1);
+      const last = words[words.length - 1];
+      if (!(first.length >= 3 && ['and', '&'].includes(first[1].toLowerCase()))) first = first.slice(0, 1);
+      first = first.map(w => (['and', '&'].includes(w.toLowerCase()) ? '&' : fix(w)));
+      return first.join(' ') + ' ' + last.charAt(0).toUpperCase() + '.';
+    }
+    // First N characters at a word boundary, or the record's `excerpt` (an exact passage of the text) with ellipses
+    // where it starts/ends mid-text. With abbreviation on, the reviewer's own surname(s) shown as an initial.
+    function snippet(text, fullName, excerpt) {
+      let t = (text || '').replace(/\s+/g, ' ').trim();
+      const ex = String(excerpt ?? '').replace(/\s+/g, ' ').trim();
+      const at = ex ? t.indexOf(ex) : -1;
+      if (at >= 0) t = (at > 0 ? '… ' : '') + ex + (at + ex.length < t.length ? (/[.!?]$/.test(ex) ? ' …' : '…') : '');
+      if (D.abbreviate_last_names) {
+        const words = (fullName || '').replace(/[()]/g, ' ').split(/\s+/).map(w => w.replace(/^[.,]+|[.,]+$/g, ''));
+        for (const w of words.slice(1)) {
+          if (w.length > 1 && !['and', '&'].includes(w.toLowerCase())) {
+            t = t.replace(new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'), w.charAt(0).toUpperCase() + '.');
+          }
+        }
+      }
+      const cps = Array.from(t);
+      if (at >= 0 || !D.snippet_chars || cps.length <= D.snippet_chars) return t;
+      let cut = cps.slice(0, D.snippet_chars).join('');
+      if (cut.includes(' ')) cut = cut.slice(0, cut.lastIndexOf(' '));
+      return cut.replace(/[,.;:!?-]+$/, '') + '…';
+    }
+    // Card link: the individual review URL, or the platform page when the platform sets card_link: "page".
+    const cardHref = r => ((PLATFORMS[r.platform] || {}).card_link === 'page' ? PLATFORMS[r.platform].page_url : r.review_url);
+    const platformRel = key => linkRel(PLATFORMS[key] || {});
+    const cardRel = r => linkRel(r, PLATFORMS[r.platform] || {});
+
+    // Card order: deterministic, newest first, with gentle platform diversity (same on every load).
+    function diverseOrder(list) {
+      const rest = list.slice().sort(byNewest), out = [];
+      const RUN = D.max_same_platform_run, WINDOW = D.diversity_window_days;
+      while (rest.length) {
+        let i = 0;
+        const run = out.slice(-RUN);
+        // after RUN consecutive cards from one platform, prefer another platform if its newest review is <= WINDOW days older
+        if (RUN > 0 && run.length === RUN && run.every(r => r.platform === rest[0].platform)) {
+          const j = rest.findIndex(r => r.platform !== rest[0].platform);
+          const gapDays = j < 0 ? Infinity : (new Date(rest[0].date) - new Date(rest[j].date)) / 864e5;
+          if (gapDays <= WINDOW) i = j;
+        }
+        out.push(rest.splice(i, 1)[0]);
+      }
+      return out;
+    }
+
+    const summary = config.summary || null;
+    // Hidden reviews stay in the data but are never shown, counted, averaged or put in the JSON-LD:
+    // "hidden": true on the record, keys <platform>-<platform_review_id> in display.hide / data-hide / ?hide=
+    // (all three combine), and rated reviews below min_rating (unrated reviews stay).
+    const minRating = Number(opt('min_rating', 'minRating', 'min_rating')) || 0;
+    const keyList = v => (Array.isArray(v) ? v : String(v ?? '').split(',')).map(k => String(k).trim()).filter(Boolean);
+    const hideKeys = new Set([...keyList(D.hide), ...keyList(opts.hide), ...keyList(q.get('hide'))]);
+    const belowMin = x => minRating > 0 && typeof x.rating === 'number' && x.rating < minRating;
+    const all = reviews.filter(r => r.hidden !== true && !hideKeys.has(`${r.platform}-${r.platform_review_id}`) && !belowMin(r));
+    for (const r of all) {
+      r.id = r.id || `${r.platform}:${r.platform_review_id}`;
+      r.display_name = displayName(r.reviewer_name);
+      r.snippet_text = snippet(r.text, r.reviewer_name, r.excerpt);
+    }
+    // Rating-only reviews (empty/whitespace text) count in the header but never become cards, unless
+    // display.show_rating_only_reviews is true; then their card simply has no text element.
+    const hasText = r => !isBlank(r.text) && Boolean(r.snippet_text);
+    const withText = D.show_rating_only_reviews ? all.slice() : all.filter(hasText);
+    const newest = withText.slice().sort(byNewest);
+    const allOrder = diverseOrder(withText);
+    const present = Object.keys(PLATFORMS).filter(p => all.some(r => r.platform === p));
+    const writeDefault = config.default_write_platform || present[0];
+    injectSchema(buildSchema(), opts);
+
+    // schema.org JSON-LD: the business (config.schema.type, name, url, schema.extra) with an AggregateRating over the
+    // 1-5 star reviews and every review as a Review item (schema.max_reviews 0 = all): text reviews in the "All
+    // reviews" card order, then rating-only reviews newest first. Names and text are the abbreviated ones visitors
+    // see. A review without a 1-5 rating (Facebook "recommends") has no reviewRating and isn't in the aggregate;
+    // a review without text has no reviewBody. The summary card is never included.
+    function buildSchema() {
+      const SC = { enabled: true, type: 'LocalBusiness', max_reviews: 0, ...(config.schema || {}) };
+      const starred = all.filter(r => typeof r.rating === 'number');
+      if (!SC.enabled || !starred.length) return null;
+      const texts = all.filter(hasText), textIds = new Set(texts.map(r => r.id));
+      const order = [...diverseOrder(texts), ...all.filter(r => !textIds.has(r.id)).sort(byNewest)];
+      const listed = SC.max_reviews > 0 ? order.slice(0, SC.max_reviews) : order;
+      const biz = config.business || {};
+      return {
+        '@context': 'https://schema.org',
+        '@type': SC.type,
+        ...(biz.website ? { '@id': biz.website.replace(/\/?$/, '/') + '#business' } : {}),
+        name: biz.name,
+        ...(biz.website ? { url: biz.website } : {}),
+        ...(SC.extra || {}),
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: (starred.reduce((s, r) => s + r.rating, 0) / starred.length).toFixed(1),
+          bestRating: 5, worstRating: 1, ratingCount: starred.length, reviewCount: starred.length,
+        },
+        review: listed.map(r => ({
+          '@type': 'Review',
+          author: { '@type': 'Person', name: r.display_name },
+          datePublished: r.date.slice(0, 10),
+          ...(typeof r.rating === 'number' ? { reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 } } : {}),
+          ...(textIds.has(r.id) ? { reviewBody: r.snippet_text } : {}),
+          publisher: { '@type': 'Organization', name: pname(r.platform) },
+        })),
+      };
+    }
+    // Accolades (config-level): reused for the Awards tab and for merging into the review track.
+    const accoladesList = Array.isArray(config.accolades)
+      ? config.accolades
+          .filter(a => a && a.year != null && String(a.year).trim() && (a.icon || a.label || a.name))
+          .slice()
+          .sort((a, b) => {
+            const ya = Number(a.year), yb = Number(b.year);
+            const na = Number.isFinite(ya) ? ya : 0, nb = Number.isFinite(yb) ? yb : 0;
+            return nb - na;
+          })
+      : [];
+    const accoladeSortDate = a => {
+      const y = Number(a.year);
+      const year = Number.isFinite(y) ? Math.trunc(y) : 0;
+      return `${String(year).padStart(4, '0')}-12-31`;
+    };
+    const reviewSortDate = r => {
+      const d = String(r.date || '').slice(0, 10);
+      return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : '0000-00-00';
+    };
+    // Testimonials (config-level): review-like cards with optional corporate source (logo + own name line).
+    const testimonialSource = t => {
+      const s = t && t.source;
+      if (!s || typeof s !== 'object') return null;
+      const name = s.name != null ? String(s.name).trim() : '';
+      if (!name) return null;
+      const logo = s.logo != null && String(s.logo).trim() ? String(s.logo).trim() : '';
+      return { name, logo };
+    };
+    const testimonialsList = Array.isArray(config.testimonials)
+      ? config.testimonials
+          .filter(t => t && !isBlank(t.text) && t.date && t.title != null && String(t.title).trim() && !belowMin(t))
+          .map(t => ({
+            ...t,
+            _source: testimonialSource(t),
+            // title / subtitle are freeform (a person, a team, a company…): shown as written, never abbreviated.
+            display_name: String(t.title).trim(),
+            subtitle: t.subtitle != null ? String(t.subtitle).trim() : '',
+            snippet_text: snippet(t.text, t.title, t.excerpt),
+          }))
+          .sort((a, b) => String(b.date).localeCompare(String(a.date)))
+      : [];
+    // Credentials (licenses, certifications): placed by their start date, so a long-held license sits where it began
+    // instead of leading the track. Each card shows its date range.
+    const DATE_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+    const credentialsList = Array.isArray(config.credentials)
+      ? config.credentials
+          .filter(c => c && DATE_RE.test(String(c.start ?? '')) && [c.label, c.title, c.icon].some(v => v != null && String(v).trim()))
+          .map(c => {
+            const end = DATE_RE.test(String(c.end ?? '')) ? String(c.end) : '';
+            return { ...c, start: String(c.start), end, sortDate: (String(c.start) + '-01-01').slice(0, 10) };
+          })
+          .sort((a, b) => b.sortDate.localeCompare(a.sortDate))
+      : [];
+    const fmtPart = d => (d.length === 4 ? d : new Date(d + (d.length === 7 ? '-15' : '') + 'T12:00:00Z').toLocaleDateString(D.date_locale, d.length === 7 ? { year: 'numeric', month: 'short' } : D.date_options));
+    const credentialDates = c => {
+      if (!c.end) return fill(S.credential_since, { start: fmtPart(c.start) });
+      return fill(S.credential_range, { start: fmtPart(c.start), end: fmtPart(c.end) });
+    };
+    const initialsAvatar = name => {
+      const words = String(name || '').trim().split(/\s+/).filter(Boolean);
+      const letters = ((words[0] && words[0][0] || '') + (words.length > 1 ? words[words.length - 1][0] : '')).toUpperCase() || '?';
+      const palette = (config.avatars && Array.isArray(config.avatars.initials_palette) && config.avatars.initials_palette.length)
+        ? config.avatars.initials_palette : ['#555'];
+      const textColor = (config.avatars && config.avatars.initials_text_color) || '#fff';
+      let h = 0;
+      for (let i = 0; i < String(name || '').length; i++) h = (h * 31 + String(name).charCodeAt(i)) >>> 0;
+      const bg = palette[h % palette.length];
+      return `<span class="rw-avatar rw-initials" style="background:${esc(bg)};color:${esc(textColor)}" aria-hidden="true">${esc(letters)}</span>`;
+    };
+    let active = cfg.platform;
+    if (active === 'accolades' && !accoladesList.length) active = 'all';
+    if (active === 'testimonials' && !testimonialsList.length) active = 'all';
+    if (active === 'credentials' && !credentialsList.length) active = 'all';
+    if (!['all', 'accolades', 'credentials', 'testimonials', ...present].includes(active)) active = 'all';
+
+    function render() {
+      const onAccolades = active === 'accolades';
+      const onTestimonials = active === 'testimonials';
+      const onCredentials = active === 'credentials';
+      const onSpecial = onAccolades || onTestimonials || onCredentials;
+      // Header rating: platform filter uses that pool; Awards/Testimonials keep the overall business score.
+      const pool = onSpecial || active === 'all' ? all : all.filter(r => r.platform === active);
+      const rated = pool.filter(r => typeof r.rating === 'number');
+      const avg = rated.length ? rated.reduce((s, r) => s + r.rating, 0) / rated.length : 5;
+      // cards show the clipped snippet only. "All": newest first + gentle diversity; one platform: newest first.
+      // Awards / Testimonials tabs: no review cards (those kinds only).
+      let shown = onSpecial ? [] : active === 'all' ? allOrder : newest.filter(r => r.platform === active);
+      if (cfg.limit && !onSpecial) shown = shown.slice(0, cfg.limit);
+      const writeKey = (onSpecial || active === 'all') ? writeDefault : active;
+      const write = (PLATFORMS[writeKey] || {}).write_url || '#';
+
+      const tabKeys = [
+        'all', ...present,
+        ...(accoladesList.length ? ['accolades'] : []),
+        ...(credentialsList.length ? ['credentials'] : []),
+        ...(testimonialsList.length ? ['testimonials'] : []),
+      ];
+      const showTabs = present.length > 1 || accoladesList.length > 0 || testimonialsList.length > 0 || credentialsList.length > 0;
+      const tabs = showTabs ? `<div class="rw-tabs" role="tablist" aria-label="${esc(S.tabs_aria)}">
+        ${tabKeys.map(p => {
+          const isAcc = p === 'accolades';
+          const isTes = p === 'testimonials';
+          const isCred = p === 'credentials';
+          const n = p === 'all' ? all.length : isAcc ? accoladesList.length : isTes ? testimonialsList.length : isCred ? credentialsList.length : all.filter(r => r.platform === p).length;
+          const allSuffix = (S.tab_all_suffix || '').trim();
+          const allSuffixSp = allSuffix ? ' ' + allSuffix : '';
+          const name = p === 'all' ? S.tab_all + allSuffixSp : isAcc ? S.tab_accolades : isTes ? S.tab_testimonials : isCred ? S.tab_credentials : pname(p);
+          const titleTpl = isAcc ? S.tab_accolades_title : isTes ? S.tab_testimonials_title : isCred ? S.tab_credentials_title : S.tab_title;
+          const ariaTpl = isAcc ? S.tab_accolades_aria : isTes ? S.tab_testimonials_aria : isCred ? S.tab_credentials_aria : S.tab_aria;
+          const labelHtml = p === 'all'
+            ? `<span class="rw-tab-name">${esc(S.tab_all)}<span class="rw-tab-long">${esc(allSuffixSp)}</span></span>`
+            : isAcc
+              ? `${tabIcon('accolades')}<span class="rw-tab-name">${esc(S.tab_accolades)}</span>`
+              : isTes
+                ? `${tabIcon('testimonials')}<span class="rw-tab-name">${esc(S.tab_testimonials)}</span>`
+                : isCred
+                ? `${tabIcon('credentials')}<span class="rw-tab-name">${esc(S.tab_credentials)}</span>`
+                : `${icon(p)}<span class="rw-tab-name">${esc(name)}</span>`;
+          return `<button type="button" role="tab" class="rw-tab ${p === active ? 'is-active' : ''}" data-p="${p}" aria-selected="${p === active}"
+            title="${esc(fill(titleTpl, { name, count: n }))}" aria-label="${esc(fill(ariaTpl, { name, count: n }))}">
+            ${labelHtml}
+            <em>${n}</em></button>`;
+        }).join('')}
+        <div class="rw-tabs-overflow" hidden>
+          <button type="button" class="rw-tabs-more" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(S.tabs_more_aria)}" title="${esc(S.tabs_more)}">
+            <span>${esc(S.tabs_more)}</span><span class="rw-tabs-more-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="rw-tabs-menu" role="menu" hidden></div>
+        </div>
+      </div>` : '';
+
+      // The header always describes reviews: a platform's own, else all of them (Awards / Credentials / Testimonials too).
+      const basedCount = pool.length;
+      const basedUnit = basedCount === 1 ? S.review_one : S.review_many;
+      const basedPlatform = (!onSpecial && active !== 'all')
+        ? esc(fill(S.on_platform, { platform: pname(active) }))
+        : '';
+      const header = `<header class="rw-header">
+        <div class="rw-summary">
+          <div class="rw-score">${avg.toFixed(1)}</div>
+          <div>
+            <div class="rw-label">${esc(label(avg))}</div>
+            ${stars(avg, 'rw-stars-lg')}
+            <div class="rw-based"><span class="rw-based-pre">${esc((S.based_on || '').trimEnd())} </span><strong>${basedCount}</strong> ${esc(basedUnit)}<span class="rw-based-pre">${basedPlatform}</span></div>
+          </div>
+        </div>
+        <a class="rw-write" href="${esc(write)}" target="_blank" rel="${esc(platformRel(writeKey))}" aria-label="${esc(S.write_review)}"><span class="rw-write-long">${esc(S.write_review)}</span><span class="rw-write-short">${esc(S.write_review_short)}</span></a>
+        ${tabs}
+      </header>`;
+
+      // Track contents follow the active filter: Awards = accolades only, Testimonials = testimonials only, a
+      // platform = that platform's reviews only. Only All mixes kinds: accolades (sorted as YYYY-12-31 so they lead
+      // that year) and testimonials merge with the reviews by date, with at least one accolade before the first review.
+      let trackItems;
+      if (onAccolades) {
+        trackItems = accoladesList.map(a => ({ kind: 'accolade', accolade: a, sortDate: accoladeSortDate(a) }));
+      } else if (onCredentials) {
+        trackItems = credentialsList.map(c => ({ kind: 'credential', credential: c, sortDate: c.sortDate }));
+      } else if (onTestimonials) {
+        trackItems = testimonialsList.map(t => ({ kind: 'testimonial', testimonial: t, sortDate: reviewSortDate(t) }));
+      } else {
+        const mixed = active === 'all';
+        trackItems = [
+          ...(mixed ? accoladesList.map(a => ({ kind: 'accolade', accolade: a, sortDate: accoladeSortDate(a) })) : []),
+          ...(mixed ? credentialsList.map(c => ({ kind: 'credential', credential: c, sortDate: c.sortDate })) : []),
+          ...(mixed ? testimonialsList.map(t => ({ kind: 'testimonial', testimonial: t, sortDate: reviewSortDate(t) })) : []),
+          ...shown.map(r => ({ kind: 'review', review: r, sortDate: reviewSortDate(r) })),
+        ].sort((a, b) => {
+          if (a.sortDate !== b.sortDate) return a.sortDate < b.sortDate ? 1 : -1;
+          const rank = { accolade: 0, credential: 1, testimonial: 2, review: 3 };
+          return (rank[a.kind] ?? 9) - (rank[b.kind] ?? 9);
+        });
+        if (accoladesList.length && trackItems.length) {
+          const firstReviewIdx = trackItems.findIndex(i => i.kind === 'review');
+          const firstAccoladeIdx = trackItems.findIndex(i => i.kind === 'accolade');
+          if (firstAccoladeIdx > 0 && (firstReviewIdx < 0 || firstAccoladeIdx > firstReviewIdx)) {
+            const [item] = trackItems.splice(firstAccoladeIdx, 1);
+            trackItems.unshift(item);
+          }
+        }
+      }
+
+      const accoladeCard = a => {
+        // Same card chrome as reviews: title + year up top, badge in the middle; link cue only when url is set.
+        const rawCap = [a.label, a.name].find(v => v != null && String(v).trim());
+        const labelText = rawCap ? String(rawCap).trim() : '';
+        const title = labelText || S.tab_accolades;
+        const yearStr = String(a.year).trim();
+        const hasUrl = a.url && String(a.url).trim();
+        const aria = fill(hasUrl ? S.accolade_card_aria : S.accolade_card_aria_nolink, { label: title, year: yearStr || '' });
+        const img = a.icon ? `<img class="rw-accolade-badge" src="${esc(url(a.icon))}" alt="" loading="lazy">` : '';
+        const linkCue = hasUrl
+          ? `<span class="rw-link" aria-hidden="true">${esc(S.view_accolade)} <span class="rw-arrow">→</span></span>`
+          : '';
+        const inner = `<div class="rw-card-top">
+            <div class="rw-who">
+              <div class="rw-name">${esc(title)}</div>
+              ${yearStr ? `<time datetime="${esc(yearStr)}">${esc(yearStr)}</time>` : ''}
+            </div>
+          </div>
+          ${img}
+          ${linkCue}`;
+        if (hasUrl) {
+          return `<a class="rw-card rw-accolade-card" href="${esc(a.url)}" target="_blank" rel="${esc(linkRel(a))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
+        }
+        return `<div class="rw-card rw-accolade-card" role="article" aria-label="${esc(aria)}">${inner}</div>`;
+      };
+      const credentialCard = c => {
+        // Accolade-style card: title, issuer, date range up top; badge in the middle; link cue only when url is set.
+        const title = String(c.label || c.title || S.tab_credentials).trim();
+        const dates = credentialDates(c);
+        const hasUrl = c.url && String(c.url).trim();
+        const aria = fill(hasUrl ? S.credential_card_aria : S.credential_card_aria_nolink, { label: title, dates });
+        const img = c.icon ? `<img class="rw-accolade-badge" src="${esc(url(c.icon))}" alt="" loading="lazy">` : '';
+        const inner = `<div class="rw-card-top">
+            <div class="rw-who">
+              <div class="rw-name">${esc(title)}</div>
+              ${c.issuer ? `<div class="rw-subtitle">${esc(c.issuer)}</div>` : ''}
+              <time datetime="${esc(c.start)}">${esc(dates)}</time>
+            </div>
+          </div>
+          ${img}
+          ${hasUrl ? `<span class="rw-link" aria-hidden="true">${esc(c.link_text || S.view_credential)} <span class="rw-arrow">→</span></span>` : ''}`;
+        const cls = 'rw-card rw-accolade-card rw-credential-card';
+        if (hasUrl) return `<a class="${cls}" href="${esc(c.url)}" target="_blank" rel="${esc(linkRel(c))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
+        return `<div class="${cls}" role="article" aria-label="${esc(aria)}">${inner}</div>`;
+      };
+      // Every media item is shown as an image with an icon overlay; its label goes to aria-label / title only.
+      // The first item is the card's main content (large); any others are small chips.
+      const MEDIA_DEFAULT = { audio: 'audio.svg', video: 'video.svg', link: 'link.svg' };
+      const mediaItem = (t, m, i, alt) => {
+        const label = m.alt || m.caption || S['media_' + m.type];
+        const src = m.thumbnail || m.poster || (m.type === 'image' ? m.url : code + 'assets/media/' + MEDIA_DEFAULT[m.type]);
+        const cls = `rw-media-item rw-media-${m.type} ${i ? 'rw-media-chip' : 'rw-media-hero'}`;
+        const inner = `<img src="${esc(url(src))}" alt="${i ? '' : esc(alt)}" loading="lazy"><span class="rw-media-icon" aria-hidden="true">${MEDIA_ICON[m.type]}</span>`;
+        if (m.type === 'link') return `<a class="${cls}" href="${esc(url(m.url))}" target="_blank" rel="${esc(linkRel(m, t))}" aria-label="${esc(label)}" title="${esc(label)}">${inner}</a>`;
+        return `<button type="button" class="${cls}" data-media="${i}" aria-label="${esc(label)}" title="${esc(label)}">${inner}</button>`;
+      };
+      const testimonialCard = t => {
+        // Review-like chrome: title (same type as review names), then optional subtitle, then date. Source logo
+        // (when set) takes the avatar slot and reviewer_image is secondary. source.name is only used in the
+        // accessible label (when there is no subtitle); the visible second line is always just `subtitle`.
+        const source = t._source;
+        const clause = t.subtitle || (source && source.name) || '';
+        const sourceClause = clause && clause !== t.display_name
+          ? fill(S.testimonial_source_clause, { source: clause })
+          : '';
+        const hasUrl = t.url && String(t.url).trim();
+        const ariaTpl = hasUrl ? S.testimonial_card_aria : S.testimonial_card_aria_nolink;
+        const aria = fill(ariaTpl, { name: t.display_name, source_clause: sourceClause });
+        const reviewerImg = t.reviewer_image && String(t.reviewer_image).trim();
+        let primary, secondary = '';
+        if (source && source.logo) {
+          primary = `<img class="rw-avatar rw-source-logo" src="${esc(url(source.logo))}" alt="" loading="lazy" width="44" height="44">`;
+          if (reviewerImg) {
+            secondary = `<img class="rw-avatar-secondary" src="${esc(url(reviewerImg))}" alt="" loading="lazy" width="22" height="22">`;
+          }
+        } else if (reviewerImg) {
+          primary = `<img class="rw-avatar" src="${esc(url(reviewerImg))}" alt="" loading="lazy" width="44" height="44">`;
+        } else {
+          primary = initialsAvatar(t.display_name);
+        }
+        const rating = typeof t.rating === 'number' ? stars(t.rating) : '';
+        const media = (t.media || []).filter(m => m && m.url && MEDIA_TYPES.includes(m.type));
+        // With media, the media is the visible content; the quote stays in the DOM (visually hidden) and is the alt text.
+        const altText = String(t.excerpt || t.text || '').replace(/\s+/g, ' ').trim();
+        const text = isBlank(t.snippet_text) ? '' : `<p class="rw-text${media.length ? ' rw-sr' : ''}">${esc(media.length ? altText : t.snippet_text)}</p>`;
+        const linkRaw = t.link_text != null ? String(t.link_text).trim() : '';
+        const linkLabel = linkRaw || S.view_testimonial;
+        const linkCue = hasUrl
+          ? `<span class="rw-link" aria-hidden="true">${esc(linkLabel)} <span class="rw-arrow">→</span></span>`
+          : '';
+        // Media (letters, voicemail, video, posts) are buttons/links, so a card with media is not itself a link;
+        // its url becomes a real footer link instead.
+        const mediaRow = media.length ? `${mediaItem(t, media[0], 0, altText)}${media.length > 1 ? `<div class="rw-media">${media.slice(1).map((m, i) => mediaItem(t, m, i + 1, altText)).join('')}</div>` : ''}` : '';
+        const subtitleLine = t.subtitle ? `<div class="rw-subtitle">${esc(t.subtitle)}</div>` : '';
+        const inner = `<div class="rw-card-top">
+            ${primary}
+            <div class="rw-who">
+              <div class="rw-name">${esc(t.display_name)}</div>
+              ${subtitleLine}
+              <time datetime="${esc(t.date)}">${fmtDate(t.date)}</time>
+            </div>
+            ${secondary}
+          </div>
+          ${rating}
+          ${text}
+          ${mediaRow}
+          ${media.length && hasUrl ? `<a class="rw-link" href="${esc(t.url)}" target="_blank" rel="${esc(linkRel(t))}">${esc(linkLabel)} <span class="rw-arrow">→</span></a>` : linkCue}`;
+        if (media.length) {
+          return `<div class="rw-card rw-testimonial-card" role="article" data-t="${testimonialsList.indexOf(t)}" aria-label="${esc(fill(S.testimonial_card_aria_nolink, { name: t.display_name, source_clause: sourceClause }))}">${inner}</div>`;
+        }
+        if (hasUrl) {
+          return `<a class="rw-card rw-testimonial-card" href="${esc(t.url)}" target="_blank" rel="${esc(linkRel(t))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
+        }
+        return `<div class="rw-card rw-testimonial-card" role="article" aria-label="${esc(aria)}">${inner}</div>`;
+      };
+      const reviewCard = r => {
+        const name = pname(r.platform);
+        const rating = typeof r.rating === 'number' ? stars(r.rating) : `<span class="rw-rec">${THUMB}${esc(S.recommends)}</span>`;
+        const href = cardHref(r);
+        const hasUrl = href && String(href).trim();
+        const aria = fill(hasUrl ? S.card_aria : S.card_aria_nolink, { name: r.display_name, platform: name });
+        const linkCue = hasUrl
+          ? `<span class="rw-link" aria-hidden="true">${esc(fill(S.view_on, { platform: name }))} <span class="rw-arrow">→</span></span>`
+          : '';
+        const inner = `<div class="rw-card-top">
+            <img class="rw-avatar" src="${esc(url(r.reviewer_image))}" alt="" loading="lazy" width="44" height="44">
+            <div class="rw-who">
+              <div class="rw-name">${esc(r.display_name)}</div>
+              <time datetime="${esc(r.date)}">${fmtDate(r.date)}</time>
+            </div>
+            ${icon(r.platform, 'rw-platform')}
+          </div>
+          ${rating}
+          ${hasText(r) ? `<p class="rw-text">${esc(r.snippet_text)}</p>` : ''}
+          ${linkCue}`;
+        // Linked cards are one <a>; nothing inside is interactive. No URL → static article (no footer cue).
+        if (hasUrl) {
+          return `<a class="rw-card" data-platform="${esc(r.platform)}" href="${esc(href)}" target="_blank" rel="${esc(cardRel(r))}" aria-label="${esc(aria)}">${inner}</a>`;
+        }
+        return `<div class="rw-card" data-platform="${esc(r.platform)}" role="article" aria-label="${esc(aria)}">${inner}</div>`;
+      };
+
+      // Summary card: first card in "All" only; not a link, not counted, not in the JSON-LD.
+      // Headline: summary.title (config) or language/strings ai_summary (e.g. "Highlights").
+      const summaryTitle = (summary && summary.title != null && String(summary.title).trim())
+        ? String(summary.title).trim()
+        : S.ai_summary;
+      const ai = cfg.summary && active === 'all' && summary && !isBlank(summary.text)
+        ? `<div class="rw-card rw-ai" role="note" aria-label="${esc(fill(S.ai_summary_aria, { count: all.length }))}">
+          <div class="rw-ai-top"><span class="rw-ai-icon">${SPARKLE}</span><span class="rw-ai-label">${esc(summaryTitle)}</span></div>
+          <p class="rw-ai-text">${esc(summary.text)}</p>
+        </div>` : '';
+      const cards = ai + trackItems.map(item => {
+        if (item.kind === 'accolade') return accoladeCard(item.accolade);
+        if (item.kind === 'testimonial') return testimonialCard(item.testimonial);
+        if (item.kind === 'credential') return credentialCard(item.credential);
+        return reviewCard(item.review);
+      }).join('');
+
+      el.innerHTML = `${header}
+        <div class="rw-viewport">
+          ${cfg.layout === 'carousel' && cfg.arrows !== 'off' ? `<button class="rw-nav rw-prev" aria-label="${esc(S.previous)}">‹</button>` : ''}
+          <div class="rw-track">${cards}</div>
+          ${cfg.layout === 'carousel' && cfg.arrows !== 'off' ? `<button class="rw-nav rw-next" aria-label="${esc(S.next)}">›</button>` : ''}
+        </div>`;
+
+      useFallbackIcons(el);
+      fitSummary();
+      clampText();
+      bindTabs();
+      bindMedia();
+      fitTabs();
+      const track = el.querySelector('.rw-track');
+      const step = dir => track.scrollBy({ left: dir * track.clientWidth * 0.9, behavior: 'smooth' });
+      el.querySelector('.rw-prev')?.addEventListener('click', () => step(-1));
+      el.querySelector('.rw-next')?.addEventListener('click', () => step(1));
+      const upd = () => {
+        const p = el.querySelector('.rw-prev'), n = el.querySelector('.rw-next');
+        if (!p) return;
+        p.disabled = track.scrollLeft < 4;
+        n.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      };
+      track.addEventListener('scroll', upd, { passive: true });
+      upd();
+      if (!cfg.fixed) notifyHeight();
+    }
+    // Very short fixed-height boxes (CSS switches the snippet to -webkit-box): clamp it to the whole lines that fit.
+    function clampText() {
+      if (!cfg.fixed) return;
+      el.querySelectorAll('.rw-card .rw-text').forEach(t => {
+        t.style.removeProperty('-webkit-line-clamp');
+        if (getComputedStyle(t).display !== '-webkit-box') return;
+        const lh = parseFloat(getComputedStyle(t).lineHeight) || 18;
+        t.style.setProperty('-webkit-line-clamp', String(Math.max(1, Math.floor((t.clientHeight + 1) / lh))));
+      });
+    }
+    // If the summary text is taller than its card (narrow cards), it scrolls; fade the bottom edge to show that.
+    function fitSummary() {
+      const t = el.querySelector('.rw-ai-text');
+      if (t) t.classList.toggle('rw-ai-more', t.scrollHeight > t.clientHeight + 2 && t.scrollTop + t.clientHeight < t.scrollHeight - 2);
+    }
+    // Filter pills: use available width (All + as many as fit + Write outside). Overflow goes in a More menu.
+    // Active filter is always promoted into the visible row — never only behind More.
+    function closeTabsMenu() {
+      const more = el.querySelector('.rw-tabs-more');
+      const menu = el.querySelector('.rw-tabs-menu');
+      if (more) {
+        more.setAttribute('aria-expanded', 'false');
+        more.classList.remove('is-open');
+      }
+      if (menu) menu.hidden = true;
+    }
+    function bindTabs() {
+      const tabsEl = el.querySelector('.rw-tabs');
+      if (!tabsEl) return;
+      const moreBtn = tabsEl.querySelector('.rw-tabs-more');
+      const menu = tabsEl.querySelector('.rw-tabs-menu');
+      const selectFilter = p => {
+        // Re-clicking the active filter clears it (back to All / unfiltered).
+        active = p === active ? 'all' : p;
+        render();
+      };
+      tabsEl.addEventListener('click', e => {
+        const more = e.target.closest('.rw-tabs-more');
+        if (more && tabsEl.contains(more)) {
+          e.preventDefault();
+          const open = more.getAttribute('aria-expanded') === 'true';
+          if (open) closeTabsMenu();
+          else {
+            more.setAttribute('aria-expanded', 'true');
+            more.classList.add('is-open');
+            if (menu) menu.hidden = false;
+          }
+          return;
+        }
+        const tab = e.target.closest('.rw-tab[data-p]');
+        if (!tab || !tabsEl.contains(tab)) return;
+        e.preventDefault();
+        selectFilter(tab.dataset.p);
+      });
+      if (!el.__rwTabsOutside) {
+        el.__rwTabsOutside = true;
+        document.addEventListener('click', e => {
+          if (!el.contains(e.target)) closeTabsMenu();
+        });
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape') closeTabsMenu();
+        });
+      }
+    }
+    // Testimonial media: audio swaps its button for an inline player; images and video open in a modal <dialog>
+    // (Tab stays inside, Escape closes, focus returns to the button).
+    let lightbox;
+    function openLightbox(m, from) {
+      if (!lightbox) {
+        lightbox = document.createElement('dialog');
+        lightbox.className = 'rw-lightbox';
+        lightbox.addEventListener('click', e => { if (e.target === lightbox || e.target.closest('.rw-lightbox-close')) lightbox.close(); });
+        lightbox.addEventListener('keydown', e => { // keep Tab inside the dialog
+          if (e.key !== 'Tab') return;
+          const f = [...lightbox.querySelectorAll('button, video')];
+          const i = f.indexOf(document.activeElement), n = i + (e.shiftKey ? -1 : 1);
+          if (n < 0 || n >= f.length) { e.preventDefault(); f[(n + f.length) % f.length].focus(); }
+        });
+        lightbox.addEventListener('close', () => { lightbox.querySelector('video')?.pause(); lightbox.__from?.focus(); });
+        host.appendChild(lightbox);
+      }
+      const body = m.type === 'video'
+        ? `<video src="${esc(url(m.url))}"${m.poster ? ` poster="${esc(url(m.poster))}"` : ''} controls autoplay playsinline></video>`
+        : `<img src="${esc(url(m.url))}" alt="${esc(m.alt || m.caption || '')}">`;
+      lightbox.setAttribute('aria-label', m.alt || m.caption || S['media_' + m.type]);
+      lightbox.innerHTML = `<button type="button" class="rw-lightbox-close" aria-label="${esc(S.media_close)}">×</button>${body}`;
+      lightbox.__from = from;
+      lightbox.showModal();
+      lightbox.querySelector('.rw-lightbox-close').focus();
+    }
+    function bindMedia() {
+      el.querySelectorAll('.rw-media-item[data-media]').forEach(btn => btn.addEventListener('click', () => {
+        const t = testimonialsList[+btn.closest('[data-t]').dataset.t];
+        const m = (t.media || []).filter(x => x && x.url && MEDIA_TYPES.includes(x.type))[+btn.dataset.media];
+        if (m.type !== 'audio') return openLightbox(m, btn);
+        // Audio: first click adds a player under the image and starts it; later clicks play / pause.
+        let audio = btn.__audio;
+        if (!audio) {
+          audio = btn.__audio = document.createElement('audio');
+          audio.className = 'rw-media-player';
+          audio.controls = true;
+          audio.src = url(m.url);
+          audio.setAttribute('aria-label', m.alt || m.caption || S.media_audio);
+          btn.after(audio);
+          audio.addEventListener('play', () => btn.classList.add('is-playing'));
+          audio.addEventListener('pause', () => btn.classList.remove('is-playing'));
+        }
+        if (audio.paused) audio.play().catch(() => {}); else audio.pause();
+      }));
+    }
+    function fitTabs() {
+      const tabsEl = el.querySelector('.rw-tabs');
+      if (!tabsEl || getComputedStyle(tabsEl).display === 'none') return;
+      const overflow = tabsEl.querySelector('.rw-tabs-overflow');
+      const moreBtn = tabsEl.querySelector('.rw-tabs-more');
+      const menu = tabsEl.querySelector('.rw-tabs-menu');
+      if (!overflow || !moreBtn || !menu) return;
+
+      closeTabsMenu();
+      const pills = [...tabsEl.querySelectorAll(':scope > .rw-tab[data-p]')];
+      pills.forEach(p => { p.hidden = false; });
+      overflow.hidden = true;
+      menu.innerHTML = '';
+      if (pills.length <= 1) return;
+
+      const avail = tabsEl.clientWidth;
+      if (avail <= 0) return; // hidden or not laid out yet; the ResizeObserver re-fits once it has a width
+      const cs = getComputedStyle(tabsEl);
+      const gap = parseFloat(cs.columnGap || cs.gap) || 0;
+      // Whole pixels, rounded up, so sub-pixel widths never add up to a pill that overlaps the next control.
+      const widths = pills.map(p => Math.ceil(p.getBoundingClientRect().width));
+      const rowWidth = idxs => idxs.reduce((w, i, k) => w + widths[i] + (k ? gap : 0), 0);
+
+      // First pass: do all pills fit without More?
+      if (rowWidth(pills.map((_, i) => i)) <= avail) return;
+
+      // Need More: reserve its width (plus one gap), then keep All + the active filter and fill left to right.
+      overflow.hidden = false;
+      const moreW = Math.ceil(moreBtn.getBoundingClientRect().width);
+      const fits = set => rowWidth([...set].sort((a, b) => a - b)) + (set.size ? gap : 0) + moreW <= avail;
+      const activeIdx = Math.max(0, pills.findIndex(p => p.dataset.p === active));
+      // Very tight rows: keep only the active filter (All when nothing is selected) next to More.
+      let visible = new Set([0, activeIdx]);
+      if (!fits(visible)) visible = new Set([activeIdx]);
+      if (fits(visible)) {
+        for (let i = 1; i < pills.length; i++) {
+          if (visible.has(i)) continue;
+          visible.add(i);
+          if (!fits(visible)) visible.delete(i);
+          // Keep scanning: a narrower pill later in the list may still fit.
+        }
+      }
+
+      pills.forEach((p, i) => { p.hidden = !visible.has(i); });
+      // Safety net: if the laid-out row still overflows (e.g. a font swapped mid-measure), drop pills from the
+      // right (never the active one) until it fits.
+      for (let i = pills.length - 1; i >= 0 && tabsEl.scrollWidth > tabsEl.clientWidth + 1; i--) {
+        if (i !== activeIdx && visible.delete(i)) pills[i].hidden = true;
+      }
+      const overflowed = pills.filter((_, i) => !visible.has(i));
+
+      if (!overflowed.length) {
+        overflow.hidden = true;
+        return;
+      }
+
+      // Active is always promoted into the row, so menu items are never the selected filter.
+      menu.innerHTML = overflowed.map(p => {
+        const pKey = p.dataset.p;
+        return `<button type="button" role="menuitem" class="rw-tab" data-p="${pKey}"
+          aria-label="${esc(p.getAttribute('aria-label') || '')}" title="${esc(p.getAttribute('title') || '')}">${p.innerHTML}</button>`;
+      }).join('');
+    }
+    el.addEventListener('scroll', e => { if (e.target.classList && e.target.classList.contains('rw-ai-text')) fitSummary(); }, { capture: true, passive: true });
+    render();
+    reveal();
+    new ResizeObserver(() => { fitTabs(); fitSummary(); clampText(); if (!cfg.fixed) notifyHeight(); }).observe(el);
+    // A late webfont changes pill widths without resizing the widget: re-fit when fonts finish loading.
+    if (document.fonts) {
+      document.fonts.ready.then(fitTabs);
+      document.fonts.addEventListener?.('loadingdone', fitTabs);
+    }
+  }
+
+  // When rendered inside an iframe (embed.html), tell the parent page our height.
+  function notifyHeight() {
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'reviews-widget-height', height: document.documentElement.scrollHeight }, '*');
+    }
+  }
+
+  // ---- where to render (no class-name selectors) ----
+  const OPTION_KEYS = ['source', 'layout', 'platform', 'limit', 'schema', 'summary', 'theme', 'constrained', 'lang', 'minRating', 'hide', 'target'];
+  const BOOL_KEYS = ['constrained']; // bare data-constrained means true
+  const pick = ds => Object.fromEntries(OPTION_KEYS.filter(k => ds && ds[k] != null && (ds[k] !== '' || BOOL_KEYS.includes(k)))
+    .map(k => [k, ds[k] === '' ? 'true' : ds[k]]));
+  const scriptOpts = pick(ME && ME.dataset);
+  const claim = el => {
+    if (el.__reviewsWidget) return false;
+    el.__reviewsWidget = true;
+    return true;
+  };
+  function start() {
+    const target = ME && ME.dataset.target;
+    if (target) { // optional compatibility mount when in-place isn’t suitable
+      const el = document.querySelector(target);
+      if (!el) return console.warn('[reviews-widget] data-target not found:', target);
+      if (claim(el)) mount(el, { ...scriptOpts, ...pick(el.dataset) });
+      return;
+    }
+    // Preferred: render in place, right before this script tag
+    const el = document.createElement('div');
+    claim(el);
+    if (ME && ME.parentNode && !(document.head && document.head.contains(ME))) ME.parentNode.insertBefore(el, ME);
+    else document.body.appendChild(el);
+    mount(el, scriptOpts);
+  }
+  // Plain/async scripts can run while the page is still parsing; wait for <body> when needed.
+  // Deferred scripts run after parsing, so they render at once.
+  document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', start) : start();
+})();

@@ -11,7 +11,7 @@ Copy this whole folder to start a new data repo (includes `.github/workflows/val
 Branch `main`, site root, keep `.nojekyll`. Then point the widget at the published URL:
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/reviews-widget.js"
+<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
         data-source="https://YOUR_USER.github.io/YOUR_DATA_REPO/" defer></script>
 ```
 

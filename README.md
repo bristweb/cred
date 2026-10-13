@@ -12,7 +12,7 @@
 <a href="https://bristweb.github.io/reviews-widget/embed.html?source=https://bristweb.github.io/reviews-widget/example/" target="_blank" rel="noopener">iframe version</a> · <a href="https://bristweb.github.io/reviews-widget/embed.html?source=https://bristweb.github.io/reviews-widget/example/&constrained=true" target="_blank" rel="noopener">constrained / fixed-height box</a>
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/reviews-widget.js"
+<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
         data-source="https://bristweb.github.io/reviews-widget/example/" defer></script>
 ```
 
@@ -44,7 +44,7 @@ Same live demo URLs as at the top of this README. For a real site, keep the scri
 ### JavaScript (preferred)
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/reviews-widget.js"
+<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
         data-source="https://bristweb.github.io/reviews-widget/example/" defer></script>
 ```
 
@@ -63,7 +63,7 @@ Optional: `data-target="#…"` on the script mounts into that element instead (c
 If your host gives you a box with limited ability to adjust sizing and responsiveness (Google Sites: *Insert → Embed → Embed code*), turn on **one** toggle:
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/reviews-widget.js"
+<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
         data-source="https://bristweb.github.io/reviews-widget/example/"
         data-constrained="true"></script>
 ```
