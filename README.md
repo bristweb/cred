@@ -1,6 +1,6 @@
 # Reviews widget
 
-## <a href="https://bristweb.github.io/reviews-widget/?source=https://bristweb.github.io/reviews-widget/example/&theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://bristweb.github.io/reviews-widget/?source=https://bristweb.github.io/reviews-widget/example/&theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
+## <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v5.png" />
@@ -9,11 +9,11 @@
 </picture>
 
 
-<a href="https://bristweb.github.io/reviews-widget/embed.html?source=https://bristweb.github.io/reviews-widget/example/" target="_blank" rel="noopener">iframe version</a> · <a href="https://bristweb.github.io/reviews-widget/embed.html?source=https://bristweb.github.io/reviews-widget/example/&constrained=true" target="_blank" rel="noopener">constrained / fixed-height box</a>
+<a href="https://cred.bristleconeweb.com/embed.html?source=https://cred.bristleconeweb.com/example/" target="_blank" rel="noopener">iframe version</a> · <a href="https://cred.bristleconeweb.com/embed.html?source=https://cred.bristleconeweb.com/example/&constrained=true" target="_blank" rel="noopener">constrained / fixed-height box</a>
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
-        data-source="https://bristweb.github.io/reviews-widget/example/" defer></script>
+<script src="https://cred.bristleconeweb.com/assets/js/cred.js"
+        data-source="https://cred.bristleconeweb.com/example/" defer></script>
 ```
 
 Paste to try it. For a real site, keep the script `src` and change only `data-source` to your data store. More patterns: [Embed](#embed).
@@ -44,8 +44,8 @@ Same live demo URLs as at the top of this README. For a real site, keep the scri
 ### JavaScript (preferred)
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
-        data-source="https://bristweb.github.io/reviews-widget/example/" defer></script>
+<script src="https://cred.bristleconeweb.com/assets/js/cred.js"
+        data-source="https://cred.bristleconeweb.com/example/" defer></script>
 ```
 
 The widget renders where the tag is. It loads CSS from this repo and `theme/theme.css`, `config.json`, and every `reviews/<year>.json` from `data-source`, in parallel. Options go on the same tag ([list](#options)).
@@ -63,8 +63,8 @@ Optional: `data-target="#…"` on the script mounts into that element instead (c
 If your host gives you a box with limited ability to adjust sizing and responsiveness (Google Sites: *Insert → Embed → Embed code*), turn on **one** toggle:
 
 ```html
-<script src="https://bristweb.github.io/reviews-widget/assets/js/cred.js"
-        data-source="https://bristweb.github.io/reviews-widget/example/"
+<script src="https://cred.bristleconeweb.com/assets/js/cred.js"
+        data-source="https://cred.bristleconeweb.com/example/"
         data-constrained="true"></script>
 ```
 
@@ -74,7 +74,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 
 ```html
 <iframe id="reviews-widget"
-        src="https://bristweb.github.io/reviews-widget/embed.html?source=https://bristweb.github.io/reviews-widget/example/"
+        src="https://cred.bristleconeweb.com/embed.html?source=https://cred.bristleconeweb.com/example/"
         title="Reviews" loading="lazy" scrolling="no"
         style="width:100%;border:0;height:420px"></iframe>
 <script>

@@ -8,6 +8,8 @@
     "*.googleusercontent.com",
     "cred-d2r.pages.dev",
     "*.cred-d2r.pages.dev",
-    "localhost"
+    "cred.bristleconeweb.com",
+    "localhost",
+    "127.0.0.1"
   ]
 }
