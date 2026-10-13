@@ -97,6 +97,36 @@
   ],
   "testimonials": [
     {
+      "title": "June Park",
+      "subtitle": "Handwritten thank-you note",
+      "text": "Thank you for fixing up my granddaughter's first bike before her birthday. She rode it around the whole block twice!",
+      "date": "2026-09-20T12:00:00Z",
+      "media": [
+        {
+          "type": "image",
+          "url": "media/thank-you-note.jpg",
+          "thumbnail": "media/thank-you-note-thumb.jpg",
+          "caption": "Thank-you note",
+          "alt": "Handwritten thank-you note from June Park"
+        }
+      ]
+    },
+    {
+      "title": "Dana Ortiz",
+      "subtitle": "Daily commuter",
+      "text": "Left a voicemail after my brake fix because a review didn't feel like enough. Same-morning turnaround and the bike stops like new.",
+      "date": "2026-09-02T15:10:00Z",
+      "rating": 5,
+      "media": [
+        {
+          "type": "audio",
+          "url": "media/voicemail.m4a",
+          "caption": "Voicemail",
+          "alt": "Play Dana's voicemail"
+        }
+      ]
+    },
+    {
       "title": "Riley Chen",
       "subtitle": "Fleet Manager, Contoso Logistics",
       "reviewer_image": "images/reviewers/testimonial-riley-chen.svg",
@@ -119,7 +149,21 @@
       "source": {
         "name": "Summit Athletics",
         "logo": "icons/summit-athletics.svg"
-      }
+      },
+      "media": [
+        {
+          "type": "video",
+          "url": "media/ride-recap.mp4",
+          "poster": "media/ride-recap-poster.jpg",
+          "caption": "Group ride recap",
+          "alt": "Video: Summit Athletics group ride recap"
+        },
+        {
+          "type": "link",
+          "url": "https://example.com/social/summit-athletics/posts/spring-ride",
+          "caption": "Spring ride post"
+        }
+      ]
     }
   ]
 }

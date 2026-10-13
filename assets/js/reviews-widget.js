@@ -53,6 +53,7 @@
     testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
     testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
     testimonial_source_clause: ' ({source})',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close',
   };
   const DISPLAY = {
     layout: 'carousel', snippet_chars: 160, abbreviate_last_names: true, max_same_platform_run: 2,
@@ -70,8 +71,10 @@
     accolades: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2"/><path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2"/><path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3"/></svg>',
     testimonials: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14a2 2 0 0 0 2-2V8h-2"/><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M8 14a2 2 0 0 0 2-2V8H8"/></svg>',
   };
+  const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fill = (tpl, vars) => String(tpl).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  const MEDIA_TYPES = ['image', 'audio', 'video', 'link'];
   const isBlank = t => !String(t ?? '').replace(/[\s\u200b-\u200d\u2060\ufeff]+/g, '');
   const SIMPLE_ICONS = 'https://cdn.simpleicons.org/';
   const byNewest = (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id);
@@ -701,6 +704,19 @@
         }
         return `<div class="rw-card rw-accolade-card" role="article" aria-label="${esc(aria)}">${inner}</div>`;
       };
+      const mediaItem = (t, m, i) => {
+        const cap = m.caption ? String(m.caption) : '';
+        const label = cap || S['media_' + m.type];
+        const thumb = m.thumbnail || m.poster || (m.type === 'image' ? m.url : '');
+        const img = thumb ? `<img src="${esc(url(thumb))}" alt="" loading="lazy">` : '';
+        if (m.type === 'link') {
+          let host = '';
+          try { host = new URL(url(m.url), location.href).hostname.replace(/^www\./, ''); } catch (_) {}
+          return `<a class="rw-media-item rw-media-link" href="${esc(url(m.url))}" target="_blank" rel="${esc(linkRel(m, t))}">${img}<span class="rw-media-cap">${esc(label)}${host ? `<small>${esc(host)}</small>` : ''}</span></a>`;
+        }
+        const play = m.type === 'image' ? '' : `<span class="rw-media-play">${PLAY}</span>`;
+        return `<button type="button" class="rw-media-item rw-media-${m.type}${img ? '' : ' rw-media-bare'}" data-media="${i}" aria-label="${esc(m.alt || label)}">${img}${play}${img && m.type !== 'audio' ? '' : `<span class="rw-media-cap">${esc(label)}</span>`}</button>`;
+      };
       const testimonialCard = t => {
         // Review-like chrome: title (same type as review names), then optional subtitle, then date. Source logo
         // (when set) takes the avatar slot and reviewer_image is secondary. source.name is only used in the
@@ -732,6 +748,10 @@
         const linkCue = hasUrl
           ? `<span class="rw-link" aria-hidden="true">${esc(linkLabel)} <span class="rw-arrow">→</span></span>`
           : '';
+        // Media (letters, voicemail, video, posts) are buttons/links, so a card with media is not itself a link;
+        // its url becomes a real footer link instead.
+        const media = (t.media || []).filter(m => m && m.url && MEDIA_TYPES.includes(m.type));
+        const mediaRow = media.length ? `<div class="rw-media">${media.map((m, i) => mediaItem(t, m, i)).join('')}</div>` : '';
         const subtitleLine = t.subtitle ? `<div class="rw-subtitle">${esc(t.subtitle)}</div>` : '';
         const inner = `<div class="rw-card-top">
             ${primary}
@@ -744,7 +764,11 @@
           </div>
           ${rating}
           ${text}
-          ${linkCue}`;
+          ${mediaRow}
+          ${media.length && hasUrl ? `<a class="rw-link" href="${esc(t.url)}" target="_blank" rel="${esc(linkRel(t))}">${esc(linkLabel)} <span class="rw-arrow">→</span></a>` : linkCue}`;
+        if (media.length) {
+          return `<div class="rw-card rw-testimonial-card" role="article" data-t="${testimonialsList.indexOf(t)}" aria-label="${esc(fill(S.testimonial_card_aria_nolink, { name: t.display_name, source_clause: sourceClause }))}">${inner}</div>`;
+        }
         if (hasUrl) {
           return `<a class="rw-card rw-testimonial-card" href="${esc(t.url)}" target="_blank" rel="${esc(linkRel(t))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
         }
@@ -804,6 +828,7 @@
       fitSummary();
       clampText();
       bindTabs();
+      bindMedia();
       fitTabs();
       const track = el.querySelector('.rw-track');
       const step = dir => track.scrollBy({ left: dir * track.clientWidth * 0.9, behavior: 'smooth' });
@@ -882,6 +907,47 @@
           if (e.key === 'Escape') closeTabsMenu();
         });
       }
+    }
+    // Testimonial media: audio swaps its button for an inline player; images and video open in a modal <dialog>
+    // (Tab stays inside, Escape closes, focus returns to the button).
+    let lightbox;
+    function openLightbox(m, from) {
+      if (!lightbox) {
+        lightbox = document.createElement('dialog');
+        lightbox.className = 'rw-lightbox';
+        lightbox.addEventListener('click', e => { if (e.target === lightbox || e.target.closest('.rw-lightbox-close')) lightbox.close(); });
+        lightbox.addEventListener('keydown', e => { // keep Tab inside the dialog
+          if (e.key !== 'Tab') return;
+          const f = [...lightbox.querySelectorAll('button, video')];
+          const i = f.indexOf(document.activeElement), n = i + (e.shiftKey ? -1 : 1);
+          if (n < 0 || n >= f.length) { e.preventDefault(); f[(n + f.length) % f.length].focus(); }
+        });
+        lightbox.addEventListener('close', () => { lightbox.querySelector('video')?.pause(); lightbox.__from?.focus(); });
+        host.appendChild(lightbox);
+      }
+      const body = m.type === 'video'
+        ? `<video src="${esc(url(m.url))}"${m.poster ? ` poster="${esc(url(m.poster))}"` : ''} controls autoplay playsinline></video>`
+        : `<img src="${esc(url(m.url))}" alt="${esc(m.alt || m.caption || '')}">`;
+      lightbox.setAttribute('aria-label', m.alt || m.caption || S['media_' + m.type]);
+      lightbox.innerHTML = `<button type="button" class="rw-lightbox-close" aria-label="${esc(S.media_close)}">×</button>${body}${m.caption ? `<p>${esc(m.caption)}</p>` : ''}`;
+      lightbox.__from = from;
+      lightbox.showModal();
+      lightbox.querySelector('.rw-lightbox-close').focus();
+    }
+    function bindMedia() {
+      el.querySelectorAll('.rw-media-item[data-media]').forEach(btn => btn.addEventListener('click', () => {
+        const t = testimonialsList[+btn.closest('[data-t]').dataset.t];
+        const m = (t.media || []).filter(x => x && x.url && MEDIA_TYPES.includes(x.type))[+btn.dataset.media];
+        if (m.type !== 'audio') return openLightbox(m, btn);
+        const audio = document.createElement('audio');
+        audio.className = 'rw-media-player';
+        audio.controls = true;
+        audio.src = url(m.url);
+        audio.setAttribute('aria-label', m.alt || m.caption || S.media_audio);
+        btn.replaceWith(audio);
+        audio.play().catch(() => {});
+        audio.focus();
+      }));
     }
     function fitTabs() {
       const tabsEl = el.querySelector('.rw-tabs');

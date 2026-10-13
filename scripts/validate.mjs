@@ -51,7 +51,7 @@ if (config) {
 const platforms = (config && config.platforms) || {};
 const relIcon = (where, icon) => {
   if (icon && !/^(https?:)?\/\//.test(icon) && !icon.startsWith('data:') && !existsSync(path.join(root, icon)))
-    err(`config.json ${where}: icon ${icon} not found`);
+    err(`config.json ${where}: ${icon} not found`);
 };
 for (const [k, p] of Object.entries(platforms)) relIcon(`platforms.${k}`, p.icon || `icons/${k}.svg`);
 for (const l of (config && config.links) || []) relIcon(`links.${l.platform}`, l.icon);
@@ -63,6 +63,9 @@ for (const k of ['accolades_icon', 'testimonials_icon']) if (config?.display?.[k
 (Array.isArray(config?.testimonials) ? config.testimonials : []).forEach((t, i) => {
   if (!t || typeof t !== 'object') return;
   checkExcerpt(`config.json testimonials[${i}]`, t);
+  (Array.isArray(t.media) ? t.media : []).forEach((m, j) => {
+    for (const k of ['url', 'thumbnail', 'poster']) if (m?.[k] && !(m.type === 'link' && k === 'url')) relIcon(`testimonials[${i}].media[${j}].${k}`, String(m[k]));
+  });
   if (t.reviewer_name != null) err(`config.json testimonials[${i}]: reviewer_name is obsolete; use title (and optional subtitle)`);
   if (t.source && typeof t.source === 'object' && t.source.logo) relIcon(`testimonials[${i}].source`, t.source.logo);
   if (t.reviewer_image) {
