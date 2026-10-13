@@ -4,7 +4,7 @@ Sample data for [bristweb/cred](https://github.com/bristweb/cred). **Northwind C
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional; the platform names identify where each sample would appear.
 
-Copy this whole folder to start a new data repo (includes `.github/workflows/validate.yml`, `.nojekyll`, and `.gitignore`).
+Copy this whole folder to start a new data repo (includes `.github/workflows/validate.yml`, `.nojekyll`, `_headers` and `.gitignore`).
 
 ## Publish
 
