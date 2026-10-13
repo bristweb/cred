@@ -11,5 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: node --check assets/js/cred.js && node --check scripts/validate.mjs && node --check scripts/badge.mjs
+      - run: node --check assets/js/cred.js && node --check scripts/validate.mjs && node --check scripts/badge.mjs && node --check scripts/build-versions.mjs
+      - name: VERSION matches package.json
+        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" assets/js/cred.js
       - run: node scripts/validate.mjs example && node scripts/badge.mjs example && git diff --exit-code example/badge.json

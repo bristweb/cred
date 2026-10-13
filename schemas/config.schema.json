@@ -10,6 +10,11 @@
   ],
   "additionalProperties": true,
   "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^(latest|\\*|[~^]?\\d+(\\.\\d+){0,2}|\\d+(\\.\\d+)?\\.x)$",
+      "description": "Widget version to load: exact \"1.4.2\", caret \"^1\" / \"^1.4\", tilde \"~1.4\", \"1.x\" / \"1.4.x\", or \"latest\" / \"*\" (default)."
+    },
     "business": {
       "type": "object",
       "required": [
@@ -120,7 +125,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 480,
-          "description": "Optional max edge (px) for accolade logos in badge cards. Omit or 0 = fill the card\u2019s free space (with padding). Positive values cap the logo. One global setting \u2014 no per-item size/width/height."
+          "description": "Optional max edge (px) for accolade logos in badge cards. Omit or 0 = fill the card’s free space (with padding). Positive values cap the logo. One global setting — no per-item size/width/height."
         },
         "min_rating": {
           "type": "number",
@@ -194,7 +199,7 @@
     },
     "languages": {
       "type": "array",
-      "description": "Translation catalogs as { lang, url }. lang is an ISO language tag (en, en-us, es, \u2026); url is absolute or relative to the data root. Partial catalogs are fine; missing keys fall through to the widget's lang/en.json.",
+      "description": "Translation catalogs as { lang, url }. lang is an ISO language tag (en, en-us, es, …); url is absolute or relative to the data root. Partial catalogs are fine; missing keys fall through to the widget's lang/en.json.",
       "items": {
         "type": "object",
         "required": [
@@ -357,7 +362,7 @@
     },
     "testimonials": {
       "type": "array",
-      "description": "Optional testimonial cards merged into the review track by date (newest first) on the All tab, like accolades. Not tied to a review platform. When present, a Testimonials filter tab lists only these cards. Platform filters omit them. Each item needs title, text, and date; optional subtitle. Optional url (when set the card links with a footer cue; when omitted not clickable and no footer cue), link_text (footer cue when url is set; default Learn more / strings.view_testimonial), rating (1\u20135), reviewer_image. Optional source: if set, name is required; source.logo (when set) replaces the usual platform icon and is shown in the avatar position (reviewer image moves secondary). Same optional nofollow/noreferrer/rel as platforms.",
+      "description": "Optional testimonial cards merged into the review track by date (newest first) on the All tab, like accolades. Not tied to a review platform. When present, a Testimonials filter tab lists only these cards. Platform filters omit them. Each item needs title, text, and date; optional subtitle. Optional url (when set the card links with a footer cue; when omitted not clickable and no footer cue), link_text (footer cue when url is set; default Learn more / strings.view_testimonial), rating (1–5), reviewer_image. Optional source: if set, name is required; source.logo (when set) replaces the usual platform icon and is shown in the avatar position (reviewer image moves secondary). Same optional nofollow/noreferrer/rel as platforms.",
       "items": {
         "type": "object",
         "required": [
@@ -514,7 +519,7 @@
     },
     "credentials": {
       "type": "array",
-      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows its date range: Since <start>, or <start>\u2013<end>. Not counted in ratings or the JSON-LD.",
+      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows its date range: Since <start>, or <start>–<end>. Not counted in ratings or the JSON-LD.",
       "items": {
         "type": "object",
         "required": [

@@ -11,11 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags, for /v/ builds
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Build
-        run: rsync -a --exclude .git --exclude .github --exclude node_modules --exclude dist ./ dist/
+        run: |
+          rsync -a --exclude .git --exclude .github --exclude node_modules --exclude dist ./ dist/
+          node scripts/build-versions.mjs dist
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

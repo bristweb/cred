@@ -30,6 +30,46 @@
   const DEFAULT_BASE = ME && ME.src ? new URL('../../', ME.src).href : './'; // this repo's root (code + CSS)
   // Shared across every copy of this script on the page, so data and CSS load once.
   const SHARED = (window.__reviewsWidget ??= { css: {}, loads: {} });
+  // Build version (kept equal to package.json). config.json "version" may ask for another build: the matching
+  // /v/<x.y.z>/, /v/<major>/ or /v/<major>.<minor>/ copy is then loaded once and takes over, reusing the data
+  // already fetched. When this build satisfies the request (e.g. "^1" on any 1.x), nothing extra loads.
+  const VERSION = '1.0.0';
+  const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
+  function versionPath(want) {
+    const w = String(want == null ? '' : want).trim().toLowerCase();
+    if (!w || w === 'latest' || w === '*' || w === 'x') return null;
+    const [M, m, p] = VERSION.split('.').map(Number);
+    const ge = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+    let r;
+    if ((r = /^(\d+)\.(\d+)\.(\d+)$/.exec(w))) return w === VERSION ? null : `v/${w}/`;
+    if ((r = /^\^(\d+)(?:\.(\d+))?(?:\.(\d+))?$/.exec(w)) || (r = /^(\d+)(?:\.x)?$/.exec(w))) {
+      const req = [+r[1], +(r[2] || 0), +(r[3] || 0)];
+      return M === req[0] && ge([M, m, p], req) >= 0 ? null : `v/${req[0]}/`;
+    }
+    if ((r = /^~(\d+)\.(\d+)(?:\.(\d+))?$/.exec(w)) || (r = /^(\d+)\.(\d+)(?:\.x)?$/.exec(w))) {
+      const req = [+r[1], +r[2], +(r[3] || 0)];
+      return M === req[0] && m === req[1] && p >= req[2] ? null : `v/${req[0]}.${req[1]}/`;
+    }
+    console.warn('[reviews-widget] unsupported version range, using latest:', want);
+    return null;
+  }
+  const handoffs = (SHARED.handoff ??= []);
+  const scriptLoads = (SHARED.scripts ??= {});
+  // Hand a widget to another build: queue it and load that build's script once. If the script fails to load
+  // (e.g. a host without /v/ copies), this build renders it after all.
+  function handOff(url, host, opts) {
+    handoffs.push({ url, host, opts, css: DEFAULT_BASE + 'assets/css/cred.css' });
+    if (scriptLoads[url]) return;
+    scriptLoads[url] = true;
+    const tag = document.createElement('script');
+    tag.src = url;
+    tag.dataset.credHandoff = '';
+    tag.onerror = () => {
+      console.warn('[reviews-widget] could not load', url, '- using', VERSION);
+      for (const h of handoffs.filter(h => h.url === url)) { handoffs.splice(handoffs.indexOf(h), 1); mount(h.host, { ...h.opts, noVersion: true }); }
+    };
+    document.head.appendChild(tag);
+  }
   const STRINGS = {
     loading: 'Loading reviews…', unavailable: 'Reviews are unavailable right now.',
     tabs_aria: 'Filter reviews by platform, awards, credentials, or testimonials', tab_all: 'All', tab_all_suffix: '',
@@ -210,14 +250,17 @@
       return null;
     }));
   }
-  function load(code, src) {
+  function loadData(src) {
     return (loads[src] ??= (() => {
-      const css = Promise.all([ensureCss(code + 'assets/css/cred.css'), ensureCss(src + 'theme/theme.css')]);
-      const config = fetchJson(src + 'config.json');
+      const config = ((SHARED.configs ??= {})[src] = fetchJson(src + 'config.json'));
       const reviews = config.then(c => Promise.all(((c.reviews && c.reviews.years) || []).map(y => fetchJson(`${src}reviews/${y}.json`))))
         .then(years => [].concat(...years));
-      return Promise.all([config, reviews, css]);
+      return Promise.all([config, reviews]);
     })());
+  }
+  // Data + CSS start together; resolves [config, reviews] once both are ready.
+  function load(code, src) {
+    return Promise.all([loadData(src), ensureCss(code + 'assets/css/cred.css'), ensureCss(src + 'theme/theme.css')]).then(([d]) => d);
   }
   // schema.org JSON-LD, built from the reviews on load -> one <script type="application/ld+json"> in <head> per page.
   // Off when config.schema.enabled is false or any widget script/target has data-schema="off".
@@ -320,6 +363,14 @@
     let config, reviews;
     try {
       if (!base) throw new Error('[reviews-widget] data-source is required (URL of a data repo root, ending in /)');
+      if (!VERSIONED && !opts.noVersion) {
+        // Data first (shared and cached), so a version switch never refetches it or loads this build's CSS.
+        ensureCss(code + 'assets/css/cred.css'); // in parallel; dropped again if another build takes over
+        loadData(base);
+        const c = await SHARED.configs[base];
+        const v = versionPath(c.version);
+        if (v) { host.innerHTML = ''; handOff(DEFAULT_BASE + v + 'assets/js/cred.js', host, opts); return; }
+      }
       [config, reviews] = await load(code, base);
     } catch (e) {
       console.warn(e);
@@ -1105,6 +1156,15 @@
     return true;
   };
   function start() {
+    if (ME && ME.dataset.credHandoff != null) { // loaded by another build for the widgets it queued
+      for (const h of handoffs.filter(h => h.url === ME.src)) {
+        handoffs.splice(handoffs.indexOf(h), 1);
+        if (h.css !== DEFAULT_BASE + 'assets/css/cred.css') { document.querySelectorAll('link[rel~="stylesheet"]').forEach(l => { if (l.href === h.css) l.remove(); });
+        delete SHARED.css[h.css]; }
+        mount(h.host, h.opts);
+      }
+      return;
+    }
     const target = ME && ME.dataset.target;
     if (target) { // optional compatibility mount when in-place isn’t suitable
       const el = document.querySelector(target);
