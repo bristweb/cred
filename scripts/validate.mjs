@@ -40,6 +40,8 @@ const readJson = f => {
   catch (e) { err(`${f}: ${e.code === 'ENOENT' ? 'missing' : 'invalid JSON (' + e.message + ')'}`); return null; }
 };
 const fmt = (prefix, e) => `${prefix}: ${e.instancePath || '/'} ${e.message}${e.params?.allowedValues ? ` (${e.params.allowedValues.join('|')})` : ''}`;
+const norm = s => String(s ?? '').replace(/\s+/g, ' ').trim();
+const checkExcerpt = (at, r) => { if (r?.excerpt != null && !norm(r.text).includes(norm(r.excerpt))) err(`${at}: excerpt is not an exact passage of text`); };
 const isIso = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(s) && !Number.isNaN(Date.parse(s));
 
 const config = readJson('config.json');
@@ -60,6 +62,7 @@ for (const k of ['accolades_icon', 'testimonials_icon']) if (config?.display?.[k
 });
 (Array.isArray(config?.testimonials) ? config.testimonials : []).forEach((t, i) => {
   if (!t || typeof t !== 'object') return;
+  checkExcerpt(`config.json testimonials[${i}]`, t);
   if (t.reviewer_name != null) err(`config.json testimonials[${i}]: reviewer_name is obsolete; use title (and optional subtitle)`);
   if (t.source && typeof t.source === 'object' && t.source.logo) relIcon(`testimonials[${i}].source`, t.source.logo);
   if (t.reviewer_image) {
@@ -126,6 +129,7 @@ for (const y of years) {
   if (!Array.isArray(list)) continue;
   list.forEach((r, i) => {
     const at = `${f}[${i}]`;
+    checkExcerpt(at, r);
     if (r.platform && !platforms[r.platform]) err(`${at}: platform "${r.platform}" is not in config.json platforms`);
     if (r.date && isIso(r.date) && r.date.slice(0, 4) !== String(y)) err(`${at}: dated ${r.date.slice(0, 10)} but stored in ${f}`);
     if (i && r.date > list[i - 1].date) err(`${at}: not newest first`);

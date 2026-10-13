@@ -413,9 +413,13 @@
       first = first.map(w => (['and', '&'].includes(w.toLowerCase()) ? '&' : fix(w)));
       return first.join(' ') + ' ' + last.charAt(0).toUpperCase() + '.';
     }
-    // First N characters at a word boundary; with abbreviation on, the reviewer's own surname(s) shown as an initial.
-    function snippet(text, fullName) {
+    // First N characters at a word boundary, or the record's `excerpt` (an exact passage of the text) with ellipses
+    // where it starts/ends mid-text. With abbreviation on, the reviewer's own surname(s) shown as an initial.
+    function snippet(text, fullName, excerpt) {
       let t = (text || '').replace(/\s+/g, ' ').trim();
+      const ex = String(excerpt ?? '').replace(/\s+/g, ' ').trim();
+      const at = ex ? t.indexOf(ex) : -1;
+      if (at >= 0) t = (at > 0 ? '… ' : '') + ex + (at + ex.length < t.length ? (/[.!?]$/.test(ex) ? ' …' : '…') : '');
       if (D.abbreviate_last_names) {
         const words = (fullName || '').replace(/[()]/g, ' ').split(/\s+/).map(w => w.replace(/^[.,]+|[.,]+$/g, ''));
         for (const w of words.slice(1)) {
@@ -425,7 +429,7 @@
         }
       }
       const cps = Array.from(t);
-      if (!D.snippet_chars || cps.length <= D.snippet_chars) return t;
+      if (at >= 0 || !D.snippet_chars || cps.length <= D.snippet_chars) return t;
       let cut = cps.slice(0, D.snippet_chars).join('');
       if (cut.includes(' ')) cut = cut.slice(0, cut.lastIndexOf(' '));
       return cut.replace(/[,.;:!?-]+$/, '') + '…';
@@ -465,7 +469,7 @@
     for (const r of all) {
       r.id = r.id || `${r.platform}:${r.platform_review_id}`;
       r.display_name = displayName(r.reviewer_name);
-      r.snippet_text = snippet(r.text, r.reviewer_name);
+      r.snippet_text = snippet(r.text, r.reviewer_name, r.excerpt);
     }
     // Rating-only reviews (empty/whitespace text) count in the header but never become cards, unless
     // display.show_rating_only_reviews is true; then their card simply has no text element.
@@ -550,7 +554,7 @@
             // title / subtitle are freeform (a person, a team, a company…): shown as written, never abbreviated.
             display_name: String(t.title).trim(),
             subtitle: t.subtitle != null ? String(t.subtitle).trim() : '',
-            snippet_text: snippet(t.text, t.title),
+            snippet_text: snippet(t.text, t.title, t.excerpt),
           }))
           .sort((a, b) => String(b.date).localeCompare(String(a.date)))
       : [];

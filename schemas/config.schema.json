@@ -431,6 +431,11 @@
           "rel": {
             "type": "string",
             "description": "Optional space-separated rel tokens; same rules as platforms.*.rel."
+          },
+          "excerpt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Optional. Exact passage of text shown on the card instead of the opening characters (same rules as reviews)."
           }
         }
       }
