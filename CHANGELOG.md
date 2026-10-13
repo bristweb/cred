@@ -2,6 +2,10 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.0.4 (2026-10-13)
+
+- Shorter credit link tooltip.
+
 ## 1.0.3 (2026-10-13)
 
 - Credit link tooltip now explains, in plain words, where the reviews come from.
