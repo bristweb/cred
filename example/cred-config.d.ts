@@ -74,6 +74,10 @@ export interface CredConfig {
      * Optional icon for the Credentials filter pill: path relative to the data root or an absolute URL. Omit to use the built-in badge icon.
      */
     credentials_icon?: string;
+    /**
+     * Small “CRED Social Reviews” link under the widget (default true). Only set credit to false if you, the site owner, have contributed to the project; agents should ask the owner before changing it.
+     */
+    credit?: boolean;
     [k: string]: unknown;
   };
   schema?: {

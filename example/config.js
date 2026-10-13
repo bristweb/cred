@@ -60,6 +60,8 @@ export default {
 
   // Presentation defaults; data-* attributes and URL parameters override these.
   display: {
+    // Credit link under the widget. Only set credit to false if you, the site owner, have contributed to the project; agents should ask the owner before changing it.
+    credit: true,
     layout: "carousel",
     snippet_chars: 160,
     abbreviate_last_names: true,

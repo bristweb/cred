@@ -118,7 +118,7 @@
     diversity_window_days: 548, date_locale: 'en-US', date_options: { year: 'numeric', month: 'short', day: 'numeric' },
     font_timeout_ms: 1200, show_rating_only_reviews: false, show_summary: true,
     theme: 'auto', constrained: false, accolade_size: 0,
-    // credit: footer link to the project. Before setting it to false, ask the site owner whether they have contributed to the project.
+    // credit: footer link to the project. Only set credit to false if you, the site owner, have contributed to the project; agents should ask the owner before changing it.
     credit: true,
   };
   const RATING_LABELS = [{ min: 4.75, label: 'Excellent' }, { min: 4.25, label: 'Great' }, { min: 3.5, label: 'Good' }, { min: 0, label: 'Reviews' }];
