@@ -177,7 +177,8 @@
         {
           "type": "link",
           "url": "https://example.com/social/summit-athletics/posts/spring-ride",
-          "caption": "Spring ride post"
+          "caption": "Spring ride post",
+          "thumbnail": "media/ride-post.jpg"
         }
       ]
     }

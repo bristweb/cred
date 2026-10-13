@@ -77,6 +77,11 @@
     testimonials: '<svg class="rw-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14a2 2 0 0 0 2-2V8h-2"/><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M8 14a2 2 0 0 0 2-2V8H8"/></svg>',
   };
   const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
+  const MEDIA_ICON = {
+    audio: PLAY, video: PLAY,
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+  };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fill = (tpl, vars) => String(tpl).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
   const MEDIA_TYPES = ['image', 'audio', 'video', 'link'];
@@ -752,18 +757,16 @@
         if (hasUrl) return `<a class="${cls}" href="${esc(c.url)}" target="_blank" rel="${esc(linkRel(c))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
         return `<div class="${cls}" role="article" aria-label="${esc(aria)}">${inner}</div>`;
       };
-      const mediaItem = (t, m, i) => {
-        const cap = m.caption ? String(m.caption) : '';
-        const label = cap || S['media_' + m.type];
-        const thumb = m.thumbnail || m.poster || (m.type === 'image' ? m.url : '');
-        const img = thumb ? `<img src="${esc(url(thumb))}" alt="" loading="lazy">` : '';
-        if (m.type === 'link') {
-          let host = '';
-          try { host = new URL(url(m.url), location.href).hostname.replace(/^www\./, ''); } catch (_) {}
-          return `<a class="rw-media-item rw-media-link" href="${esc(url(m.url))}" target="_blank" rel="${esc(linkRel(m, t))}">${img}<span class="rw-media-cap">${esc(label)}${host ? `<small>${esc(host)}</small>` : ''}</span></a>`;
-        }
-        const play = m.type === 'image' ? '' : `<span class="rw-media-play">${PLAY}</span>`;
-        return `<button type="button" class="rw-media-item rw-media-${m.type}${img ? '' : ' rw-media-bare'}" data-media="${i}" aria-label="${esc(m.alt || label)}">${img}${play}${img && m.type !== 'audio' ? '' : `<span class="rw-media-cap">${esc(label)}</span>`}</button>`;
+      // Every media item is shown as an image with an icon overlay; its label goes to aria-label / title only.
+      // The first item is the card's main content (large); any others are small chips.
+      const MEDIA_DEFAULT = { audio: 'audio.svg', video: 'video.svg', link: 'link.svg' };
+      const mediaItem = (t, m, i, alt) => {
+        const label = m.alt || m.caption || S['media_' + m.type];
+        const src = m.thumbnail || m.poster || (m.type === 'image' ? m.url : code + 'assets/media/' + MEDIA_DEFAULT[m.type]);
+        const cls = `rw-media-item rw-media-${m.type} ${i ? 'rw-media-chip' : 'rw-media-hero'}`;
+        const inner = `<img src="${esc(url(src))}" alt="${i ? '' : esc(alt)}" loading="lazy"><span class="rw-media-icon" aria-hidden="true">${MEDIA_ICON[m.type]}</span>`;
+        if (m.type === 'link') return `<a class="${cls}" href="${esc(url(m.url))}" target="_blank" rel="${esc(linkRel(m, t))}" aria-label="${esc(label)}" title="${esc(label)}">${inner}</a>`;
+        return `<button type="button" class="${cls}" data-media="${i}" aria-label="${esc(label)}" title="${esc(label)}">${inner}</button>`;
       };
       const testimonialCard = t => {
         // Review-like chrome: title (same type as review names), then optional subtitle, then date. Source logo
@@ -790,7 +793,10 @@
           primary = initialsAvatar(t.display_name);
         }
         const rating = typeof t.rating === 'number' ? stars(t.rating) : '';
-        const text = !isBlank(t.snippet_text) ? `<p class="rw-text">${esc(t.snippet_text)}</p>` : '';
+        const media = (t.media || []).filter(m => m && m.url && MEDIA_TYPES.includes(m.type));
+        // With media, the media is the visible content; the quote stays in the DOM (visually hidden) and is the alt text.
+        const altText = String(t.excerpt || t.text || '').replace(/\s+/g, ' ').trim();
+        const text = isBlank(t.snippet_text) ? '' : `<p class="rw-text${media.length ? ' rw-sr' : ''}">${esc(media.length ? altText : t.snippet_text)}</p>`;
         const linkRaw = t.link_text != null ? String(t.link_text).trim() : '';
         const linkLabel = linkRaw || S.view_testimonial;
         const linkCue = hasUrl
@@ -798,8 +804,7 @@
           : '';
         // Media (letters, voicemail, video, posts) are buttons/links, so a card with media is not itself a link;
         // its url becomes a real footer link instead.
-        const media = (t.media || []).filter(m => m && m.url && MEDIA_TYPES.includes(m.type));
-        const mediaRow = media.length ? `<div class="rw-media">${media.map((m, i) => mediaItem(t, m, i)).join('')}</div>` : '';
+        const mediaRow = media.length ? `${mediaItem(t, media[0], 0, altText)}${media.length > 1 ? `<div class="rw-media">${media.slice(1).map((m, i) => mediaItem(t, m, i + 1, altText)).join('')}</div>` : ''}` : '';
         const subtitleLine = t.subtitle ? `<div class="rw-subtitle">${esc(t.subtitle)}</div>` : '';
         const inner = `<div class="rw-card-top">
             ${primary}
@@ -978,7 +983,7 @@
         ? `<video src="${esc(url(m.url))}"${m.poster ? ` poster="${esc(url(m.poster))}"` : ''} controls autoplay playsinline></video>`
         : `<img src="${esc(url(m.url))}" alt="${esc(m.alt || m.caption || '')}">`;
       lightbox.setAttribute('aria-label', m.alt || m.caption || S['media_' + m.type]);
-      lightbox.innerHTML = `<button type="button" class="rw-lightbox-close" aria-label="${esc(S.media_close)}">×</button>${body}${m.caption ? `<p>${esc(m.caption)}</p>` : ''}`;
+      lightbox.innerHTML = `<button type="button" class="rw-lightbox-close" aria-label="${esc(S.media_close)}">×</button>${body}`;
       lightbox.__from = from;
       lightbox.showModal();
       lightbox.querySelector('.rw-lightbox-close').focus();
@@ -988,14 +993,19 @@
         const t = testimonialsList[+btn.closest('[data-t]').dataset.t];
         const m = (t.media || []).filter(x => x && x.url && MEDIA_TYPES.includes(x.type))[+btn.dataset.media];
         if (m.type !== 'audio') return openLightbox(m, btn);
-        const audio = document.createElement('audio');
-        audio.className = 'rw-media-player';
-        audio.controls = true;
-        audio.src = url(m.url);
-        audio.setAttribute('aria-label', m.alt || m.caption || S.media_audio);
-        btn.replaceWith(audio);
-        audio.play().catch(() => {});
-        audio.focus();
+        // Audio: first click adds a player under the image and starts it; later clicks play / pause.
+        let audio = btn.__audio;
+        if (!audio) {
+          audio = btn.__audio = document.createElement('audio');
+          audio.className = 'rw-media-player';
+          audio.controls = true;
+          audio.src = url(m.url);
+          audio.setAttribute('aria-label', m.alt || m.caption || S.media_audio);
+          btn.after(audio);
+          audio.addEventListener('play', () => btn.classList.add('is-playing'));
+          audio.addEventListener('pause', () => btn.classList.remove('is-playing'));
+        }
+        if (audio.paused) audio.play().catch(() => {}); else audio.pause();
       }));
     }
     function fitTabs() {
