@@ -59,7 +59,7 @@
     testimonial_source_clause: ' ({source})',
     media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'CRED: free, open-source review and testimonial widget. Your reviews, your data, no tracking.',
   };
-  const CREDIT_URL = 'https://github.com/bristweb/cred';
+  const CREDIT_URL = 'https://cred.bristleconeweb.com/';
   const DISPLAY = {
     layout: 'carousel', snippet_chars: 160, abbreviate_last_names: true, max_same_platform_run: 2,
     diversity_window_days: 548, date_locale: 'en-US', date_options: { year: 'numeric', month: 'short', day: 'numeric' },
