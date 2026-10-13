@@ -1,12 +1,15 @@
 # Reusable check for a reviews data repo. A data repo calls it with:
+#   permissions:
+#     contents: write
 #   jobs:
 #     validate:
 #       uses: bristweb/reviews-widget/.github/workflows/validate.yml@main
+# After validating, it rewrites badge.json / badge.svg (rating badge) and commits them to the default branch when they change.
 name: Validate reviews data
 on:
   workflow_call:
 permissions:
-  contents: read
+  contents: write
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -22,3 +25,12 @@ jobs:
       - run: npm ci
         working-directory: widget
       - run: node widget/scripts/validate.mjs data
+      - run: node widget/scripts/badge.mjs data
+      - name: Commit badge files
+        if: github.ref_name == github.event.repository.default_branch
+        working-directory: data
+        run: |
+          git add badge.json badge.svg
+          git diff --cached --quiet && exit 0
+          git -c user.name=github-actions[bot] -c user.email=41898193+github-actions[bot]@users.noreply.github.com commit -m "Update rating badge"
+          git push

@@ -5,6 +5,8 @@ name: Validate reviews data
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write # lets the check commit the updated rating badge (badge.json, badge.svg)
 jobs:
   validate:
     uses: bristweb/reviews-widget/.github/workflows/validate.yml@main
