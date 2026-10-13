@@ -1,0 +1,13 @@
+{
+  "allowed_origins": [
+    "heatherwolfeart.com",
+    "www.heatherwolfeart.com",
+    "fastonepro.com",
+    "www.fastonepro.com",
+    "sites.google.com",
+    "*.googleusercontent.com",
+    "cred-d2r.pages.dev",
+    "*.cred-d2r.pages.dev",
+    "localhost"
+  ]
+}
