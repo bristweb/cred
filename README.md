@@ -277,7 +277,7 @@ Above those heights, long card text scrolls inside its card.
 
 Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.json`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish on any static host (GitHub Pages: branch `main`, site root, keep `.nojekyll`). Point the widget’s `data-source` at that published URL.
 
-To limit which sites can load your data, host it on Cloudflare Pages with a `functions/_middleware.js` like [bristweb/heather-wolfe-art-reviews](https://github.com/bristweb/heather-wolfe-art-reviews/blob/main/functions/_middleware.js) and list allowed hostnames in `config.json` as `"allowed_origins": ["example.com", "*.example.com"]`. Other sites get a 403; direct visits and crawlers (no Origin/Referer) are still served. This is a browser-side deterrent, not access control.
+Optional hotlink allowlist for self-hosters on Cloudflare Pages: copy `functions/_middleware.js` and `allowlist.json` (both in `example/`) to the site root and list hostnames in `allowlist.json` as `"allowed_origins": ["example.com", "*.example.com"]`. An empty list (the default) serves everyone with `Access-Control-Allow-Origin: *`. With hosts listed, other sites get a 403; direct visits and crawlers (no Origin/Referer) are still served. It only deters hotlinking, since the headers can be left out or forged; it does not secure anything. This repo's own deployment uses it for the widget files ([`allowlist.json`](allowlist.json)).
 
 ---
 
