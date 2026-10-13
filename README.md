@@ -226,24 +226,23 @@ Built in the browser and injected once per page as `#reviews-widget-schema`. `@t
 
 ## Header behavior
 
-Container queries on the widget’s own width (and height when constrained / `.rw-fixed`):
+Container queries on the widget’s own width, shared by the header and the carousel (and on its height in constrained / `.rw-fixed` mode):
 
-| Width | Header |
-|---|---|
-| > 1020px | full score row; All + as many filter pills as fit + **More** overflow menu; Write |
-| ≤ 1020px | tabs → icon + count (still fit-to-width; overflow in More; no horizontal scroll) |
-| ≤ 720px | hide “Excellent” / “Based on” |
-| ≤ 575px | hide tabs |
-| ≤ 360px | button label → short string |
+| Width | Header | Carousel |
+|---|---|---|
+| > 1000px | score row; All + as many filter pills as fit + **More** menu; Write | 4 cards |
+| ≤ 1000px | filter pills → icon + count | 3 cards |
+| ≤ 760px | hide “Excellent” / “Based on” | 2 cards |
+| ≤ 480px | hide filters; short button label; no arrows | 1 card |
 
-Filter pills never wrap or scroll horizontally. The active filter is always kept as a visible pill (promoted out of More if needed). Write stays outside the overflow control.
+Between these widths the filter row fits itself: pills never wrap or scroll, the rest go into More, and the active filter always stays visible. Write stays outside the More menu.
 
 | Height (fixed mode) | |
 |---|---|
-| ≤ 460px | compact header |
-| ≤ 240px | slim header; cards drop date / “View on”; snippets clamp |
+| ≤ 360px | compact header and cards |
+| ≤ 200px | slim header; cards drop date / “View on”; snippets clamp |
 
-Carousel: 4 / 3 / 2 / 1 cards by width breakpoints.
+Above those heights, long card text scrolls inside its card.
 
 ---
 
