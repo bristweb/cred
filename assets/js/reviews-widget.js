@@ -38,7 +38,7 @@
     tab_testimonials: 'Testimonials', tab_testimonials_title: '{name}: {count} testimonials', tab_testimonials_aria: '{name}, {count} testimonials',
     tab_credentials: 'Credentials', tab_credentials_title: '{name}: {count} credentials', tab_credentials_aria: '{name}, {count} credentials',
     credential_one: 'credential', credential_many: 'credentials', view_credential: 'Verify',
-    credential_since: 'Since {start}', credential_range: '{start}–{end}', credential_expired: '{range} · Expired',
+    credential_since: 'Since {start}', credential_range: '{start}–{end}',
     credential_card_aria: '{label} ({dates}) — opens in a new tab', credential_card_aria_nolink: '{label} ({dates})',
     tabs_more: 'More', tabs_more_aria: 'More filters',
     write_review: 'Write a review', write_review_short: 'Review',
@@ -567,24 +567,21 @@
           .sort((a, b) => String(b.date).localeCompare(String(a.date)))
       : [];
     // Credentials (licenses, certifications): placed by their start date, so a long-held license sits where it began
-    // instead of leading the track. Expired ones (end before today) stay in place, marked as expired.
+    // instead of leading the track. Each card shows its date range.
     const DATE_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
-    const today = new Date().toISOString().slice(0, 10);
     const credentialsList = Array.isArray(config.credentials)
       ? config.credentials
           .filter(c => c && DATE_RE.test(String(c.start ?? '')) && [c.label, c.title, c.icon].some(v => v != null && String(v).trim()))
           .map(c => {
             const end = DATE_RE.test(String(c.end ?? '')) ? String(c.end) : '';
-            const endFull = end.length === 4 ? end + '-12-31' : end.length === 7 ? end + '-31' : end;
-            return { ...c, start: String(c.start), end, sortDate: (String(c.start) + '-01-01').slice(0, 10), expired: Boolean(end) && endFull < today };
+            return { ...c, start: String(c.start), end, sortDate: (String(c.start) + '-01-01').slice(0, 10) };
           })
           .sort((a, b) => b.sortDate.localeCompare(a.sortDate))
       : [];
     const fmtPart = d => (d.length === 4 ? d : new Date(d + (d.length === 7 ? '-15' : '') + 'T12:00:00Z').toLocaleDateString(D.date_locale, d.length === 7 ? { year: 'numeric', month: 'short' } : D.date_options));
     const credentialDates = c => {
       if (!c.end) return fill(S.credential_since, { start: fmtPart(c.start) });
-      const range = fill(S.credential_range, { start: fmtPart(c.start), end: fmtPart(c.end) });
-      return c.expired ? fill(S.credential_expired, { range, end: fmtPart(c.end) }) : range;
+      return fill(S.credential_range, { start: fmtPart(c.start), end: fmtPart(c.end) });
     };
     const initialsAvatar = name => {
       const words = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -751,7 +748,7 @@
           </div>
           ${img}
           ${hasUrl ? `<span class="rw-link" aria-hidden="true">${esc(c.link_text || S.view_credential)} <span class="rw-arrow">→</span></span>` : ''}`;
-        const cls = `rw-card rw-accolade-card rw-credential-card${c.expired ? ' rw-expired' : ''}`;
+        const cls = 'rw-card rw-accolade-card rw-credential-card';
         if (hasUrl) return `<a class="${cls}" href="${esc(c.url)}" target="_blank" rel="${esc(linkRel(c))}" title="${esc(aria)}" aria-label="${esc(aria)}">${inner}</a>`;
         return `<div class="${cls}" role="article" aria-label="${esc(aria)}">${inner}</div>`;
       };

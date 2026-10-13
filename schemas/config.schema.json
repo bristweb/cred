@@ -514,7 +514,7 @@
     },
     "credentials": {
       "type": "array",
-      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows the date range: Since <start>, <start>\u2013<end>, or <start>\u2013<end> \u00b7 Expired once end is past. Expired credentials are not hidden. Not counted in ratings or the JSON-LD.",
+      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows its date range: Since <start>, or <start>\u2013<end>. Not counted in ratings or the JSON-LD.",
       "items": {
         "type": "object",
         "required": [
@@ -572,7 +572,7 @@
           "end": {
             "type": "string",
             "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
-            "description": "Optional. YYYY, YYYY-MM or YYYY-MM-DD. After this date the card shows as expired."
+            "description": "Optional. YYYY, YYYY-MM or YYYY-MM-DD. Shown as the end of the date range."
           },
           "nofollow": {
             "type": "boolean"
