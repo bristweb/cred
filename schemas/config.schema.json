@@ -494,6 +494,18 @@
           }
         }
       }
+    },
+    "badge": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional settings for the rating badge files written by scripts/badge.mjs (badge.json for shields.io, badge.svg).",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Left-hand badge text. Default rating."
+        }
+      }
     }
   }
 }

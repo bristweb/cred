@@ -205,10 +205,22 @@ name: Validate reviews data
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write # lets the check commit the updated rating badge
 jobs:
   validate:
     uses: bristweb/reviews-widget/.github/workflows/validate.yml@main
 ```
+
+### Rating badge
+
+After validating, the same workflow writes `badge.json` and `badge.svg` at the data root (or run `node scripts/badge.mjs <data-dir>`) and commits them when they change. They use the same reviews the widget shows (`hidden`, `display.hide` and `display.min_rating` apply). Optional `config.badge.label` sets the left-hand text (default `rating`). Put it in your own README or site:
+
+```markdown
+![Rating](https://img.shields.io/endpoint?url=https://<you>.github.io/<your-data-repo>/badge.json)
+```
+
+`badge.svg` is the same badge as a plain image, for pages that should not depend on shields.io.
 
 ---
 
