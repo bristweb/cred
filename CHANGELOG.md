@@ -2,6 +2,10 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.0.3 (2026-10-13)
+
+- Credit link tooltip now explains, in plain words, where the reviews come from.
+
 ## 1.0.2 (2026-10-13)
 
 - Data repo config is now `config.js`, an ES module (`export default { … }`) with comments and editor type hints (`cred-config.d.ts`, generated from the schema). `config.json` is no longer read; `scripts/config-to-js.mjs` converts one.
