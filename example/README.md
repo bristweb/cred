@@ -6,13 +6,13 @@ Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). 
 
 Copy this whole folder to start a new data repo (includes `.github/workflows/validate.yml`, `.nojekyll`, and `.gitignore`).
 
-## Publish (GitHub Pages)
+## Publish
 
-Branch `main`, site root, keep `.nojekyll`. Then point the widget at the published URL:
+Publish the repo root on any static host (Cloudflare Pages, or GitHub Pages from branch `main`, site root, keep `.nojekyll`). Then point the widget at the published URL:
 
 ```html
 <script src="https://cred-d2r.pages.dev/assets/js/cred.js"
-        data-source="https://YOUR_USER.github.io/YOUR_DATA_REPO/" defer></script>
+        data-source="https://YOUR_DATA_REPO.pages.dev/" defer></script>
 ```
 
 Google Sites / fixed-height box: add `data-constrained="true"`.
