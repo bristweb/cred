@@ -10,9 +10,9 @@ Side-by-side look at this open, static reviews widget versus common **hosted rev
 | 🟡 | Partial — limits, paid tiers, add-ons, or a different product shape |
 | ❌ | Not offered, or not the product’s model |
 
-Columns: **reviews-widget** first; other products sorted by score (✅×2 + 🟡) on that table, high to low. Superscripts point to short notes under the table.
+Columns: **CRED** first; other products sorted by score (✅×2 + 🟡) on that table, high to low. Superscripts point to short notes under the table.
 
-| Feature | **reviews-widget** | [Birdeye](https://birdeye.com/) | [Reputation.com](https://reputation.com/) | [EmbedSocial](https://embedsocial.com/review-widget/) | [Trustpilot](https://www.trustpilot.com/) | [Podium](https://www.podium.com/) | [ProvenExpert](https://www.provenexpert.com/) | [Elfsight](https://elfsight.com/all-in-one-reviews-widget/) | [Tagembed](https://tagembed.com/) | [SociableKIT](https://www.sociablekit.com/) |
+| Feature | **CRED** | [Birdeye](https://birdeye.com/) | [Reputation.com](https://reputation.com/) | [EmbedSocial](https://embedsocial.com/review-widget/) | [Trustpilot](https://www.trustpilot.com/) | [Podium](https://www.podium.com/) | [ProvenExpert](https://www.provenexpert.com/) | [Elfsight](https://elfsight.com/all-in-one-reviews-widget/) | [Tagembed](https://tagembed.com/) | [SociableKIT](https://www.sociablekit.com/) |
 |---|---|---|---|---|---|---|---|---|---|---|
 | **Self-hosted** (you serve the embed) | ✅¹ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Free to run** at modest traffic | ✅² | ❌ | ❌ | 🟡 | 🟡 | ❌ | 🟡 | 🟡³ | 🟡 | 🟡 |
@@ -46,7 +46,7 @@ Columns: **reviews-widget** first; other products sorted by score (✅×2 + 🟡
 
 Because this widget is self-hosted, **any platform is supported**: you can gather the records however you like (automation or by hand), so nothing depends on a vendor’s connector catalog (including sources other services may not offer). The table below is about *built-in connectors / official integrations* for the other products (including whether a review platform only “connects” to itself). Rows cover 100+ common review, directory, marketplace, app-store, B2B, vertical, and social surfaces.
 
-| Platform | **reviews-widget** | Birdeye | SociableKIT | Reputation.com | Elfsight | Podium | Tagembed | EmbedSocial | ProvenExpert | Trustpilot |
+| Platform | **CRED** | Birdeye | SociableKIT | Reputation.com | Elfsight | Podium | Tagembed | EmbedSocial | ProvenExpert | Trustpilot |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Google Maps / Business Profile | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ❌ |
 | Yelp | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡¹⁵ | ❌ | ❌ |
@@ -190,13 +190,13 @@ Because this widget is self-hosted, **any platform is supported**: you can gathe
 16. Amazon often needs a manual / CSV-style import on several hosted widgets; not always a full live API sync.
 17. Trustpilot generally does not allow third-party widgets to re-embed Trustpilot reviews; use Trustpilot’s own embeds or store a copy yourself (as with this widget).
 
-Marks for other vendors are based on their public docs and connector lists (and may change). Treat 🟡 as “partial, plan-gated, manual import, monitoring-only, or limited API.” **reviews-widget** is ✅ on every row because any source you can turn into the data format can be displayed. Elfsight also offers a custom/manual source for platforms without a connector — that is still not a live connector, so unlisted rows stay ❌ here.
+Marks for other vendors are based on their public docs and connector lists (and may change). Treat 🟡 as “partial, plan-gated, manual import, monitoring-only, or limited API.” **CRED** is ✅ on every row because any source you can turn into the data format can be displayed. Elfsight also offers a custom/manual source for platforms without a connector — that is still not a live connector, so unlisted rows stay ❌ here.
 
 ### Reading the columns
 
-Each matrix sorts competitor columns by its own score: **✅ × 2 + 🟡** (reviews-widget always first). Feature-matrix order and platform-support order can differ. Google Business Profile and Yelp are **not** product columns — they are review platforms / source networks listed as **rows** under platform support.
+Each matrix sorts competitor columns by its own score: **✅ × 2 + 🟡** (CRED always first). Feature-matrix order and platform-support order can differ. Google Business Profile and Yelp are **not** product columns — they are review platforms / source networks listed as **rows** under platform support.
 
-- **reviews-widget** is only the on-site display layer plus a data format. Collection (scrapers, hand entry, …) and any owner-reply / response automation live in each data store’s own tooling if you want them — there is no native inbox, but the data you own makes those workflows possible.
+- **CRED** is only the on-site display layer plus a data format. Collection (scrapers, hand entry, …) and any owner-reply / response automation live in each data store’s own tooling if you want them — there is no native inbox, but the data you own makes those workflows possible.
 - **Birdeye**, **Reputation.com**, **Podium** — reputation / review-management / messaging suites: widgets exist, but the core product is listing management, outreach, and inbox across many sources.
 - **Trustpilot**, **ProvenExpert** — review platforms that also sell first-party badges/widgets (still not self-hosted multi-source carousels).
 - **Elfsight**, **EmbedSocial**, **SociableKIT**, **Tagembed** — hosted multi-source review embeds (pull from networks like Google/Yelp into a vendor widget).

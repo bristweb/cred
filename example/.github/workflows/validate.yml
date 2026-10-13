@@ -1,5 +1,5 @@
 # Checks config.json, reviews/<year>.json and images/reviewers/ with the shared validator
-# (https://github.com/bristweb/reviews-widget, scripts/validate.mjs).
+# (https://github.com/bristweb/cred, scripts/validate.mjs).
 # Copied with example/ into a new data repo — lands at .github/workflows/validate.yml at the repo root.
 name: Validate reviews data
 on:
@@ -9,4 +9,4 @@ permissions:
   contents: write # lets the check commit the updated rating badge (badge.json, badge.svg)
 jobs:
   validate:
-    uses: bristweb/reviews-widget/.github/workflows/validate.yml@main
+    uses: bristweb/cred/.github/workflows/validate.yml@main

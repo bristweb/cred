@@ -3,7 +3,7 @@
 #     contents: write
 #   jobs:
 #     validate:
-#       uses: bristweb/reviews-widget/.github/workflows/validate.yml@main
+#       uses: bristweb/cred/.github/workflows/validate.yml@main
 # After validating, it rewrites badge.json / badge.svg (rating badge) and commits them to the default branch when they change.
 name: Validate reviews data
 on:
@@ -19,7 +19,7 @@ jobs:
           path: data
       - uses: actions/checkout@v4
         with:
-          repository: bristweb/reviews-widget
+          repository: bristweb/cred
           ref: main
           path: widget
       - run: npm ci

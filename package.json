@@ -1,5 +1,5 @@
 {
-  "name": "reviews-widget",
+  "name": "cred",
   "version": "1.0.0",
   "description": "Static reviews widget (code only)",
   "main": "index.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bristweb/reviews-widget.git"
+    "url": "git+https://github.com/bristweb/cred.git"
   },
   "keywords": [],
   "author": "",
   "bugs": {
-    "url": "https://github.com/bristweb/reviews-widget/issues"
+    "url": "https://github.com/bristweb/cred/issues"
   },
-  "homepage": "https://github.com/bristweb/reviews-widget#readme",
+  "homepage": "https://github.com/bristweb/cred#readme",
   "type": "module",
   "private": "true",
   "dependencies": {

@@ -1,4 +1,4 @@
-/* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/reviews-widget
+/* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
  * The code lives in this repo; everything about a site lives in a separate data repo, named by data-source:
  *   <source>config.json          business, platforms, display defaults, languages/defaultLanguage/strings, schema,
  *                                summary card, optional accolades/testimonials, and reviews.years
@@ -11,7 +11,7 @@
  * snippet (both computed here at render time).
  *
  * Usage (JS embed) — one script tag renders the widget right where the tag is (defer/async are fine):
- *   <script src="…/reviews-widget/assets/js/cred.js"
+ *   <script src="…/assets/js/cred.js"
  *           data-source="…/<your-data-repo>/" defer></script>
  * Public options: data-source (required), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
  *   data-limit, data-summary="off", data-theme="light|dark|auto", data-schema="off", data-constrained="true",
@@ -59,7 +59,7 @@
     testimonial_source_clause: ' ({source})',
     media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews',
   };
-  const CREDIT_URL = 'https://github.com/bristweb/reviews-widget';
+  const CREDIT_URL = 'https://github.com/bristweb/cred';
   const DISPLAY = {
     layout: 'carousel', snippet_chars: 160, abbreviate_last_names: true, max_same_platform_run: 2,
     diversity_window_days: 548, date_locale: 'en-US', date_options: { year: 'numeric', month: 'short', day: 'numeric' },

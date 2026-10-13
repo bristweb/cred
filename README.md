@@ -211,7 +211,7 @@ permissions:
   contents: write # lets the check commit the updated rating badge
 jobs:
   validate:
-    uses: bristweb/reviews-widget/.github/workflows/validate.yml@main
+    uses: bristweb/cred/.github/workflows/validate.yml@main
 ```
 
 ### Rating badge
@@ -292,7 +292,7 @@ Optional hotlink allowlist for self-hosters on Cloudflare Pages: copy `functions
 
 Review text belongs to its authors; platform marks belong to their owners.
 
-If a feature is missing or you want to run it entirely independently, [fork the repo](https://github.com/bristweb/reviews-widget/fork). Pull requests are welcome.
+If a feature is missing or you want to run it entirely independently, [fork the repo](https://github.com/bristweb/cred/fork). Pull requests are welcome.
 
 ## License
 
