@@ -1112,7 +1112,7 @@
       if (claim(el)) mount(el, { ...scriptOpts, ...pick(el.dataset) });
       return;
     }
-    // Preferred: render in place, right before this script tag
+    // Recommended: render in place, right before this script tag
     const el = document.createElement('div');
     claim(el);
     if (ME && ME.parentNode && !(document.head && document.head.contains(ME))) ME.parentNode.insertBefore(el, ME);

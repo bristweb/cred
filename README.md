@@ -20,7 +20,7 @@ The open-source (MIT) widget for reviews, testimonials, awards and credentials. 
 
 Paste to try it. For a real site, keep the script `src` and change only `data-source` to your data store. More patterns: [Embed](#embed).
 
-A static, dependency-free reviews widget. Host the files on any static host (GitHub Pages works out of the box). You are not limited to a vendor's supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
+A static, dependency-free reviews widget. Host the files on any static host (Cloudflare Pages recommended; GitHub Pages works as a backup with no setup). You are not limited to a vendor's supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
 
 Product comparison: [COMPARISON.md](COMPARISON.md).
 
@@ -43,7 +43,7 @@ Product comparison: [COMPARISON.md](COMPARISON.md).
 
 Same live demo URLs as at the top of this README. For a real site, keep the script `src` and change only `data-source` (or the iframe `?source=`) to your own data store URL.
 
-### JavaScript (preferred)
+### JavaScript (recommended)
 
 ```html
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js"
@@ -115,7 +115,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 
 ## Data format
 
-Plain files at the data root, served over HTTPS with CORS open enough for your pages to fetch them (GitHub Pages does this by default with branch `main`, site root, and `.nojekyll`; any static host works). The widget reads only these paths; other folders (e.g. your own `scripts/`) are never loaded.
+Plain files at the data root, served over HTTPS with CORS open enough for your pages to fetch them (Cloudflare Pages with the included `_headers`, or GitHub Pages by default; any static host works). The widget reads only these paths; other folders (e.g. your own `scripts/`) are never loaded.
 
 ```
 config.json              business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, credentials, testimonials, reviews.years, …
@@ -278,7 +278,9 @@ Above those heights, long card text scrolls inside its card.
 
 ## New data repo
 
-Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.json`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish on any static host (Cloudflare Pages reads the included `_headers` for open CORS; GitHub Pages: branch `main`, site root, keep `.nojekyll`). Point the widget’s `data-source` at that published URL.
+Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.json`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL.
+
+**Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
 
 
 ---
