@@ -1,8 +1,8 @@
-// Cloudflare Pages Function: serves the widget files (assets/, lang/, embed.html) only to pages whose
-// Origin/Referer host is in allowlist.json. "*.example.com" also matches subdomains. Requests with no
-// Origin/Referer (direct visits, crawlers) and everything else (docs, demo, example data) are served as usual.
+// Optional Cloudflare Pages Function (same file for the widget repo and data repos). With an empty or missing
+// allowlist.json every request is served, with Access-Control-Allow-Origin: *. With hosts listed, a request whose
+// Origin/Referer is another, unlisted host gets 403; "*.example.com" also matches subdomains. Requests with no
+// Origin/Referer (direct visits, crawlers) and from the host itself are always served.
 // This deters hotlinking; it is not access control (headers can be omitted or forged).
-const GATED = /^\/(assets\/|lang\/|embed\.html$)/;
 let cached;
 async function allowlist(context) {
   if (!cached) {
@@ -22,11 +22,10 @@ const matches = (host, list) => list.some(e => {
 export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
-  if (GATED.test(url.pathname)) {
-    const caller = hostOf(request.headers.get('Origin') || request.headers.get('Referer') || '');
-    if (caller && caller !== url.hostname && !matches(caller, await allowlist(context))) {
-      return new Response('Forbidden', { status: 403, headers: { 'Vary': 'Origin, Referer' } });
-    }
+  const list = await allowlist(context);
+  const caller = hostOf(request.headers.get('Origin') || request.headers.get('Referer') || '');
+  if (list.length && caller && caller !== url.hostname && !matches(caller, list)) {
+    return new Response('Forbidden', { status: 403, headers: { 'Vary': 'Origin, Referer' } });
   }
   const res = await context.next();
   const out = new Response(res.body, res);
