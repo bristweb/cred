@@ -180,6 +180,8 @@ Array of records for that calendar year, newest first. Store full names, full te
 
 `reviewer_image` may be any working URL or path (absolute, `data:`, or relative to the data root). A local convention like `images/reviewers/<platform>-<id>.<ext>` is only a suggestion for sync scripts — not required.
 
+Optional `excerpt`: an exact passage of `text` to show on the card instead of the opening ~160 characters (ellipses mark where it starts or ends mid-text). The validator checks it is a real passage.
+
 Optional per-review `nofollow` / `noreferrer` (or `rel`) override the platform for that card’s link. Outbound links always keep `noopener`; unset review → platform → just `noopener`.
 
 Formal shape: `schemas/reviews.schema.json` in this repo.
@@ -248,7 +250,7 @@ Carousel: 4 / 3 / 2 / 1 cards by width breakpoints.
 ## Privacy and presentation
 
 - **Storage:** full names, text, replies, URLs, extras in the public data files.
-- **Presentation:** first name + last initial; ~160-character snippets; card links back to the platform.
+- **Presentation:** first name + last initial; ~160-character snippets (or the review's `excerpt`); card links back to the platform.
 
 ---
 

@@ -126,6 +126,11 @@
       "hidden": {
         "type": "boolean",
         "description": "Optional. true keeps the review in the data but hides it: not shown, counted, averaged or included in the JSON-LD."
+      },
+      "excerpt": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Optional. An exact passage of text (whitespace may differ) shown on the card instead of the opening characters, with ellipses where it starts or ends mid-text. The full text stays in the data."
       }
     }
   }
