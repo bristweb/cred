@@ -444,7 +444,7 @@
           },
           "media": {
             "type": "array",
-            "description": "Optional media shown on the card: image (thumbnail opens a lightbox), audio (play button, then an inline player), video (poster with play button, opens a lightbox player), link (a social post or page, shown as a link card). A card with media is not itself a link; its url becomes the footer link.",
+            "description": "Optional media shown as the card's content instead of visible quote text (the text stays in the page, visually hidden, and is the image alt text). The first item fills the card; others are small image chips. Each is an image with an icon overlay and no visible label: image (opens a lightbox), audio (plays below the image), video (poster; opens a lightbox player), link (opens the post). Without thumbnail/poster, audio, video and link use a neutral default image. A card with media is not itself a link; its url becomes the footer link.",
             "items": {
               "type": "object",
               "required": [
@@ -470,7 +470,7 @@
                 "thumbnail": {
                   "type": "string",
                   "minLength": 1,
-                  "description": "Optional small preview image (image or link)."
+                  "description": "Optional preview image (any type; e.g. a post screenshot for link, a cover for audio)."
                 },
                 "poster": {
                   "type": "string",
@@ -479,11 +479,11 @@
                 },
                 "caption": {
                   "type": "string",
-                  "description": "Optional visible caption."
+                  "description": "Optional short label, used as the accessible name and tooltip (not shown as text)."
                 },
                 "alt": {
                   "type": "string",
-                  "description": "Optional accessible description."
+                  "description": "Optional accessible name; overrides caption."
                 },
                 "nofollow": {
                   "type": "boolean"

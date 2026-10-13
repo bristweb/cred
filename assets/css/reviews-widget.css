@@ -122,19 +122,25 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
 /* Testimonial subtitle: own line under the title, date-sized but a step stronger than the date; wraps, never ellipsized. */
 .rw-subtitle{font-size:12.5px;font-weight:500;line-height:1.3;color:var(--rw-body,#555);margin:1px 0}
 .rw-avatar-secondary{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none;background:var(--rw-tint,#f1f1f1)}
-/* Testimonial media: a row of small thumbnails / play buttons / post links; images and video open in a <dialog>. */
-.rw-media{display:flex;flex-wrap:wrap;gap:8px}
-.rw-media-item{position:relative;display:inline-flex;align-items:center;gap:8px;height:56px;max-width:100%;padding:0;border:1px solid var(--rw-line,#e3e3e3);border-radius:10px;background:var(--rw-tint,#f1f1f1);color:var(--rw-ink,#111);font:inherit;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;overflow:hidden}
+/* Testimonial media: shown as images with an icon overlay (no visible labels). The first item fills the card body;
+   extra items are small chips. The quote text stays in the DOM, visually hidden (.rw-sr). */
+.rw-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
+.rw-media-item{position:relative;display:block;flex:none;padding:0;border:1px solid var(--rw-line,#e3e3e3);border-radius:10px;background:var(--rw-tint,#f1f1f1);color:#fff;cursor:pointer;overflow:hidden;text-decoration:none}
 .rw-media-item:hover{border-color:var(--rw-accent,#333)}
 .rw-media-item:focus-visible,.rw-card a.rw-link:focus-visible{outline:2px solid var(--rw-accent,#333);outline-offset:2px}
-.rw-root .rw-media-item img{height:100%;width:auto;max-width:96px;object-fit:cover;flex:none}
-.rw-media-cap{display:flex;flex-direction:column;min-width:0;padding-right:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rw-media-cap small{font-size:11.5px;font-weight:400;color:var(--rw-muted,#888)}
-.rw-media-bare{padding-left:8px}
-.rw-media-play{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--rw-accent,#333);flex:none}
-.rw-media-play svg{width:16px;height:16px;fill:var(--rw-on-accent,#fff)}
-.rw-media-item img+.rw-media-play{position:absolute;left:48px;top:50%;transform:translate(-50%,-50%)}
-.rw-media-player{width:100%;height:40px}
+.rw-media-hero{flex:1 1 auto;width:100%;min-height:150px}
+.rw-media-chip{width:52px;height:52px}
+.rw-root .rw-media-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rw-root .rw-media-hero.rw-media-image img{object-fit:contain}
+.rw-media-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.55)}
+.rw-media-icon svg{width:22px;height:22px;fill:currentColor}
+.rw-media-image .rw-media-icon,.rw-media-link .rw-media-icon{left:auto;top:auto;right:8px;bottom:8px;transform:none;width:30px;height:30px}
+.rw-media-image .rw-media-icon svg,.rw-media-link .rw-media-icon svg{width:16px;height:16px;fill:none}
+.rw-media-chip .rw-media-icon{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:24px;height:24px}
+.rw-media-chip .rw-media-icon svg{width:13px;height:13px}
+.rw-media-item.is-playing .rw-media-icon{opacity:0}
+.rw-media{display:flex;flex-wrap:wrap;gap:8px}
+.rw-media-player{width:100%;height:36px;flex:none}
 .rw-card a.rw-link:hover{color:var(--rw-accent-2,#555)}
 .rw-lightbox{max-width:min(92vw,960px);max-height:92vh;padding:12px;border:0;border-radius:var(--rw-radius,14px);background:var(--rw-card,#fff);color:var(--rw-ink,#111);font-family:var(--rw-font,system-ui,sans-serif)}
 .rw-lightbox::backdrop{background:rgba(0,0,0,.72)}
@@ -198,7 +204,7 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
   .rw-fixed .rw-write{padding:7px 12px;font-size:12.5px}.rw-fixed .rw-tab,.rw-fixed .rw-tabs-more{padding:4px 7px;font-size:12.5px}
   .rw-fixed .rw-card{padding:12px;gap:6px}.rw-fixed .rw-avatar{width:34px;height:34px}.rw-fixed .rw-name{font-size:14px}
   .rw-fixed .rw-text{font-size:14px;line-height:1.5}.rw-fixed .rw-ai-text{font-size:13px;line-height:1.45}.rw-fixed .rw-link{font-size:12.5px}
-  .rw-fixed .rw-media-item{height:40px}}
+  .rw-fixed .rw-media-hero{min-height:0}.rw-fixed .rw-media-chip{width:40px;height:40px}}
 @container rw (max-height:200px){
   .rw-fixed .rw-header{padding:3px 8px;margin-bottom:4px;gap:8px}.rw-fixed .rw-summary{gap:7px}
   .rw-fixed .rw-score{font-size:20px}.rw-fixed .rw-based{display:none}.rw-fixed .rw-stars-lg i{width:13px;height:13px}
@@ -212,4 +218,4 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
   .rw-fixed.rw-layout-carousel .rw-text{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.35}
   .rw-fixed .rw-ai{gap:3px}.rw-fixed .rw-ai-top{gap:5px}.rw-fixed .rw-ai-label{font-size:13px}
   .rw-fixed .rw-ai-icon{width:16px;height:16px}.rw-fixed .rw-ai-icon svg{width:10px;height:10px}
-  .rw-fixed .rw-ai-text{font-size:12.5px;line-height:1.35}.rw-fixed .rw-media-item{height:28px}.rw-fixed .rw-media-play{width:22px;height:22px}}
+  .rw-fixed .rw-ai-text{font-size:12.5px;line-height:1.35}.rw-fixed .rw-media-chip{width:28px;height:28px}.rw-fixed .rw-media-icon{width:24px;height:24px}}
