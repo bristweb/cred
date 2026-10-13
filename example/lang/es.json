@@ -72,7 +72,6 @@
   "credential_many": "credenciales",
   "view_credential": "Verificar",
   "credential_since": "Desde {start}",
-  "credential_expired": "{range} · Vencida",
   "credential_card_aria": "{label} ({dates}) — se abre en una pestaña nueva",
   "credential_card_aria_nolink": "{label} ({dates})",
   "media_image": "Ver imagen",
