@@ -33,10 +33,6 @@
   (function () {
     var q = new URLSearchParams(location.search);
     if (!location.search) document.addEventListener('DOMContentLoaded', function () { document.getElementById('intro').hidden = false; });
-    if (!q.has('source')) {
-      q.set('source', new URL('example/', location.href).href);
-      history.replaceState(null, '', location.pathname + '?' + q + location.hash);
-    }
     var theme = (q.get('theme') || '').toLowerCase();
     if (theme !== 'light' && theme !== 'dark') return;
     var dark = theme === 'dark';
@@ -53,7 +49,7 @@
 <h2>How to embed</h2>
 <ol>
 <li><strong>Copy the snippet.</strong>
-<div class="snip"><pre><code>&lt;script src=&quot;https://cred-d2r.pages.dev/assets/js/cred.js&quot; data-source=&quot;https://your-reviews.pages.dev/&quot; defer&gt;&lt;/script&gt;</code></pre><button type="button" class="copy">Copy</button></div></li>
+<div class="snip"><pre><code>&lt;script src=&quot;https://cred.bristleconeweb.com/assets/js/cred.js&quot; data-source=&quot;https://your-reviews.pages.dev/&quot; defer&gt;&lt;/script&gt;</code></pre><button type="button" class="copy">Copy</button></div></li>
 <li><strong>Paste it into your site's HTML</strong> where the reviews should appear:
 <ul>
 <li>Framer: Insert → Embed, choose HTML, paste.</li>
@@ -68,7 +64,8 @@
 <p class="note">Please don't embed or link to this page itself; paste the snippet on your own site.</p>
 <h2>Preview</h2>
 </div></div>
-<script src="assets/js/cred.js" defer data-overflow="visible"></script>
+<script id="cred-demo" src="assets/js/cred.js" defer data-overflow="visible"></script>
+<script>if (!new URLSearchParams(location.search).has('source')) document.getElementById('cred-demo').dataset.source = new URL('example/', location.href).href;</script>
 <script>document.querySelectorAll('.ci .copy').forEach(function(b){b.addEventListener('click',function(){var t=b.parentNode.querySelector('code').textContent;var done=function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)};if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});else{var r=document.createRange();r.selectNodeContents(b.parentNode.querySelector('code'));getSelection().removeAllRanges();getSelection().addRange(r);document.execCommand('copy');done()}})});</script>
 </body>
 </html>
