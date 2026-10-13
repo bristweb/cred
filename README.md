@@ -258,6 +258,8 @@ Carousel: 4 / 3 / 2 / 1 cards by width breakpoints.
 
 Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.json`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish on any static host (GitHub Pages: branch `main`, site root, keep `.nojekyll`). Point the widget’s `data-source` at that published URL.
 
+To limit which sites can load your data, host it on Cloudflare Pages with a `functions/_middleware.js` like [bristweb/heather-wolfe-art-reviews](https://github.com/bristweb/heather-wolfe-art-reviews/blob/main/functions/_middleware.js) and list allowed hostnames in `config.json` as `"allowed_origins": ["example.com", "*.example.com"]`. Other sites get a 403; direct visits and crawlers (no Origin/Referer) are still served. This is a browser-side deterrent, not access control.
+
 ---
 
 ## Technical details
