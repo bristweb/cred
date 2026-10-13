@@ -1,6 +1,6 @@
 {
   "name": "cred",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Static reviews widget (code only)",
   "main": "index.js",
   "directories": {

@@ -33,7 +33,7 @@
   // Build version (kept equal to package.json). config.js `version` may ask for another release: the newest
   // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
-  const VERSION = '1.0.3';
+  const VERSION = '1.0.4';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   const num = v => v.split('.').map(Number);
   const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
@@ -110,7 +110,7 @@
     testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
     testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
     testimonial_source_clause: ' ({source})',
-    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'These reviews are collected from sites like Google and Yelp and shown with CRED, an open-source review display.',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'Reviews gathered from sites like Google, shown with CRED.',
   };
   const CREDIT_URL = 'https://cred.bristleconeweb.com/';
   const DISPLAY = {
