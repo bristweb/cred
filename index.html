@@ -3,11 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reviews</title>
+<title>CRED: free, open-source review and testimonial widget</title>
+<meta name="description" content="CRED is a free, open-source (MIT) widget for reviews, testimonials, awards and credentials from many platforms. Your data stays in your own repo, with schema.org JSON-LD, no tracking and no third-party scripts.">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="assets/css/cred.css">
 <style>html,body{margin:0;background:transparent}</style>
+<style>#intro{margin:0;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#222;background:#fafafa}
+.ci{max-width:1100px;margin:0 auto;padding:32px 20px 8px}
+.ci h1{font-size:20px;font-weight:600;margin:0 0 6px}.ci h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#777;margin:28px 0 10px}
+.ci p,.ci li{color:#555;margin:6px 0}.ci ol{padding-left:20px;margin:8px 0}.ci li{margin:8px 0}.ci a{color:inherit}
+.ci ul{padding-left:18px;margin:4px 0;font-size:14px}.ci ul li{margin:2px 0}
+.ci .snip{position:relative;margin:8px 0}.ci pre{background:#fff;border:1px solid #e3e3e3;border-radius:8px;padding:12px 84px 12px 14px;overflow-x:auto;font-size:13px;margin:0}
+.ci .copy{position:absolute;top:8px;right:8px;font:inherit;font-size:12.5px;border:1px solid #d6d6d6;background:#f6f6f6;border-radius:6px;padding:4px 10px;cursor:pointer;color:#333}
+.ci .copy:hover{background:#eee}.ci code{font-size:13px}.ci .note{font-size:13.5px;color:#777}
+#intro{background:none}</style>
 </head>
 <body>
 <!-- Demo host page. Defaults to the bundled fictional example/.
@@ -33,11 +43,28 @@
     document.documentElement.setAttribute('data-theme', theme);
   })();
 </script>
+<div id="intro" hidden><div class="ci">
+<h1>CRED reviews widget</h1>
+<p>Free, open-source reviews widget. This page shows fictional example data (a bike shop) loaded from <a href="example/">example/</a>.</p>
+<h2>How to embed</h2>
+<ol>
+<li><strong>Copy the snippet.</strong>
+<div class="snip"><pre><code>&lt;script src=&quot;https://cred-d2r.pages.dev/assets/js/cred.js&quot; data-source=&quot;https://your-reviews.pages.dev/&quot; defer&gt;&lt;/script&gt;</code></pre><button type="button" class="copy">Copy</button></div></li>
+<li><strong>Paste it into your site's HTML</strong> where the reviews should appear:
+<ul>
+<li>Framer: Insert → Embed, choose HTML, paste.</li>
+<li>Google Sites: Insert → Embed → Embed code, paste. Add <code>data-constrained="true"</code> and size the box.</li>
+<li>Squarespace: Code block. Wix: Embed code → Custom code / HTML iframe.</li>
+<li>WordPress: Custom HTML block.</li>
+<li>Any other site: paste into the page HTML.</li>
+</ul></li>
+<li><strong>That's it.</strong> The widget adapts to the width it's given. Optional <code>data-*</code> attributes (layout, theme, limit, <code>data-constrained</code> for fixed-height boxes) are listed in the <a href="https://github.com/bristweb/cred#options">options</a>.</li>
+<li><strong>Make your own.</strong> Copy the <a href="https://github.com/bristweb/cred/tree/main/example">example data folder</a> into a new repo, add your reviews, publish it, and point <code>data-source</code> at its address. Setup guide: <a href="https://github.com/bristweb/cred#new-data-repo">github.com/bristweb/cred</a>.</li>
+</ol>
+<p class="note">Please don't embed or link to this page itself; paste the snippet on your own site.</p>
+<h2>Preview</h2>
+</div></div>
 <script src="assets/js/cred.js" defer data-overflow="visible"></script>
-<div id="intro" hidden style="max-width:1100px;margin:28px auto;padding:0 20px;font:14px/1.5 system-ui,sans-serif;color:#555">
-<p>Example data (fictional). Embed with your own data repo:</p>
-<pre style="background:#f6f6f6;border:1px solid #e3e3e3;border-radius:8px;padding:12px;overflow-x:auto;font-size:13px"><code>&lt;script src="https://cred-d2r.pages.dev/assets/js/cred.js" data-source="https://your-reviews.pages.dev/" defer&gt;&lt;/script&gt;</code></pre>
-<p>Setup and options: <a href="https://github.com/bristweb/cred" style="color:inherit">github.com/bristweb/cred</a></p>
-</div>
+<script>document.querySelectorAll('.ci .copy').forEach(function(b){b.addEventListener('click',function(){var t=b.parentNode.querySelector('code').textContent;var done=function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)};if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});else{var r=document.createRange();r.selectNodeContents(b.parentNode.querySelector('code'));getSelection().removeAllRanges();getSelection().addRange(r);document.execCommand('copy');done()}})});</script>
 </body>
 </html>

@@ -57,7 +57,7 @@
     testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
     testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
     testimonial_source_clause: ' ({source})',
-    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'CRED: free, open-source review and testimonial widget. Your reviews, your data, no tracking.',
   };
   const CREDIT_URL = 'https://github.com/bristweb/cred';
   const DISPLAY = {
@@ -880,7 +880,7 @@
           <div class="rw-track">${cards}</div>
           ${cfg.layout === 'carousel' && cfg.arrows !== 'off' ? `<button class="rw-nav rw-next" aria-label="${esc(S.next)}">›</button>` : ''}
         </div>
-        ${D.credit !== false ? `<div class="rw-credit"><a href="${CREDIT_URL}" target="_blank" rel="noopener">${esc(S.credit)}</a></div>` : ''}`;
+        ${D.credit !== false ? `<div class="rw-credit"><a href="${CREDIT_URL}" target="_blank" rel="noopener" title="${esc(S.credit_title)}">${esc(S.credit)}</a></div>` : ''}`;
 
       useFallbackIcons(el);
       fitSummary();
