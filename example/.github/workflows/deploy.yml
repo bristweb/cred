@@ -1,0 +1,30 @@
+# Publishes the repo root to Cloudflare Pages on push to main. Needs repo secrets CLOUDFLARE_API_TOKEN,
+# CLOUDFLARE_ACCOUNT_ID and CF_PAGES_PROJECT; without them this step is skipped (GitHub Pages still works).
+name: Deploy to Cloudflare Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: cf-pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.CF_PAGES_PROJECT != ''
+      - uses: actions/setup-node@v4
+        if: env.CF_PAGES_PROJECT != ''
+        with:
+          node-version: 22
+      - name: Build
+        if: env.CF_PAGES_PROJECT != ''
+        run: rsync -a --exclude .git --exclude .github --exclude node_modules --exclude dist ./ dist/
+      - name: Deploy
+        if: env.CF_PAGES_PROJECT != ''
+        run: npx --yes wrangler@4 pages deploy dist --project-name "$CF_PAGES_PROJECT" --branch main

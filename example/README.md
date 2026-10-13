@@ -4,11 +4,13 @@ Sample data for [bristweb/cred](https://github.com/bristweb/cred). **Northwind C
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional; the platform names identify where each sample would appear.
 
-Copy this whole folder to start a new data repo (includes `.github/workflows/validate.yml`, `.nojekyll`, `_headers` and `.gitignore`).
+Copy this whole folder to start a new data repo (includes `.github/workflows/validate.yml` and `deploy.yml`, `.nojekyll`, `_headers` and `.gitignore`).
 
 ## Publish
 
-Publish the repo root on any static host (Cloudflare Pages, or GitHub Pages from branch `main`, site root, keep `.nojekyll`). Then point the widget at the published URL:
+**Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
+
+Then point the widget at the published URL:
 
 ```html
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js"
