@@ -33,9 +33,10 @@ Product comparison: [COMPARISON.md](COMPARISON.md).
 5. [Updating data](#updating-data)
 6. [Structured data (JSON-LD)](#structured-data-json-ld)
 7. [Header behavior](#header-behavior)
-8. [Privacy and presentation](#privacy-and-presentation)
-9. [New data repo](#new-data-repo)
-10. [Technical details](#technical-details)
+8. [Versions](#versions)
+9. [Privacy and presentation](#privacy-and-presentation)
+10. [New data repo](#new-data-repo)
+11. [Technical details](#technical-details)
 
 ---
 
@@ -134,6 +135,7 @@ theme/fonts/             optional self-hosted fonts
 | `business` | `name` (required), optional `website` and extras |
 | `platforms` | review platforms in **tab order**: `name`, `icon`, `write_url`, `page_url`, `card_link` (`review`\|`page`), optional `invert_icon_when_active`, optional `nofollow` / `noreferrer` (or `rel`) for outbound write/card links. Extra fields (scrape URLs, notes, …) are ignored by the widget |
 | `default_write_platform` | `write_url` used on the “All” tab |
+| `version` | optional widget version range, e.g. `"^1"`; see [Versions](#versions) |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
 | `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Text: `strings.credit` |
 | `schema.*` | JSON-LD on/off, `@type`, `max_reviews`, `extra` |
@@ -268,6 +270,21 @@ Between these widths the filter row fits itself: pills never wrap or scroll, the
 Above those heights, long card text scrolls inside its card.
 
 ---
+
+## Versions
+
+The embed code never changes: `…/assets/js/cred.js` is always the latest release. A data repo can pin the widget version with a top-level `"version"` in `config.json` (package.json-style, common subset):
+
+| `version` | Loads |
+|---|---|
+| omitted, `"latest"`, `"*"` | latest |
+| `"^1"`, `"^1.4"`, `"1"`, `"1.x"` | newest 1.x (at least 1.4 for `^1.4`) |
+| `"~1.4"`, `"1.4"`, `"1.4.x"` | newest 1.4.x |
+| `"1.4.2"` | exactly 1.4.2 |
+
+When the latest build already satisfies the range (e.g. `"^1"` while latest is 1.x), nothing extra loads. Otherwise the widget loads the matching copy from `/v/<x.y.z>/`, `/v/<major>/` or `/v/<major>.<minor>/` once, reusing the data it already fetched. `/versions.json` lists every release. Recommended: `"^1"`, which takes fixes and features but never a breaking change. The `/v/` copies are built by the Cloudflare Pages deploy; on GitHub Pages only the latest is served.
+
+Releases follow [semantic versioning](https://semver.org/): breaking changes to the embed, options or data format bump the major version; new features the minor; fixes the patch. Each release is a `vX.Y.Z` git tag; see [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy and presentation
 
