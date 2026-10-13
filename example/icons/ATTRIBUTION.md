@@ -4,8 +4,8 @@ Platform logos in this folder (**Google**, **Yelp**, **Facebook**) are from [Sim
 
 All marks belong to their owners and are used only to identify where each review was posted. This example is not affiliated with those platforms.
 
-Placeholder award badges (`award-choice.svg`, `award-bestof.svg`) are original graphics for this example (not real award marks). Any award names in `config.json` are fictional; each entry shows its label and year on the accolade card.
+Placeholder award badges (`award-choice.svg`, `award-bestof.svg`) are original graphics for this example (not real award marks). Any award names in `config.js` are fictional; each entry shows its label and year on the accolade card.
 
 Placeholder company marks (`contoso-logistics.svg`, `summit-athletics.svg`) are original graphics for this example (not real brands).
 
-Placeholder credential badges (`credential-mechanic.svg`, `credential-ebike.svg`) are original graphics for this example; the credentials and issuers in `config.json` are fictional.
+Placeholder credential badges (`credential-mechanic.svg`, `credential-ebike.svg`) are original graphics for this example; the credentials and issuers in `config.js` are fictional.

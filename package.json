@@ -1,13 +1,13 @@
 {
   "name": "cred",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Static reviews widget (code only)",
   "main": "index.js",
   "directories": {
     "example": "example"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "types": "npx --yes json-schema-to-typescript@15 -i schemas/config.schema.json -o types/config.d.ts --bannerComment \"// Generated from schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.\""
   },
   "repository": {
     "type": "git",

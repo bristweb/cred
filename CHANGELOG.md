@@ -2,6 +2,11 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.0.2 (2026-10-13)
+
+- Data repo config is now `config.js`, an ES module (`export default { … }`) with comments and editor type hints (`cred-config.d.ts`, generated from the schema). `config.json` is no longer read; `scripts/config-to-js.mjs` converts one.
+- `version` is documented in full semantic-version form (`"^1.0.0"`, `"~1.0.0"`, `"1.0.2"`, `"latest"`).
+
 ## 1.0.1 (2026-10-13)
 
 Version ranges resolve against `/versions.json`; releases are published only as immutable `/v/<x.y.z>/` copies.
