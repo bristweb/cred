@@ -43,7 +43,7 @@
 .rw-tabs-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:6;min-width:min(240px,70vw);max-width:min(320px,85vw);display:flex;flex-direction:column;gap:4px;padding:6px;margin:0;background:var(--rw-card,#fff);border:1px solid var(--rw-line,#e3e3e3);border-radius:12px;box-shadow:var(--rw-nav-shadow,0 2px 12px rgba(0,0,0,.12))}
 .rw-tabs-menu[hidden]{display:none!important}
 .rw-tabs-menu .rw-tab{width:100%;justify-content:flex-start;border-radius:8px}
-/* Menu always shows names (even when the pill row is icon-only ≤1020). */
+/* Menu always shows names (even when the pill row is icon-only). */
 .rw-tabs-menu .rw-tab-name,.rw-tabs-menu .rw-tab-long{display:inline!important}
 .rw-tab{display:inline-flex;align-items:center;gap:6px;flex:none;border:1px solid var(--rw-line,#e3e3e3);background:var(--rw-card,#fff);border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;color:var(--rw-ink,#111);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap}
 .rw-tab img,.rw-tab-icon{width:16px;height:16px;flex:none}
@@ -71,9 +71,9 @@
 .rw-layout-carousel .rw-track{grid-auto-flow:column;grid-auto-columns:calc((100% - 48px)/4);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px 2px 8px}
 .rw-layout-carousel .rw-track::-webkit-scrollbar{display:none}
 .rw-layout-carousel .rw-card{scroll-snap-align:start}
-@container rw (max-width:1024px){.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 32px)/3)}}
+@container rw (max-width:1000px){.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 32px)/3)}}
 @container rw (max-width:760px){.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 16px)/2)}}
-@container rw (max-width:575px){.rw-layout-carousel .rw-track{grid-auto-columns:88%}}
+@container rw (max-width:480px){.rw-layout-carousel .rw-track{grid-auto-columns:88%}}
 .rw-card{color:inherit;text-decoration:none;display:flex;flex-direction:column;gap:10px;background:var(--rw-card,#fff);border:1px solid var(--rw-line,#e3e3e3);border-radius:var(--rw-radius,14px);padding:18px;min-height:240px;box-shadow:none;transition:transform .2s,border-color .2s}
 a.rw-card{cursor:pointer}
 a.rw-card:hover,a.rw-card:focus-visible{border-color:var(--rw-accent,#333);box-shadow:none;transform:translateY(-2px)}
@@ -143,21 +143,20 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
 .rw-lightbox-close{position:absolute;top:6px;right:6px;z-index:1;width:36px;height:36px;border-radius:50%;border:1px solid var(--rw-line,#e3e3e3);background:var(--rw-card,#fff);color:var(--rw-ink,#111);font-size:22px;line-height:1;cursor:pointer}
 .rw-initials{display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1;letter-spacing:.02em;user-select:none}
 .rw-nav:disabled{opacity:0;pointer-events:none}
-@container rw (max-width:575px){.rw-nav{display:none}}
+@container rw (max-width:480px){.rw-nav{display:none}}
 
-/* Header responsiveness follows the widget's own width (container queries), not the window.
-   >1020 one row: rating | tabs (All + as many filters as fit + More overflow) | Write
-   ≤1020 tabs collapse to icon + count (names stay in title/aria-label); overflow still fits, never wraps/scrolls
-   ≤720  compact: rating label and "Based on" hidden
-   ≤575  one row: filters hidden; rating + Write only
-   ≤360  button label → short string */
-@container rw (max-width:1020px){.rw-tab:not([data-p=all]) .rw-tab-name,.rw-tab-long{display:none}.rw-tab,.rw-tabs-more{padding:6px 10px;gap:5px}.rw-tabs{gap:5px}}
-@container rw (max-width:720px){.rw-header{gap:8px 10px;padding:9px 12px}.rw-summary{gap:9px}.rw-score{font-size:30px}.rw-label,.rw-based-pre{display:none}.rw-stars-lg i{width:15px;height:15px}
+/* Three shared width steps (container queries on the widget's own width); the header and the carousel use the same ones.
+   Between steps, the filter row fits itself: All + as many pills as fit + More (never wraps or scrolls).
+   >1000 rating | filters with names | Write; 4 cards
+   ≤1000 filter pills → icon + count; 3 cards
+   ≤760  compact header: rating label and "Based on" hidden; 2 cards
+   ≤480  filters hidden, short button label, no arrows; 1 card */
+@container rw (max-width:1000px){.rw-tab:not([data-p=all]) .rw-tab-name,.rw-tab-long{display:none}.rw-tab,.rw-tabs-more{padding:6px 10px;gap:5px}.rw-tabs{gap:5px}}
+@container rw (max-width:760px){.rw-header{gap:8px 10px;padding:9px 12px}.rw-summary{gap:9px}.rw-score{font-size:30px}.rw-label,.rw-based-pre{display:none}.rw-stars-lg i{width:15px;height:15px}
   .rw-write{padding:8px 13px;font-size:12.5px}.rw-tabs{gap:4px}.rw-tab,.rw-tabs-more{padding:4px 7px;gap:4px;font-size:12.5px}.rw-tab img,.rw-tab-icon{width:14px;height:14px}.rw-tab em{padding:0 5px;font-size:11px}}
-/* Narrow: one row only. The filter tabs are hidden (the cards show every review), the rating and a compact button share the row. */
-@container rw (max-width:575px){.rw-header{flex-wrap:nowrap;justify-content:space-between;gap:10px;padding:8px 12px}.rw-tabs{display:none}.rw-summary{flex:0 1 auto;min-width:0}.rw-write{margin-left:auto}}
 .rw-write-short{display:none}
-@container rw (max-width:360px){.rw-write-long{display:none}.rw-write-short{display:inline}.rw-write{padding:8px 14px}.rw-summary{gap:7px}.rw-score{font-size:28px}}
+@container rw (max-width:480px){.rw-header{justify-content:space-between}.rw-tabs{display:none}.rw-summary{flex:0 1 auto;min-width:0}.rw-write{margin-left:auto;padding:8px 14px}
+  .rw-write-long{display:none}.rw-write-short{display:inline}}
 
 /* ---- Fitting options (all opt-in; see the README "Options" table). Nothing below applies by default. ---- */
 /* data-arrows="inside": arrows sit within the widget's edges instead of overhanging them */
@@ -167,9 +166,9 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
 /* data-focus-ring="inside": focus outlines drawn inside tabs, button and arrows (never cut off at the edges) */
 .rw-focus-inside .rw-tab:focus-visible,.rw-focus-inside .rw-write:focus-visible,.rw-focus-inside .rw-nav:focus-visible,.rw-focus-inside .rw-tabs-more:focus-visible{outline-offset:-4px}
 /* data-cards="N": at most N cards side by side */
-@container rw (min-width:1025px){.rw-cards-3.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 32px)/3)}}
+@container rw (min-width:1001px){.rw-cards-3.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 32px)/3)}}
 @container rw (min-width:761px){.rw-cards-2.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 16px)/2)}}
-@container rw (min-width:576px){.rw-cards-1.rw-layout-carousel .rw-track{grid-auto-columns:100%}}
+@container rw (min-width:481px){.rw-cards-1.rw-layout-carousel .rw-track{grid-auto-columns:100%}}
 .rw-cards-1.rw-layout-grid .rw-track{grid-template-columns:minmax(0,1fr)}
 .rw-cards-2.rw-layout-grid .rw-track{grid-template-columns:repeat(auto-fill,minmax(max(270px,calc((100% - 16px)/2)),1fr))}
 .rw-cards-3.rw-layout-grid .rw-track{grid-template-columns:repeat(auto-fill,minmax(max(270px,calc((100% - 32px)/3)),1fr))}
@@ -190,38 +189,27 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
 .rw-fixed .rw-card-top,.rw-fixed .rw-stars,.rw-fixed .rw-rec,.rw-fixed .rw-link,.rw-fixed .rw-ai-top{flex:none}
 .rw-root.rw-fixed img.rw-accolade-badge{padding:6px 8px}
 .rw-fixed .rw-avatar-secondary{width:18px;height:18px}
-@container rw (max-height:460px){
-  .rw-fixed .rw-header{padding:9px 12px;margin-bottom:10px;gap:8px 12px}.rw-fixed .rw-score{font-size:30px}
-  .rw-fixed .rw-label,.rw-fixed .rw-based-pre{display:none}.rw-fixed .rw-card{padding:14px;gap:8px}}
+/* Two height steps in fixed mode; between them the card text scrolls inside its card.
+   ≤360  compact header and cards
+   ≤200  slim: no review count line, cards drop the date and the "View on" cue, snippets clamp to the lines that fit */
 @container rw (max-height:360px){
-  .rw-fixed .rw-header{padding:7px 10px;margin-bottom:8px}.rw-fixed .rw-score{font-size:26px}.rw-fixed .rw-stars i{width:15px;height:15px}.rw-fixed .rw-stars-lg i{width:14px;height:14px}
+  .rw-fixed .rw-header{padding:7px 10px;margin-bottom:8px;gap:8px 12px}.rw-fixed .rw-score{font-size:26px}.rw-fixed .rw-label,.rw-fixed .rw-based-pre{display:none}.rw-fixed .rw-based{margin-top:0}
+  .rw-fixed .rw-stars i{width:15px;height:15px}.rw-fixed .rw-stars-lg i{width:14px;height:14px}
   .rw-fixed .rw-write{padding:7px 12px;font-size:12.5px}.rw-fixed .rw-tab,.rw-fixed .rw-tabs-more{padding:4px 7px;font-size:12.5px}
-  .rw-fixed .rw-card{padding:12px;gap:6px}.rw-fixed .rw-avatar{width:36px;height:36px}.rw-fixed .rw-name{font-size:14px}
-  .rw-fixed .rw-text{font-size:14px;line-height:1.5}.rw-fixed .rw-ai-text{font-size:13px;line-height:1.45}}
-@container rw (max-height:300px){
-  .rw-fixed .rw-header{padding:6px 10px;margin-bottom:6px}.rw-fixed .rw-score{font-size:24px}.rw-fixed .rw-based{margin-top:0}
-  .rw-fixed .rw-card{padding:10px 12px;gap:5px}.rw-fixed .rw-avatar{width:32px;height:32px}.rw-fixed .rw-card-top{gap:9px}
-  .rw-fixed .rw-text{font-size:13.5px;line-height:1.45}.rw-fixed .rw-link{font-size:12.5px}}
-/* Very short fixed-height boxes: same layout, fewer extras. The header stays one compact row (no review count line),
-   cards drop the date and the "View on" cue, the snippet is clamped to the whole lines that fit, and the summary card
-   keeps as much room as possible for its text (which scrolls, with a fade at the bottom). */
-@container rw (max-height:240px){
-  .rw-fixed .rw-header{padding:4px 10px;margin-bottom:6px;gap:8px}.rw-fixed .rw-summary{gap:7px}
-  .rw-fixed .rw-score{font-size:22px}.rw-fixed .rw-based{display:none}.rw-fixed .rw-stars-lg i{width:13px;height:13px}
+  .rw-fixed .rw-card{padding:12px;gap:6px}.rw-fixed .rw-avatar{width:34px;height:34px}.rw-fixed .rw-name{font-size:14px}
+  .rw-fixed .rw-text{font-size:14px;line-height:1.5}.rw-fixed .rw-ai-text{font-size:13px;line-height:1.45}.rw-fixed .rw-link{font-size:12.5px}
+  .rw-fixed .rw-media-item{height:40px}}
+@container rw (max-height:200px){
+  .rw-fixed .rw-header{padding:3px 8px;margin-bottom:4px;gap:8px}.rw-fixed .rw-summary{gap:7px}
+  .rw-fixed .rw-score{font-size:20px}.rw-fixed .rw-based{display:none}.rw-fixed .rw-stars-lg i{width:13px;height:13px}
   .rw-fixed .rw-write{padding:4px 10px;font-size:12px}.rw-fixed .rw-tab,.rw-fixed .rw-tabs-more{padding:2px 7px;font-size:12px}
   .rw-fixed.rw-layout-carousel .rw-track{padding:2px 2px 4px}
-  .rw-fixed .rw-nav{width:28px;height:28px;font-size:20px;padding:0 0 2px}
-  .rw-fixed .rw-card{padding:8px 10px;gap:4px}
-  .rw-fixed .rw-card-top{gap:8px}.rw-fixed .rw-avatar{width:26px;height:26px}.rw-fixed .rw-name{font-size:13px}
-  .rw-fixed .rw-who time,.rw-fixed .rw-link{display:none}
-  .rw-fixed .rw-stars i{width:13px;height:13px}.rw-fixed .rw-stars svg{display:block}
-  .rw-fixed.rw-layout-carousel .rw-text{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.4}
+  .rw-fixed .rw-nav{width:24px;height:24px;font-size:18px;padding:0 0 2px}
+  .rw-fixed .rw-card{padding:6px 9px;gap:3px}
+  .rw-fixed .rw-card-top{gap:8px}.rw-fixed .rw-avatar{width:22px;height:22px}.rw-fixed .rw-name{font-size:13px}
+  .rw-fixed .rw-who time,.rw-fixed .rw-link,.rw-fixed .rw-subtitle{display:none}
+  .rw-fixed .rw-stars i{width:12px;height:12px}.rw-fixed .rw-stars svg{display:block}
+  .rw-fixed.rw-layout-carousel .rw-text{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.35}
   .rw-fixed .rw-ai{gap:3px}.rw-fixed .rw-ai-top{gap:5px}.rw-fixed .rw-ai-label{font-size:13px}
   .rw-fixed .rw-ai-icon{width:16px;height:16px}.rw-fixed .rw-ai-icon svg{width:10px;height:10px}
-  .rw-fixed .rw-ai-text{font-size:13px;line-height:1.4}}
-@container rw (max-height:180px){
-  .rw-fixed .rw-header{padding:3px 8px;margin-bottom:4px}.rw-fixed .rw-score{font-size:20px}
-  .rw-fixed .rw-card{padding:6px 9px;gap:3px}.rw-fixed .rw-avatar{width:20px;height:20px}
-  .rw-fixed .rw-stars i{width:12px;height:12px}
-  .rw-fixed.rw-layout-carousel .rw-text,.rw-fixed .rw-ai-text{font-size:12.5px;line-height:1.35}
-  .rw-fixed .rw-nav{width:24px;height:24px;font-size:18px}}
+  .rw-fixed .rw-ai-text{font-size:12.5px;line-height:1.35}.rw-fixed .rw-media-item{height:28px}.rw-fixed .rw-media-play{width:22px;height:22px}}
