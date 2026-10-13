@@ -11,5 +11,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: node --check assets/js/cred.js && node --check assets/js/reviews-widget.js && node --check scripts/validate.mjs && node --check scripts/badge.mjs
+      - run: node --check assets/js/cred.js && node --check scripts/validate.mjs && node --check scripts/badge.mjs
       - run: node scripts/validate.mjs example && node scripts/badge.mjs example && git diff --exit-code example/badge.json

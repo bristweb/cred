@@ -3,7 +3,7 @@
  * Write rating badge files into a reviews data repo, from the same reviews the widget shows
  * (skips "hidden": true records, display.hide keys and rated reviews below display.min_rating).
  *
- *   node reviews-widget/scripts/badge.mjs <data-repo-dir>   # default: .
+ *   node cred/scripts/badge.mjs <data-repo-dir>   # default: .
  *
  * badge.json  shields.io endpoint: https://img.shields.io/endpoint?url=<data-source>badge.json
  * badge.svg   the same badge as a static image

@@ -3,9 +3,9 @@
  * Validate a reviews data repo against the JSON Schemas in schemas/, plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
- *   node reviews-widget/scripts/validate.mjs <data-repo-dir>   # default: .
+ *   node cred/scripts/validate.mjs <data-repo-dir>   # default: .
  *
- * Requires the `ajv` dependency from this repo (`npm ci` in reviews-widget). The reusable workflow
+ * Requires the `ajv` dependency from this repo (`npm ci` in cred). The reusable workflow
  * installs it before running. Schemas: schemas/config.schema.json, schemas/reviews.schema.json.
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -25,7 +25,7 @@ try {
   Ajv = require('ajv');
   addFormats = require('ajv-formats');
 } catch (e) {
-  console.error(`Cannot load ajv from ${WIDGET}. Run: npm ci   (in the reviews-widget checkout)\n${e.message}`);
+  console.error(`Cannot load ajv from ${WIDGET}. Run: npm ci   (in the cred checkout)\n${e.message}`);
   process.exit(2);
 }
 

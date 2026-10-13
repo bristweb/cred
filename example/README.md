@@ -1,6 +1,6 @@
 # Example reviews data (fictional)
 
-Sample data for [bristweb/reviews-widget](https://github.com/bristweb/reviews-widget). **Northwind Cycles** is an invented bike shop — not a real business. Do not present these as real testimonials.
+Sample data for [bristweb/cred](https://github.com/bristweb/cred). **Northwind Cycles** is an invented bike shop — not a real business. Do not present these as real testimonials.
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional; the platform names identify where each sample would appear.
 
@@ -24,7 +24,7 @@ Google Sites / fixed-height box: add `data-constrained="true"`.
 - `reviews/<year>.json` — review records
 - `theme/theme.css` — `--rw-*` colors (light + dark)
 - `icons/`, `images/` — optional local assets
-- `.github/workflows/validate.yml` — validates against reviews-widget on push
+- `.github/workflows/validate.yml` — validates against cred on push
 
 ## Credits
 
