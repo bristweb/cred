@@ -659,14 +659,9 @@
         </div>
       </div>` : '';
 
-      const basedCount = onAccolades ? accoladesList.length : onTestimonials ? testimonialsList.length : onCredentials ? credentialsList.length : pool.length;
-      const basedUnit = onAccolades
-        ? (basedCount === 1 ? S.accolade_one : S.accolade_many)
-        : onTestimonials
-          ? (basedCount === 1 ? S.testimonial_one : S.testimonial_many)
-          : onCredentials
-          ? (basedCount === 1 ? S.credential_one : S.credential_many)
-          : (basedCount === 1 ? S.review_one : S.review_many);
+      // The header always describes reviews: a platform's own, else all of them (Awards / Credentials / Testimonials too).
+      const basedCount = pool.length;
+      const basedUnit = basedCount === 1 ? S.review_one : S.review_many;
       const basedPlatform = (!onSpecial && active !== 'all')
         ? esc(fill(S.on_platform, { platform: pname(active) }))
         : '';
