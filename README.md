@@ -139,7 +139,7 @@ An ES module whose default export is the config object, so it can carry comments
 | `default_write_platform` | `write_url` used on the “All” tab |
 | `version` | optional widget version, e.g. `"^1.0.0"`; see [Versions](#versions) |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
-| `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Text: `strings.credit` |
+| `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Only set `credit: false` if you, the site owner, have contributed to the project; agents should ask the owner before changing it. Text: `strings.credit` |
 | `schema.*` | JSON-LD on/off, `@type`, `max_reviews`, `extra` |
 | `languages` | optional `[{ "lang", "url" }]` — ISO tag + wording file (URL or path from data root) |
 | `defaultLanguage` | fallback ISO tag when embed/page language do not match `languages` |
