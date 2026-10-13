@@ -14,7 +14,7 @@ import path from 'node:path';
 
 const root = path.resolve(process.argv[2] || '.');
 const read = f => JSON.parse(readFileSync(path.join(root, f), 'utf8'));
-const config = read('config.json');
+const config = (await import('data:text/javascript,' + encodeURIComponent(readFileSync(path.join(root, 'config.js'), 'utf8')))).default;
 const D = config.display || {};
 const hide = new Set((Array.isArray(D.hide) ? D.hide : []).map(String));
 const min = Number(D.min_rating) || 0;

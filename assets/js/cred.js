@@ -1,6 +1,6 @@
 /* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
  * The code lives in this repo; everything about a site lives in a separate data repo, named by data-source:
- *   <source>config.json          business, platforms, display defaults, languages/defaultLanguage/strings, schema,
+ *   <source>config.js            business, platforms, display defaults, languages/defaultLanguage/strings, schema,
  *                                summary card, optional accolades/testimonials, and reviews.years
  *   <source>lang/<code>.json     optional UI wording files listed in config.languages[{lang,url}]. Partial OK.
  *   <source>reviews/<year>.json  the reviews (plain records, newest first) — the only copy of the review data
@@ -30,10 +30,10 @@
   const DEFAULT_BASE = ME && ME.src ? new URL('../../', ME.src).href : './'; // this repo's root (code + CSS)
   // Shared across every copy of this script on the page, so data and CSS load once.
   const SHARED = (window.__reviewsWidget ??= { css: {}, loads: {} });
-  // Build version (kept equal to package.json). config.json "version" may ask for another release: the newest
+  // Build version (kept equal to package.json). config.js `version` may ask for another release: the newest
   // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
-  const VERSION = '1.0.1';
+  const VERSION = '1.0.2';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   const num = v => v.split('.').map(Number);
   const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
@@ -265,7 +265,8 @@
   }
   function loadData(src) {
     return (loads[src] ??= (() => {
-      const config = ((SHARED.configs ??= {})[src] = fetchJson(src + 'config.json'));
+      // config.js: an ES module whose default export is the config object.
+      const config = ((SHARED.configs ??= {})[src] = import(src + 'config.js').then(m => m.default));
       const reviews = config.then(c => Promise.all(((c.reviews && c.reviews.years) || []).map(y => fetchJson(`${src}reviews/${y}.json`))))
         .then(years => [].concat(...years));
       return Promise.all([config, reviews]);
@@ -410,7 +411,7 @@
     }
     const PLATFORMS = config.platforms || {};
     const RL = (config.rating_labels || fromSel.rating_labels || fromEn.rating_labels || RATING_LABELS).slice().sort((a, b) => b.min - a.min);
-    // URL param > data-* > config.json display > built-in default.
+    // URL param > data-* > config display > built-in default.
     const opt = (param, key, dkey) => (q.get(param) !== null ? q.get(param) : opts[key] != null ? opts[key] : D[dkey]);
     const constrained = toBool(opt('constrained', 'constrained', 'constrained'));
     // One platform key from config.platforms, or omit / empty → all. ("all" still accepted.)

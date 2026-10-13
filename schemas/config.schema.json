@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.com/reviews-widget/schemas/config.schema.json",
-  "title": "Reviews widget data-repo config.json",
+  "title": "CredConfig",
   "type": "object",
   "required": [
     "business",
@@ -13,7 +13,7 @@
     "version": {
       "type": "string",
       "pattern": "^(latest|\\*|[~^]?\\d+(\\.\\d+){0,2}|\\d+(\\.\\d+)?\\.x)$",
-      "description": "Widget version to load: exact \"1.4.2\", caret \"^1\" / \"^1.4\", tilde \"~1.4\", \"1.x\" / \"1.4.x\", or \"latest\" / \"*\" (default)."
+      "description": "Widget version to load (semver, full major.minor.patch): exact \"1.0.2\", caret \"^1.0.0\" (same major), tilde \"~1.0.0\" (same minor), or \"latest\" (default). Pin a caret range in production."
     },
     "business": {
       "type": "object",
@@ -591,5 +591,6 @@
         }
       }
     }
-  }
+  },
+  "description": "CRED data repo config (config.js default export)."
 }

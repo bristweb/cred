@@ -34,7 +34,7 @@ Columns: **CRED** first; other products sorted by score (✅×2 + 🟡) on that 
 2. e.g. GitHub Pages or another free static host.
 3. Free tiers usually mean view caps and/or vendor branding.
 4. Your data repo (or folder) is the copy the widget reads.
-6. Summary text you store in `config.json` (labeled “Summary” in the widget).
+6. Summary text you store in `config.js` (labeled “Summary” in the widget).
 7. AI summaries / tagging on higher plans.
 8. 30+ review sources.
 9. Google, Facebook, Trustpilot, Yelp, and more.

@@ -51,7 +51,7 @@ Same live demo URLs as at the top of this README. For a real site, keep the scri
         data-source="https://cred.bristleconeweb.com/example/" defer></script>
 ```
 
-The widget renders where the tag is. It loads CSS from this repo and `theme/theme.css`, `config.json`, and every `reviews/<year>.json` from `data-source`, in parallel. Options go on the same tag ([list](#options)).
+The widget renders where the tag is. It loads CSS from this repo and `theme/theme.css`, `config.js`, and every `reviews/<year>.json` from `data-source`, in parallel. Options go on the same tag ([list](#options)).
 
 - Sizes itself in the page; no resize script needed for the JS embed.
 - Invisible until font and first layout are ready, then fades in once.
@@ -94,7 +94,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 
 ## Options
 
-Each option below is set as `data-<name>` on the script (or target element) and/or as `?<name>=` in the URL. Query wins over `data-*`, which wins over `display` in `config.json`, which wins over the built-in default. Omit an option to keep its default. `source` is special: `?source=` applies only when there is no `data-source`.
+Each option below is set as `data-<name>` on the script (or target element) and/or as `?<name>=` in the URL. Query wins over `data-*`, which wins over `display` in `config.js`, which wins over the built-in default. Omit an option to keep its default. `source` is special: `?source=` applies only when there is no `data-source`.
 
 | Option | Values | Default |
 |---|---|---|
@@ -119,7 +119,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 Plain files at the data root, served over HTTPS with CORS open enough for your pages to fetch them (Cloudflare Pages with the included `_headers`, or GitHub Pages by default; any static host works). The widget reads only these paths; other folders (e.g. your own `scripts/`) are never loaded.
 
 ```
-config.json              business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, credentials, testimonials, reviews.years, …
+config.js                business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, credentials, testimonials, reviews.years, …
 lang/<code>.json         optional UI wording (listed in config.languages; partial OK)
 reviews/<year>.json      reviews dated that year (array, newest first)
 images/reviewers/        optional local avatars (any path/URL works in records)
@@ -128,14 +128,16 @@ theme/theme.css          @font-face + --rw-* variables
 theme/fonts/             optional self-hosted fonts
 ```
 
-### `config.json`
+### `config.js`
+
+An ES module whose default export is the config object, so it can carry comments. `// @ts-check` plus the `/** @type {import('./cred-config').CredConfig} */` line above `export default` gives editor autocomplete and type checks from `cred-config.d.ts` (copy it from `example/`; it is generated from `schemas/config.schema.json`). Migrating from an older `config.json`: `node scripts/config-to-js.mjs <data-dir>`, then delete `config.json`. `reviews.years` stays on one line (`years: [2026, 2025]`) so import scripts can update it.
 
 | Key | Role |
 |---|---|
 | `business` | `name` (required), optional `website` and extras |
 | `platforms` | review platforms in **tab order**: `name`, `icon`, `write_url`, `page_url`, `card_link` (`review`\|`page`), optional `invert_icon_when_active`, optional `nofollow` / `noreferrer` (or `rel`) for outbound write/card links. Extra fields (scrape URLs, notes, …) are ignored by the widget |
 | `default_write_platform` | `write_url` used on the “All” tab |
-| `version` | optional widget version range, e.g. `"^1"`; see [Versions](#versions) |
+| `version` | optional widget version, e.g. `"^1.0.0"`; see [Versions](#versions) |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
 | `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Text: `strings.credit` |
 | `schema.*` | JSON-LD on/off, `@type`, `max_reviews`, `extra` |
@@ -198,7 +200,7 @@ Formal shape: `schemas/reviews.schema.json` in this repo.
 
 | Schema | Validates |
 |---|---|
-| `schemas/config.schema.json` | `config.json` |
+| `schemas/config.schema.json` | `config.js` |
 | `schemas/reviews.schema.json` | each `reviews/<year>.json` array |
 
 Optional check: from a checkout of this repo, run `node scripts/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`).
@@ -232,7 +234,7 @@ After validating, the same workflow writes `badge.json` and `badge.svg` at the d
 
 ## Updating data
 
-Edit the cloned data repo (same shape as `example/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.json` / icons / theme as needed, then publish. Optionally run `node scripts/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
+Edit the cloned data repo (same shape as `example/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / icons / theme as needed, then publish. Optionally run `node scripts/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
 
 ---
 
@@ -273,16 +275,16 @@ Above those heights, long card text scrolls inside its card.
 
 ## Versions
 
-The embed code never changes: `…/assets/js/cred.js` is always the latest release. A data repo can pin the widget version with a top-level `"version"` in `config.json` (package.json-style, common subset):
+The embed code never changes: `…/assets/js/cred.js` is always the latest release. A data repo can pin the widget version with `version` in `config.js`, written as a full semantic version:
 
 | `version` | Loads |
 |---|---|
-| omitted, `"latest"`, `"*"` | latest |
-| `"^1"`, `"^1.4"`, `"1"`, `"1.x"` | newest 1.x (at least 1.4 for `^1.4`) |
-| `"~1.4"`, `"1.4"`, `"1.4.x"` | newest 1.4.x |
-| `"1.4.2"` | exactly 1.4.2 |
+| `"latest"` (or omitted) | the latest release |
+| `"^1.0.0"` | newest 1.x.x, at least 1.0.0 |
+| `"~1.0.0"` | newest 1.0.x, at least 1.0.0 |
+| `"1.0.2"` | exactly 1.0.2 |
 
-When the latest build already satisfies the range (e.g. `"^1"` while latest is 1.x), nothing extra loads. Otherwise it reads `/versions.json` (the list of releases), picks the newest match and loads that release's immutable copy from `/v/<x.y.z>/` once, reusing the data it already fetched. Recommended: `"^1"`, which takes fixes and features but never a breaking change. The `/v/` copies are built by the Cloudflare Pages deploy; on GitHub Pages only the latest is served.
+When the latest build already satisfies the range (e.g. `"^1.0.0"` while latest is 1.x.x), nothing extra loads. Otherwise it reads `/versions.json` (the list of releases), picks the newest match and loads that release's immutable copy from `/v/<x.y.z>/` once, reusing the data it already fetched. Recommended for production: `"^1.0.0"`, which takes fixes and features but never a breaking change. The `/v/` copies are built by the Cloudflare Pages deploy; on GitHub Pages only the latest is served.
 
 Releases follow [semantic versioning](https://semver.org/): breaking changes to the embed, options or data format bump the major version; new features the minor; fixes the patch. Each release is a `vX.Y.Z` git tag; see [CHANGELOG.md](CHANGELOG.md).
 
@@ -295,7 +297,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ## New data repo
 
-Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.json`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL.
+Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL.
 
 **Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
 
@@ -304,7 +306,7 @@ Clone this repo’s `example/` folder (or copy it into a new repo) and replace t
 
 ## Technical details
 
-- Loads `config.json`, then all year files in parallel; injects CSS if missing.
+- Loads `config.js` (an ES module), then all year files in parallel; injects CSS if missing.
 - Without `data-source` / `?source=`, shows the unavailable message.
 - Fixed-height mode: host height 100% or viewport remainder; card text scrolls without blocking horizontal swipe.
 - Icons: data-repo SVG, then Simple Icons CDN fallback.

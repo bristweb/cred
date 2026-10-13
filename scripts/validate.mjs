@@ -44,14 +44,18 @@ const norm = s => String(s ?? '').replace(/\s+/g, ' ').trim();
 const checkExcerpt = (at, r) => { if (r?.excerpt != null && !norm(r.text).includes(norm(r.excerpt))) err(`${at}: excerpt is not an exact passage of text`); };
 const isIso = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(s) && !Number.isNaN(Date.parse(s));
 
-const config = readJson('config.json');
+// config.js: ES module, default export = the config object (loaded as a module whatever the repo's package.json says).
+let config = null;
+try { config = (await import('data:text/javascript,' + encodeURIComponent(readFileSync(path.join(root, 'config.js'), 'utf8')))).default; }
+catch (e) { err(`config.js: ${e.code === 'ENOENT' ? 'missing' : 'cannot load (' + e.message + ')'}`); }
+if (existsSync(path.join(root, 'config.json'))) warn('config.json is no longer read; config.js is the config (node cred/scripts/config-to-js.mjs converts it)');
 if (config) {
-  if (!validateConfig(config)) for (const e of validateConfig.errors) err(fmt('config.json', e));
+  if (!validateConfig(config)) for (const e of validateConfig.errors) err(fmt('config.js', e));
 }
 const platforms = (config && config.platforms) || {};
 const relIcon = (where, icon) => {
   if (icon && !/^(https?:)?\/\//.test(icon) && !icon.startsWith('data:') && !existsSync(path.join(root, icon)))
-    err(`config.json ${where}: ${icon} not found`);
+    err(`config.js ${where}: ${icon} not found`);
 };
 for (const [k, p] of Object.entries(platforms)) relIcon(`platforms.${k}`, p.icon || `icons/${k}.svg`);
 for (const l of (config && config.links) || []) relIcon(`links.${l.platform}`, l.icon);
@@ -59,7 +63,7 @@ for (const k of ['accolades_icon', 'credentials_icon', 'testimonials_icon']) if 
 (Array.isArray(config?.credentials) ? config.credentials : []).forEach((c, i) => {
   if (!c || typeof c !== 'object') return;
   if (c.icon) relIcon(`credentials[${i}]`, c.icon);
-  if (c.start && c.end && String(c.end) < String(c.start)) err(`config.json credentials[${i}]: end ${c.end} is before start ${c.start}`);
+  if (c.start && c.end && String(c.end) < String(c.start)) err(`config.js credentials[${i}]: end ${c.end} is before start ${c.start}`);
 });
 (Array.isArray(config?.accolades) ? config.accolades : []).forEach((a, i) => {
   if (!a || typeof a !== 'object') return;
@@ -67,40 +71,40 @@ for (const k of ['accolades_icon', 'credentials_icon', 'testimonials_icon']) if 
 });
 (Array.isArray(config?.testimonials) ? config.testimonials : []).forEach((t, i) => {
   if (!t || typeof t !== 'object') return;
-  checkExcerpt(`config.json testimonials[${i}]`, t);
+  checkExcerpt(`config.js testimonials[${i}]`, t);
   (Array.isArray(t.media) ? t.media : []).forEach((m, j) => {
     for (const k of ['url', 'thumbnail', 'poster']) if (m?.[k] && !(m.type === 'link' && k === 'url')) relIcon(`testimonials[${i}].media[${j}].${k}`, String(m[k]));
   });
-  if (t.reviewer_name != null) err(`config.json testimonials[${i}]: reviewer_name is obsolete; use title (and optional subtitle)`);
+  if (t.reviewer_name != null) err(`config.js testimonials[${i}]: reviewer_name is obsolete; use title (and optional subtitle)`);
   if (t.source && typeof t.source === 'object' && t.source.logo) relIcon(`testimonials[${i}].source`, t.source.logo);
   if (t.reviewer_image) {
     const img = String(t.reviewer_image);
     if (!/^(https?:|data:|\/)/i.test(img) && !existsSync(path.join(root, img)))
-      err(`config.json testimonials[${i}]: reviewer_image ${img} not found`);
+      err(`config.js testimonials[${i}]: reviewer_image ${img} not found`);
   }
 });
 if (!existsSync(path.join(root, 'theme', 'theme.css'))) warn('theme/theme.css not found (the widget loads it)');
 
 // Language files listed in config.languages: [{ lang, url }, …]. defaultLanguage is a fallback ISO tag.
 if (config) {
-  if (config.default_language != null) warn('config.json: default_language is obsolete; use defaultLanguage');
+  if (config.default_language != null) warn('config.js: default_language is obsolete; use defaultLanguage');
   if (config.languages && typeof config.languages === 'object' && !Array.isArray(config.languages)) {
-    err('config.json: languages must be an array of { lang, url } (object map form is obsolete)');
+    err('config.js: languages must be an array of { lang, url } (object map form is obsolete)');
   }
   const langs = Array.isArray(config.languages) ? config.languages : null;
   if (langs) {
     const norm = c => String(c || '').trim().replace(/_/g, '-').toLowerCase();
     const tags = [];
     langs.forEach((entry, i) => {
-      if (!entry || typeof entry !== 'object') { err(`config.json: languages[${i}] must be an object`); return; }
+      if (!entry || typeof entry !== 'object') { err(`config.js: languages[${i}] must be an object`); return; }
       const code = entry.lang;
       const rel = entry.url;
-      if (code == null || !String(code).trim()) err(`config.json: languages[${i}].lang is required`);
+      if (code == null || !String(code).trim()) err(`config.js: languages[${i}].lang is required`);
       else tags.push(norm(code));
-      if (rel == null || !String(rel).trim()) { err(`config.json: languages[${i}].url must be a non-empty path or URL`); return; }
+      if (rel == null || !String(rel).trim()) { err(`config.js: languages[${i}].url must be a non-empty path or URL`); return; }
       const langRel = String(rel).trim();
       if (/^(https?:)?\/\//i.test(langRel) || langRel.startsWith('/')) return;
-      if (!existsSync(path.join(root, langRel))) err(`config.json: languages[${i}].url file ${langRel} not found`);
+      if (!existsSync(path.join(root, langRel))) err(`config.js: languages[${i}].url file ${langRel} not found`);
       else {
         const pack = readJson(langRel);
         if (pack && typeof pack === 'object') {
@@ -114,18 +118,18 @@ if (config) {
       const want = norm(def);
       const wantPrimary = want.split('-')[0];
       const matchable = tags.some(t => t === want || t === wantPrimary || t.split('-')[0] === want || t.split('-')[0] === wantPrimary);
-      if (tags.length && !matchable) warn(`config.json: defaultLanguage "${def}" does not match any languages[].lang (widget English will be used)`);
+      if (tags.length && !matchable) warn(`config.js: defaultLanguage "${def}" does not match any languages[].lang (widget English will be used)`);
     } else if (tags.length) {
-      warn('config.json: languages set but defaultLanguage missing');
+      warn('config.js: languages set but defaultLanguage missing');
     }
   }
-  if (typeof config.strings === 'string') err('config.json: strings must be an object of inline overrides (use languages for translation files)');
+  if (typeof config.strings === 'string') err('config.js: strings must be an object of inline overrides (use languages for translation files)');
 }
 
 const years = (config && config.reviews && config.reviews.years) || [];
-if (Array.isArray(years) && years.some((y, i) => i && y >= years[i - 1])) err('config.json: reviews.years must be unique and sorted newest first');
+if (Array.isArray(years) && years.some((y, i) => i && y >= years[i - 1])) err('config.js: reviews.years must be unique and sorted newest first');
 const files = existsSync(path.join(root, 'reviews')) ? readdirSync(path.join(root, 'reviews')).filter(f => f.endsWith('.json')) : [];
-for (const f of files) if (!years.includes(Number(f.replace(/\.json$/, '')))) err(`reviews/${f}: not listed in config.json reviews.years`);
+for (const f of files) if (!years.includes(Number(f.replace(/\.json$/, '')))) err(`reviews/${f}: not listed in config.js reviews.years`);
 
 const seen = new Map(), used = new Set(), counts = {}, hideKeys = new Set();
 let total = 0, hidden = 0;
@@ -138,7 +142,7 @@ for (const y of years) {
   list.forEach((r, i) => {
     const at = `${f}[${i}]`;
     checkExcerpt(at, r);
-    if (r.platform && !platforms[r.platform]) err(`${at}: platform "${r.platform}" is not in config.json platforms`);
+    if (r.platform && !platforms[r.platform]) err(`${at}: platform "${r.platform}" is not in config.js platforms`);
     if (r.date && isIso(r.date) && r.date.slice(0, 4) !== String(y)) err(`${at}: dated ${r.date.slice(0, 10)} but stored in ${f}`);
     if (i && r.date > list[i - 1].date) err(`${at}: not newest first`);
     const key = `${r.platform}:${r.platform_review_id}`;
@@ -165,7 +169,7 @@ for (const y of years) {
 });
 // display.hide keys are <platform>-<platform_review_id>; a key that matches no review is probably a typo.
 const hideList = Array.isArray(config?.display?.hide) ? config.display.hide : [];
-for (const k of hideList) if (!hideKeys.has(String(k))) warn(`config.json display.hide: "${k}" matches no review (expected <platform>-<platform_review_id>)`);
+for (const k of hideList) if (!hideKeys.has(String(k))) warn(`config.js display.hide: "${k}" matches no review (expected <platform>-<platform_review_id>)`);
 const imgDir = path.join(root, 'images', 'reviewers');
 if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`images/reviewers/${f}`)) warn(`images/reviewers/${f}: not referenced by any review or testimonial (ok if unused)`);
 
