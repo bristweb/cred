@@ -1,6 +1,6 @@
 # Icon attribution
 
-The default Awards and Testimonials filter icons (`trophy.svg`, `message-square-quote.svg`; the widget draws the same artwork inline) are from [Lucide](https://lucide.dev/) (v1.52.0), used under the ISC License:
+The default Awards, Credentials and Testimonials filter icons (`trophy.svg`, `badge-check.svg`, `message-square-quote.svg`; the widget draws the same artwork inline) are from [Lucide](https://lucide.dev/) (v1.52.0), used under the ISC License:
 
 ```
 ISC License

@@ -1,7 +1,7 @@
 {
   "loading": "Loading reviews…",
   "unavailable": "Reviews are unavailable right now.",
-  "tabs_aria": "Filter reviews by platform, awards, or testimonials",
+  "tabs_aria": "Filter reviews by platform, awards, credentials, or testimonials",
   "tab_all": "All",
   "tab_all_suffix": "",
   "tab_title": "{name}",
@@ -64,5 +64,21 @@
   "tabs_more": "More",
   "tabs_more_aria": "More filters",
   "accolade_card_aria_nolink": "{label} ({year})",
-  "card_aria_nolink": "{name}'s review on {platform}"
+  "card_aria_nolink": "{name}'s review on {platform}",
+  "tab_credentials": "Credentials",
+  "tab_credentials_title": "{name}: {count} credentials",
+  "tab_credentials_aria": "{name}, {count} credentials",
+  "credential_one": "credential",
+  "credential_many": "credentials",
+  "view_credential": "Verify",
+  "credential_since": "Since {start}",
+  "credential_range": "{start}–{end}",
+  "credential_expired": "{range} · Expired",
+  "credential_card_aria": "{label} ({dates}) — opens in a new tab",
+  "credential_card_aria_nolink": "{label} ({dates})",
+  "media_image": "View image",
+  "media_audio": "Play audio",
+  "media_video": "Play video",
+  "media_link": "View post",
+  "media_close": "Close"
 }

@@ -55,7 +55,12 @@ const relIcon = (where, icon) => {
 };
 for (const [k, p] of Object.entries(platforms)) relIcon(`platforms.${k}`, p.icon || `icons/${k}.svg`);
 for (const l of (config && config.links) || []) relIcon(`links.${l.platform}`, l.icon);
-for (const k of ['accolades_icon', 'testimonials_icon']) if (config?.display?.[k]) relIcon(`display.${k}`, String(config.display[k]));
+for (const k of ['accolades_icon', 'credentials_icon', 'testimonials_icon']) if (config?.display?.[k]) relIcon(`display.${k}`, String(config.display[k]));
+(Array.isArray(config?.credentials) ? config.credentials : []).forEach((c, i) => {
+  if (!c || typeof c !== 'object') return;
+  if (c.icon) relIcon(`credentials[${i}]`, c.icon);
+  if (c.start && c.end && String(c.end) < String(c.start)) err(`config.json credentials[${i}]: end ${c.end} is before start ${c.start}`);
+});
 (Array.isArray(config?.accolades) ? config.accolades : []).forEach((a, i) => {
   if (!a || typeof a !== 'object') return;
   if (a.icon) relIcon(`accolades[${i}]`, a.icon);
@@ -167,10 +172,12 @@ if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`imag
 for (const w of warnings) console.warn('warning:', w);
 if (errors.length) { console.error(errors.join('\n')); console.error(`\n${errors.length} problem(s)`); process.exit(1); }
 const nAcc = Array.isArray(config?.accolades) ? config.accolades.length : 0;
+const nCred = Array.isArray(config?.credentials) ? config.credentials.length : 0;
 const nTes = Array.isArray(config?.testimonials) ? config.testimonials.length : 0;
 console.log(`ok: ${total} reviews (${Object.entries(counts).map(([k, n]) => `${k} ${n}`).join(', ') || 'none'}) in ${years.length} year file(s)` +
   (hidden || hideList.length ? `; hidden: ${hidden} record(s) marked hidden, ${hideList.length} display.hide key(s)` : '') +
   (config?.display?.min_rating ? `; min_rating ${config.display.min_rating}` : '') +
   (nAcc ? `; ${nAcc} accolade(s)` : '') +
+  (nCred ? `; ${nCred} credential(s)` : '') +
   (nTes ? `; ${nTes} testimonial(s)` : '') +
   (config?.summary ? `; summary generated ${config.summary.generated_at}` : ''));

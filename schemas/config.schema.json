@@ -147,6 +147,11 @@
           "type": "string",
           "minLength": 1,
           "description": "Optional icon for the Testimonials filter pill: path relative to the data root or an absolute URL (SVG or image, shown at the platform icon size). Omit to use the built-in quote bubble icon."
+        },
+        "credentials_icon": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional icon for the Credentials filter pill: path relative to the data root or an absolute URL. Omit to use the built-in badge icon."
         }
       }
     },
@@ -504,6 +509,80 @@
           "type": "string",
           "minLength": 1,
           "description": "Left-hand badge text. Default rating."
+        }
+      }
+    },
+    "credentials": {
+      "type": "array",
+      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows the date range: Since <start>, <start>\u2013<end>, or <start>\u2013<end> \u00b7 Expired once end is past. Expired credentials are not hidden. Not counted in ratings or the JSON-LD.",
+      "items": {
+        "type": "object",
+        "required": [
+          "start"
+        ],
+        "additionalProperties": true,
+        "anyOf": [
+          {
+            "required": [
+              "label"
+            ]
+          },
+          {
+            "required": [
+              "title"
+            ]
+          },
+          {
+            "required": [
+              "icon"
+            ]
+          }
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Card title (title is an alias)."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issuer": {
+            "type": "string",
+            "description": "Optional issuing body, shown under the title."
+          },
+          "icon": {
+            "type": "string",
+            "description": "Optional badge image (URL or path relative to the data root)."
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Optional. When set, the card links with a Verify cue (or link_text); when omitted, the card is not clickable and has no link text."
+          },
+          "link_text": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+            "description": "Required. YYYY, YYYY-MM or YYYY-MM-DD. Sort key on the track."
+          },
+          "end": {
+            "type": "string",
+            "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+            "description": "Optional. YYYY, YYYY-MM or YYYY-MM-DD. After this date the card shows as expired."
+          },
+          "nofollow": {
+            "type": "boolean"
+          },
+          "noreferrer": {
+            "type": "boolean"
+          },
+          "rel": {
+            "type": "string"
+          }
         }
       }
     }
