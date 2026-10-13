@@ -30,27 +30,40 @@
   const DEFAULT_BASE = ME && ME.src ? new URL('../../', ME.src).href : './'; // this repo's root (code + CSS)
   // Shared across every copy of this script on the page, so data and CSS load once.
   const SHARED = (window.__reviewsWidget ??= { css: {}, loads: {} });
-  // Build version (kept equal to package.json). config.json "version" may ask for another build: the matching
-  // /v/<x.y.z>/, /v/<major>/ or /v/<major>.<minor>/ copy is then loaded once and takes over, reusing the data
-  // already fetched. When this build satisfies the request (e.g. "^1" on any 1.x), nothing extra loads.
-  const VERSION = '1.0.0';
+  // Build version (kept equal to package.json). config.json "version" may ask for another release: the newest
+  // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
+  // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
+  const VERSION = '1.0.1';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
-  function versionPath(want) {
+  const num = v => v.split('.').map(Number);
+  const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+  // "1.4.2" exact; "^1", "^1.4", "1", "1.x" same major; "~1.4", "1.4", "1.4.x" same minor. Returns a test or null (= latest).
+  function range(want) {
     const w = String(want == null ? '' : want).trim().toLowerCase();
     if (!w || w === 'latest' || w === '*' || w === 'x') return null;
-    const [M, m, p] = VERSION.split('.').map(Number);
-    const ge = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
     let r;
-    if ((r = /^(\d+)\.(\d+)\.(\d+)$/.exec(w))) return w === VERSION ? null : `v/${w}/`;
+    if ((r = /^(\d+)\.(\d+)\.(\d+)$/.exec(w))) return v => v === w;
     if ((r = /^\^(\d+)(?:\.(\d+))?(?:\.(\d+))?$/.exec(w)) || (r = /^(\d+)(?:\.x)?$/.exec(w))) {
-      const req = [+r[1], +(r[2] || 0), +(r[3] || 0)];
-      return M === req[0] && ge([M, m, p], req) >= 0 ? null : `v/${req[0]}/`;
+      const q = [+r[1], +(r[2] || 0), +(r[3] || 0)];
+      return v => { const n = num(v); return n[0] === q[0] && cmp(n, q) >= 0; };
     }
     if ((r = /^~(\d+)\.(\d+)(?:\.(\d+))?$/.exec(w)) || (r = /^(\d+)\.(\d+)(?:\.x)?$/.exec(w))) {
-      const req = [+r[1], +r[2], +(r[3] || 0)];
-      return M === req[0] && m === req[1] && p >= req[2] ? null : `v/${req[0]}.${req[1]}/`;
+      const q = [+r[1], +r[2], +(r[3] || 0)];
+      return v => { const n = num(v); return n[0] === q[0] && n[1] === q[1] && n[2] >= q[2]; };
     }
     console.warn('[reviews-widget] unsupported version range, using latest:', want);
+    return null;
+  }
+  // null = use this build; else the "v/x.y.z/" path of the newest release in range (versions.json only when needed).
+  async function versionPath(want) {
+    const ok = range(want);
+    if (!ok || ok(VERSION)) return null;
+    try {
+      const list = (await (SHARED.versions ??= fetchJson(DEFAULT_BASE + 'versions.json'))).versions || [];
+      const best = list.filter(ok).sort((a, b) => cmp(num(a), num(b))).pop();
+      if (best) return `v/${best}/`;
+    } catch (e) { console.warn('[reviews-widget] versions.json', e); }
+    console.warn('[reviews-widget] no release matches', want, '- using', VERSION);
     return null;
   }
   const handoffs = (SHARED.handoff ??= []);
@@ -368,7 +381,7 @@
         ensureCss(code + 'assets/css/cred.css'); // in parallel; dropped again if another build takes over
         loadData(base);
         const c = await SHARED.configs[base];
-        const v = versionPath(c.version);
+        const v = await versionPath(c.version);
         if (v) { host.innerHTML = ''; handOff(DEFAULT_BASE + v + 'assets/js/cred.js', host, opts); return; }
       }
       [config, reviews] = await load(code, base);

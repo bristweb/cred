@@ -282,7 +282,7 @@ The embed code never changes: `…/assets/js/cred.js` is always the latest relea
 | `"~1.4"`, `"1.4"`, `"1.4.x"` | newest 1.4.x |
 | `"1.4.2"` | exactly 1.4.2 |
 
-When the latest build already satisfies the range (e.g. `"^1"` while latest is 1.x), nothing extra loads. Otherwise the widget loads the matching copy from `/v/<x.y.z>/`, `/v/<major>/` or `/v/<major>.<minor>/` once, reusing the data it already fetched. `/versions.json` lists every release. Recommended: `"^1"`, which takes fixes and features but never a breaking change. The `/v/` copies are built by the Cloudflare Pages deploy; on GitHub Pages only the latest is served.
+When the latest build already satisfies the range (e.g. `"^1"` while latest is 1.x), nothing extra loads. Otherwise it reads `/versions.json` (the list of releases), picks the newest match and loads that release's immutable copy from `/v/<x.y.z>/` once, reusing the data it already fetched. Recommended: `"^1"`, which takes fixes and features but never a breaking change. The `/v/` copies are built by the Cloudflare Pages deploy; on GitHub Pages only the latest is served.
 
 Releases follow [semantic versioning](https://semver.org/): breaking changes to the embed, options or data format bump the major version; new features the minor; fixes the patch. Each release is a `vX.Y.Z` git tag; see [CHANGELOG.md](CHANGELOG.md).
 
