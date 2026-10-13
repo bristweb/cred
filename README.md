@@ -220,7 +220,14 @@ Edit the cloned data repo (same shape as `example/`): add or change records in `
 
 ## Structured data (JSON-LD)
 
-Built in the browser and injected once per page as `#reviews-widget-schema`. `@type` from `schema.type` (default `LocalBusiness`), `aggregateRating` from 1–5 ratings only, `review` items in card order. Hidden reviews (`hide`, `min_rating`, `"hidden": true`) are left out of both, like the counts and filter tabs. Disable with `schema.enabled: false` or `data-schema="off"`. Google often withholds review stars for self-serving business markup; the JSON-LD still describes the entity accurately.
+Built in the browser and injected once per page as `#reviews-widget-schema`. `@type` from `schema.type` (default `LocalBusiness`), `aggregateRating` from 1–5 ratings only, `review` items in card order. Hidden reviews (`hide`, `min_rating`, `"hidden": true`) are left out of both, like the counts and filter tabs. Disable with `schema.enabled: false` or `data-schema="off"`.
+
+### Stars in Google results
+
+- Valid `AggregateRating` / `Review` markup makes review stars possible in search results; Google never guarantees them ([review snippets](https://developers.google.com/search/docs/appearance/structured-data/review-snippet)).
+- Google does not show stars for self-serving reviews: a `LocalBusiness` or `Organization` marking up reviews about itself on its own site, including through an embedded widget ([announcement](https://developers.google.com/search/blog/2019/09/making-review-rich-results-more-helpful)). Other eligible types, such as `Product`, can qualify (`schema.type`).
+- Google reads JSON-LD added by JavaScript, as this widget does; check a live page with the [Rich Results Test](https://search.google.com/test/rich-results) ([JavaScript guide](https://developers.google.com/search/docs/appearance/structured-data/generate-structured-data-with-javascript)).
+- Markup must match what visitors can see. The widget builds it from the shown reviews only, so hidden reviews are left out.
 
 ---
 
