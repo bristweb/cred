@@ -1,7 +1,8 @@
 // Optional Cloudflare Pages Function (same file for the widget repo and data repos). With an empty or missing
 // allowlist.json every request is served, with Access-Control-Allow-Origin: *. With hosts listed, a request whose
 // Origin/Referer is another, unlisted host gets 403; "*.example.com" also matches subdomains. Requests with no
-// Origin/Referer (direct visits, crawlers) and from the host itself are always served.
+// Origin/Referer (direct visits, crawlers), from the host itself, page visits (link clicks) and images are
+// always served, so only script and data use by other sites is gated.
 // This deters hotlinking; it is not access control (headers can be omitted or forged).
 let cached;
 async function allowlist(context) {
@@ -24,7 +25,9 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const list = await allowlist(context);
   const caller = hostOf(request.headers.get('Origin') || request.headers.get('Referer') || '');
-  if (list.length && caller && caller !== url.hostname && !matches(caller, list)) {
+  const dest = request.headers.get('Sec-Fetch-Dest') || '';
+  const open = request.headers.get('Sec-Fetch-Mode') === 'navigate' || dest === 'document' || dest === 'image';
+  if (list.length && !open && caller && caller !== url.hostname && !matches(caller, list)) {
     return new Response('Forbidden', { status: 403, headers: { 'Vary': 'Origin, Referer' } });
   }
   const res = await context.next();

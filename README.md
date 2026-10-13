@@ -133,7 +133,7 @@ theme/fonts/             optional self-hosted fonts
 | `platforms` | review platforms in **tab order**: `name`, `icon`, `write_url`, `page_url`, `card_link` (`review`\|`page`), optional `invert_icon_when_active`, optional `nofollow` / `noreferrer` (or `rel`) for outbound write/card links. Extra fields (scrape URLs, notes, …) are ignored by the widget |
 | `default_write_platform` | `write_url` used on the “All” tab |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
-| `display.credit` | small “CRED Social Reviews” link under the widget, pointing to this project. `true` by default; `false` hides it. Text: `strings.credit` |
+| `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Text: `strings.credit` |
 | `schema.*` | JSON-LD on/off, `@type`, `max_reviews`, `extra` |
 | `languages` | optional `[{ "lang", "url" }]` — ISO tag + wording file (URL or path from data root) |
 | `defaultLanguage` | fallback ISO tag when embed/page language do not match `languages` |
