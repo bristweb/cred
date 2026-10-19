@@ -56,7 +56,10 @@
     },
     "collected_at": "2026-10-06T18:00:00Z",
     "reviewer_image": "images/reviewers/google-ex-google-009.svg",
-    "reviewer_image_source_url": null
+    "reviewer_image_source_url": null,
+    "hidden": {
+      "display": true
+    }
   },
   {
     "platform": "yelp",

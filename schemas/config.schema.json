@@ -143,6 +143,10 @@
           "uniqueItems": true,
           "description": "Review keys to hide, each <platform>-<platform_review_id> (the reviewer image file name convention). Hidden reviews stay in the data but are not shown, counted, averaged or included in the JSON-LD. data-hide / ?hide= (comma-separated) add to this list."
         },
+        "dedupe": {
+          "type": "boolean",
+          "description": "Merge copies of one review posted on several platforms (default true): records whose text matches (ignoring case, punctuation and spacing; 40+ characters) show one card with an \"Also on …\" line and count once in the overall rating, counts and JSON-LD. Each platform filter shows and counts its own copy. false turns off the automatic text match; duplicate_of on a record still applies."
+        },
         "accolades_icon": {
           "type": "string",
           "minLength": 1,

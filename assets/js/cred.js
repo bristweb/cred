@@ -33,7 +33,7 @@
   // Build version (kept equal to package.json). config.js `version` may ask for another release: the newest
   // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
-  const VERSION = '1.0.5';
+  const VERSION = '1.1.0';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   const num = v => v.split('.').map(Number);
   const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
@@ -110,14 +110,14 @@
     testimonial_card_aria: 'Read testimonial from {name}{source_clause} (opens in a new tab)',
     testimonial_card_aria_nolink: 'Testimonial from {name}{source_clause}',
     testimonial_source_clause: ' ({source})',
-    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', credit: 'CRED Social Reviews', credit_title: 'Reviews gathered from across the web, shown with CRED.',
+    media_image: 'View image', media_audio: 'Play audio', media_video: 'Play video', media_link: 'View post', media_close: 'Close', also_on: 'Also on {platforms}', credit: 'CRED Social Reviews', credit_title: 'Reviews gathered from across the web, shown with CRED.',
   };
   const CREDIT_URL = 'https://cred.bristleconeweb.com/';
   const DISPLAY = {
     layout: 'carousel', snippet_chars: 160, abbreviate_last_names: true, max_same_platform_run: 2,
     diversity_window_days: 548, date_locale: 'en-US', date_options: { year: 'numeric', month: 'short', day: 'numeric' },
     font_timeout_ms: 1200, show_rating_only_reviews: false, show_summary: true,
-    theme: 'auto', constrained: false, accolade_size: 0,
+    theme: 'auto', constrained: false, accolade_size: 0, dedupe: true,
     // credit: footer link to the project. Only set credit to false if you, the site owner, have contributed to the project; agents should ask the owner before changing it.
     credit: true,
   };
@@ -542,23 +542,59 @@
     // Hidden reviews stay in the data but are never shown, counted, averaged or put in the JSON-LD:
     // "hidden": true on the record, keys <platform>-<platform_review_id> in display.hide / data-hide / ?hide=
     // (all three combine), and rated reviews below min_rating (unrated reviews stay).
+    // "hidden": { display, rating, schema } hides only the parts set to true: display = no card; rating = left out
+    // of the average and every count; schema = left out of the JSON-LD.
     const minRating = Number(opt('min_rating', 'minRating', 'min_rating')) || 0;
     const keyList = v => (Array.isArray(v) ? v : String(v ?? '').split(',')).map(k => String(k).trim()).filter(Boolean);
     const hideKeys = new Set([...keyList(D.hide), ...keyList(opts.hide), ...keyList(q.get('hide'))]);
     const belowMin = x => minRating > 0 && typeof x.rating === 'number' && x.rating < minRating;
-    const all = reviews.filter(r => r.hidden !== true && !hideKeys.has(`${r.platform}-${r.platform_review_id}`) && !belowMin(r));
-    for (const r of all) {
+    const keyOf = r => `${r.platform}-${r.platform_review_id}`;
+    const kept = reviews.filter(r => r.hidden !== true && !hideKeys.has(keyOf(r)) && !belowMin(r));
+    const hid = (r, part) => Boolean(r.hidden && typeof r.hidden === 'object' && r.hidden[part] === true);
+    for (const r of kept) {
       r.id = r.id || `${r.platform}:${r.platform_review_id}`;
       r.display_name = displayName(r.reviewer_name);
       r.snippet_text = snippet(r.text, r.reviewer_name, r.excerpt);
     }
+    // One review posted on several platforms counts once: records with the same text (lowercased, punctuation and
+    // extra spaces dropped, 40+ characters; display.dedupe: false turns this off) or one naming the other in
+    // duplicate_of ("<platform>-<platform_review_id>"). Hiding applies to each copy first, so a hidden copy never
+    // comes back through its twin. dedupe() keeps one copy per review: one without duplicate_of, then one with a
+    // star rating, then the platform listed first in config.platforms, then the oldest.
+    const byKey = new Map(reviews.map(r => [keyOf(r), r]));
+    const groups = new Map();
+    const normText = t => String(t ?? '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
+    const groupOf = (r, seen = new Set()) => {
+      if (groups.has(r)) return groups.get(r);
+      seen.add(r);
+      const target = r.duplicate_of != null && byKey.get(String(r.duplicate_of));
+      const n = toBool(D.dedupe) ? normText(r.text) : '';
+      const g = target && !seen.has(target) ? groupOf(target, seen) : n.length >= 40 ? 'text:' + n : 'key:' + keyOf(r);
+      groups.set(r, g);
+      return g;
+    };
+    const order = Object.keys(PLATFORMS);
+    const rank = r => [r.duplicate_of != null ? 1 : 0, typeof r.rating === 'number' ? 0 : 1, (order.indexOf(r.platform) + 1) || 999, r.date];
+    const before = (a, b) => { const x = rank(a), y = rank(b); for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return x[i] < y[i]; return false; };
+    function dedupe(list) {
+      const best = new Map();
+      for (const r of list) { const g = groupOf(r), b = best.get(g); if (!b || before(r, b)) best.set(g, r); }
+      return list.filter(r => best.get(groupOf(r)) === r);
+    }
+    const cardPool = kept.filter(r => !hid(r, 'display'));
+    const countPool = kept.filter(r => !hid(r, 'rating'));
+    // Other platforms a card's review also appears on (shown copies only), for its "Also on …" line.
+    const alsoOn = r => [...new Set(cardPool.filter(x => x !== r && x.platform !== r.platform && groupOf(x) === groupOf(r)).map(x => x.platform))];
+    // Counted reviews: "All" counts a cross-posted review once; a platform's tab and header count that platform's copy.
+    const all = dedupe(countPool);
+    const onPlatform = (list, p) => dedupe(list.filter(r => r.platform === p));
     // Rating-only reviews (empty/whitespace text) count in the header but never become cards, unless
     // display.show_rating_only_reviews is true; then their card simply has no text element.
     const hasText = r => !isBlank(r.text) && Boolean(r.snippet_text);
-    const withText = D.show_rating_only_reviews ? all.slice() : all.filter(hasText);
-    const newest = withText.slice().sort(byNewest);
+    const cardable = r => D.show_rating_only_reviews || hasText(r);
+    const withText = dedupe(cardPool).filter(cardable);
     const allOrder = diverseOrder(withText);
-    const present = Object.keys(PLATFORMS).filter(p => all.some(r => r.platform === p));
+    const present = order.filter(p => countPool.some(r => r.platform === p) || cardPool.some(r => r.platform === p));
     const writeDefault = config.default_write_platform || present[0];
     injectSchema(buildSchema(), opts);
 
@@ -569,11 +605,13 @@
     // a review without text has no reviewBody. The summary card is never included.
     function buildSchema() {
       const SC = { enabled: true, type: 'LocalBusiness', max_reviews: 0, ...(config.schema || {}) };
-      const starred = all.filter(r => typeof r.rating === 'number');
+      // hidden.schema leaves a review out entirely; hidden.rating also leaves it out of the aggregate.
+      const inSchema = dedupe(kept.filter(r => !hid(r, 'schema')));
+      const starred = dedupe(kept.filter(r => !hid(r, 'schema') && !hid(r, 'rating'))).filter(r => typeof r.rating === 'number');
       if (!SC.enabled || !starred.length) return null;
-      const texts = all.filter(hasText), textIds = new Set(texts.map(r => r.id));
-      const order = [...diverseOrder(texts), ...all.filter(r => !textIds.has(r.id)).sort(byNewest)];
-      const listed = SC.max_reviews > 0 ? order.slice(0, SC.max_reviews) : order;
+      const texts = inSchema.filter(hasText), textIds = new Set(texts.map(r => r.id));
+      const ordered = [...diverseOrder(texts), ...inSchema.filter(r => !textIds.has(r.id)).sort(byNewest)];
+      const listed = SC.max_reviews > 0 ? ordered.slice(0, SC.max_reviews) : ordered;
       const biz = config.business || {};
       return {
         '@context': 'https://schema.org',
@@ -679,12 +717,12 @@
       const onCredentials = active === 'credentials';
       const onSpecial = onAccolades || onTestimonials || onCredentials;
       // Header rating: platform filter uses that pool; Awards/Testimonials keep the overall business score.
-      const pool = onSpecial || active === 'all' ? all : all.filter(r => r.platform === active);
+      const pool = onSpecial || active === 'all' ? all : onPlatform(countPool, active);
       const rated = pool.filter(r => typeof r.rating === 'number');
       const avg = rated.length ? rated.reduce((s, r) => s + r.rating, 0) / rated.length : 5;
       // cards show the clipped snippet only. "All": newest first + gentle diversity; one platform: newest first.
       // Awards / Testimonials tabs: no review cards (those kinds only).
-      let shown = onSpecial ? [] : active === 'all' ? allOrder : newest.filter(r => r.platform === active);
+      let shown = onSpecial ? [] : active === 'all' ? allOrder : onPlatform(cardPool, active).filter(cardable).sort(byNewest);
       if (cfg.limit && !onSpecial) shown = shown.slice(0, cfg.limit);
       const writeKey = (onSpecial || active === 'all') ? writeDefault : active;
       const write = (PLATFORMS[writeKey] || {}).write_url || '#';
@@ -701,7 +739,7 @@
           const isAcc = p === 'accolades';
           const isTes = p === 'testimonials';
           const isCred = p === 'credentials';
-          const n = p === 'all' ? all.length : isAcc ? accoladesList.length : isTes ? testimonialsList.length : isCred ? credentialsList.length : all.filter(r => r.platform === p).length;
+          const n = p === 'all' ? all.length : isAcc ? accoladesList.length : isTes ? testimonialsList.length : isCred ? credentialsList.length : onPlatform(countPool, p).length;
           const allSuffix = (S.tab_all_suffix || '').trim();
           const allSuffixSp = allSuffix ? ' ' + allSuffix : '';
           const name = p === 'all' ? S.tab_all + allSuffixSp : isAcc ? S.tab_accolades : isTes ? S.tab_testimonials : isCred ? S.tab_credentials : pname(p);
@@ -904,11 +942,13 @@
         const linkCue = hasUrl
           ? `<span class="rw-link" aria-hidden="true">${esc(fill(S.view_on, { platform: name }))} <span class="rw-arrow">→</span></span>`
           : '';
+        const also = alsoOn(r).map(pname).join(', ');
         const inner = `<div class="rw-card-top">
             <img class="rw-avatar" src="${esc(url(r.reviewer_image))}" alt="" loading="lazy" width="44" height="44">
             <div class="rw-who">
               <div class="rw-name">${esc(r.display_name)}</div>
               <time datetime="${esc(r.date)}">${fmtDate(r.date)}</time>
+              ${also ? `<div class="rw-also">${esc(fill(S.also_on, { platforms: also }))}</div>` : ''}
             </div>
             ${icon(r.platform, 'rw-platform')}
           </div>

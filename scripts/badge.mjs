@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Write rating badge files into a reviews data repo, from the same reviews the widget shows
- * (skips "hidden": true records, display.hide keys and rated reviews below display.min_rating).
+ * (skips "hidden": true and hidden.rating records, display.hide keys and rated reviews below display.min_rating, and
+ * counts a review posted on several platforms once, as the widget does: scripts/dedupe.mjs).
  *
  *   node cred/scripts/badge.mjs <data-repo-dir>   # default: .
  *
@@ -11,6 +12,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { deduper, hid, keyOf } from './dedupe.mjs';
 
 const root = path.resolve(process.argv[2] || '.');
 const read = f => JSON.parse(readFileSync(path.join(root, f), 'utf8'));
@@ -18,8 +20,8 @@ const config = (await import('data:text/javascript,' + encodeURIComponent(readFi
 const D = config.display || {};
 const hide = new Set((Array.isArray(D.hide) ? D.hide : []).map(String));
 const min = Number(D.min_rating) || 0;
-const reviews = (config.reviews?.years || []).flatMap(y => read(`reviews/${y}.json`))
-  .filter(r => r.hidden !== true && !hide.has(`${r.platform}-${r.platform_review_id}`) && !(min > 0 && typeof r.rating === 'number' && r.rating < min));
+const records = (config.reviews?.years || []).flatMap(y => read(`reviews/${y}.json`));
+const reviews = deduper(config, records)(records.filter(r => !hid(r, 'rating') && !hide.has(keyOf(r)) && !(min > 0 && typeof r.rating === 'number' && r.rating < min)));
 const rated = reviews.filter(r => typeof r.rating === 'number');
 const avg = rated.length ? rated.reduce((s, r) => s + r.rating, 0) / rated.length : 0;
 const label = config.badge?.label || 'rating';

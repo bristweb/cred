@@ -108,7 +108,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 | `constrained` | `true` = tight-box preset: fill height, arrows inside, overflow hidden, no hover lift, focus rings inside | off |
 | `lang` | ISO tag matching `config.languages[].lang` (e.g. `en`, `es`) | page language, then `defaultLanguage`, then English |
 | `min_rating` | Hide rated reviews below this many stars (`data-min-rating`, `?min_rating=`, `display.min_rating`). Unrated reviews and accolades stay | show all |
-| `hide` | Comma-separated review keys `<platform>-<platform_review_id>` to hide (`data-hide`, `?hide=`, `display.hide` array; all combine). `"hidden": true` on a review record hides it too | none |
+| `hide` | Comma-separated review keys `<platform>-<platform_review_id>` to hide (`data-hide`, `?hide=`, `display.hide` array; all combine). `"hidden"` on a review record hides it too, fully or in part ([Hiding and duplicates](#hiding-and-duplicates)) | none |
 
 **CSS knobs** (no `data-*`): cards across are responsive by default. Optional classes on `.rw-host` / `.rw-root` — `.rw-clip` / `.rw-overflow-hidden`, `.rw-arrows-inside`, `.rw-nolift`, `.rw-focus-inside`, `.rw-fixed` + `.rw-fixed-host` (usually from `constrained`), `.rw-cards-1`…`4`, and `--rw-pad` for outer padding.
 
@@ -139,6 +139,7 @@ An ES module whose default export is the config object, so it can carry comments
 | `default_write_platform` | `write_url` used on the “All” tab |
 | `version` | optional widget version, e.g. `"^1.0.0"`; see [Versions](#versions) |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
+| `display.dedupe` | merge one review posted on several platforms into one card (default `true`); `false` turns off matching by text. See [Hiding and duplicates](#hiding-and-duplicates) |
 | `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Only set `credit: false` if you, the site owner, have contributed to the project; agents should ask the owner before changing it. Text: `strings.credit` |
 | `schema.*` | JSON-LD on/off, `@type`, `max_reviews`, `extra` |
 | `languages` | optional `[{ "lang", "url" }]` — ISO tag + wording file (URL or path from data root) |
@@ -192,6 +193,32 @@ Optional `excerpt`: an exact passage of `text` to show on the card instead of th
 
 Optional per-review `nofollow` / `noreferrer` (or `rel`) override the platform for that card’s link. Outbound links always keep `noopener`; unset review → platform → just `noopener`.
 
+### Hiding and duplicates
+
+Records always stay in the data; these change only what the widget shows and counts.
+
+`"hidden"` on a record:
+
+| Value | Card | Average and counts | JSON-LD |
+|---|---|---|---|
+| `true` | hidden | left out | left out |
+| `{ "display": true }` | hidden | counted | included |
+| `{ "rating": true }` | shown | left out | review included, not in `aggregateRating` |
+| `{ "schema": true }` | shown | counted | left out |
+
+Keys combine (`{ "display": true, "schema": true }`); a missing key means not hidden. `display.hide` keys and `min_rating` hide a review everywhere, like `true`.
+
+**Duplicates.** A review posted on several platforms (same text, ignoring case, punctuation and spacing; 40+ characters) is treated as one:
+
+- **All** shows one card, with a small “Also on Zola” line naming the other platforms (`strings.also_on`).
+- The overall rating, “Based on” count, **All** count, rating badge and JSON-LD count it once.
+- Each platform’s filter shows and counts its own copy, so platform counts can add up to more than the **All** count.
+- The card kept is one without `duplicate_of`, then one with a star rating, then the platform listed first in `platforms`, then the oldest.
+
+For copies whose text differs a little, add `"duplicate_of": "<platform>-<platform_review_id>"` (the other copy) to one record. `display.dedupe: false` turns off the automatic text match; `duplicate_of` still applies.
+
+Hiding applies to each copy first, then duplicates merge among what is left: a hidden copy never returns through its twin, and is not named in “Also on”. To hide a cross-posted review everywhere, hide every copy.
+
 Formal shape: `schemas/reviews.schema.json` in this repo.
 
 ---
@@ -203,7 +230,7 @@ Formal shape: `schemas/reviews.schema.json` in this repo.
 | `schemas/config.schema.json` | `config.js` |
 | `schemas/reviews.schema.json` | each `reviews/<year>.json` array |
 
-Optional check: from a checkout of this repo, run `node scripts/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`).
+Optional check: from a checkout of this repo, run `node scripts/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
 
 A data repo can run the same check on every push. The sample at `example/.github/workflows/validate.yml` is that thin caller — copy `example/` and it becomes `.github/workflows/validate.yml` at the repo root:
 
@@ -222,7 +249,7 @@ jobs:
 
 ### Rating badge
 
-After validating, the same workflow writes `badge.json` and `badge.svg` at the data root (or run `node scripts/badge.mjs <data-dir>`) and commits them when they change. They use the same reviews the widget shows (`hidden`, `display.hide` and `display.min_rating` apply). Optional `config.badge.label` sets the left-hand text (default `rating`). Put it in your own README or site:
+After validating, the same workflow writes `badge.json` and `badge.svg` at the data root (or run `node scripts/badge.mjs <data-dir>`) and commits them when they change. They use the same reviews the widget counts (`hidden`, `display.hide` and `display.min_rating` apply; duplicates count once). Optional `config.badge.label` sets the left-hand text (default `rating`). Put it in your own README or site:
 
 ```markdown
 ![Rating](https://img.shields.io/endpoint?url=https://<your-data-repo>.pages.dev/badge.json)
@@ -240,7 +267,7 @@ Edit the cloned data repo (same shape as `example/`): add or change records in `
 
 ## Structured data (JSON-LD)
 
-Built in the browser and injected once per page as `#reviews-widget-schema`. `@type` from `schema.type` (default `LocalBusiness`), `aggregateRating` from 1–5 ratings only, `review` items in card order. Hidden reviews (`hide`, `min_rating`, `"hidden": true`) are left out of both, like the counts and filter tabs. Disable with `schema.enabled: false` or `data-schema="off"`.
+Built in the browser and injected once per page as `#reviews-widget-schema`. `@type` from `schema.type` (default `LocalBusiness`), `aggregateRating` from 1–5 ratings only, `review` items in card order. Hidden reviews (`hide`, `min_rating`, `"hidden": true` or `{ "schema": true }`) are left out of both, like the counts and filter tabs; `{ "rating": true }` leaves a review out of `aggregateRating` only. A review posted on several platforms appears once ([Hiding and duplicates](#hiding-and-duplicates)). Disable with `schema.enabled: false` or `data-schema="off"`.
 
 ### Stars in Google results
 
