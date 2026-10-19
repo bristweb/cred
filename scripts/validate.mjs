@@ -12,6 +12,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { deduper, hid, keyOf } from './dedupe.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WIDGET = path.resolve(HERE, '..');
@@ -131,8 +132,8 @@ if (Array.isArray(years) && years.some((y, i) => i && y >= years[i - 1])) err('c
 const files = existsSync(path.join(root, 'reviews')) ? readdirSync(path.join(root, 'reviews')).filter(f => f.endsWith('.json')) : [];
 for (const f of files) if (!years.includes(Number(f.replace(/\.json$/, '')))) err(`reviews/${f}: not listed in config.js reviews.years`);
 
-const seen = new Map(), used = new Set(), counts = {}, hideKeys = new Set();
-let total = 0, hidden = 0;
+const seen = new Map(), used = new Set(), counts = {}, hideKeys = new Set(), records = [];
+let total = 0, hidden = 0, partly = 0;
 for (const y of years) {
   const f = `reviews/${y}.json`;
   const list = readJson(f);
@@ -158,6 +159,8 @@ for (const y of years) {
     }
     hideKeys.add(`${r.platform}-${r.platform_review_id}`);
     if (r.hidden === true) hidden++;
+    else if (r.hidden && typeof r.hidden === 'object') partly++;
+    records.push({ r, at });
     counts[r.platform] = (counts[r.platform] || 0) + 1;
     total++;
   });
@@ -170,6 +173,18 @@ for (const y of years) {
 // display.hide keys are <platform>-<platform_review_id>; a key that matches no review is probably a typo.
 const hideList = Array.isArray(config?.display?.hide) ? config.display.hide : [];
 for (const k of hideList) if (!hideKeys.has(String(k))) warn(`config.js display.hide: "${k}" matches no review (expected <platform>-<platform_review_id>)`);
+// duplicate_of names another record (<platform>-<platform_review_id>); chains must end at a record without one.
+const byKey = new Map(records.map(x => [keyOf(x.r), x.r]));
+for (const { r, at } of records) {
+  if (r.duplicate_of == null) continue;
+  const k = String(r.duplicate_of);
+  if (k === keyOf(r)) { err(`${at}: duplicate_of names the review itself`); continue; }
+  if (!byKey.has(k)) { err(`${at}: duplicate_of "${k}" matches no review (expected <platform>-<platform_review_id>)`); continue; }
+  for (let t = byKey.get(k), n = 0; t && t.duplicate_of != null; t = byKey.get(String(t.duplicate_of)))
+    if (t === r || ++n > records.length) { err(`${at}: duplicate_of loops back to this review`); break; }
+}
+const kept = records.map(x => x.r).filter(r => !hid(r, 'rating') && !hideList.includes(keyOf(r)));
+const merged = kept.length - deduper(config, records.map(x => x.r))(kept).length;
 const imgDir = path.join(root, 'images', 'reviewers');
 if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`images/reviewers/${f}`)) warn(`images/reviewers/${f}: not referenced by any review or testimonial (ok if unused)`);
 
@@ -179,7 +194,8 @@ const nAcc = Array.isArray(config?.accolades) ? config.accolades.length : 0;
 const nCred = Array.isArray(config?.credentials) ? config.credentials.length : 0;
 const nTes = Array.isArray(config?.testimonials) ? config.testimonials.length : 0;
 console.log(`ok: ${total} reviews (${Object.entries(counts).map(([k, n]) => `${k} ${n}`).join(', ') || 'none'}) in ${years.length} year file(s)` +
-  (hidden || hideList.length ? `; hidden: ${hidden} record(s) marked hidden, ${hideList.length} display.hide key(s)` : '') +
+  (hidden || partly || hideList.length ? `; hidden: ${hidden} record(s) marked hidden${partly ? `, ${partly} partly hidden` : ''}, ${hideList.length} display.hide key(s)` : '') +
+  (merged ? `; ${merged} duplicate(s) counted once` : '') +
   (config?.display?.min_rating ? `; min_rating ${config.display.min_rating}` : '') +
   (nAcc ? `; ${nAcc} accolade(s)` : '') +
   (nCred ? `; ${nCred} credential(s)` : '') +

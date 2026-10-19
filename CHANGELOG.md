@@ -2,6 +2,12 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.1.0 (2026-10-19)
+
+- `hidden` on a review can be an object that hides only some parts: `{ "display": true }` (no card), `{ "rating": true }` (left out of the average and counts), `{ "schema": true }` (left out of the JSON-LD). `true` still hides everything.
+- A review posted on several platforms (same text) shows as one card with an "Also on …" line and counts once in the overall rating, counts, badge and JSON-LD; each platform filter shows its own copy. `display.dedupe: false` turns the text match off; `duplicate_of: "<platform>-<platform_review_id>"` merges near-identical copies.
+- The validator checks `duplicate_of` and reports how many duplicates count once.
+
 ## 1.0.5 (2026-10-13)
 
 - Credit link tooltip names no platforms.

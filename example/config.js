@@ -75,7 +75,12 @@ export default {
     },
     font_timeout_ms: 2500,
     show_rating_only_reviews: false,
-    show_summary: true
+    show_summary: true,
+    // One review posted on several platforms shows as one card ("Also on …") and counts once. Copies are matched by
+    // identical text; false turns that off. For near-identical copies, add duplicate_of: "<platform>-<platform_review_id>"
+    // (the other copy) to a record in reviews/<year>.json. A record can also hide parts of itself:
+    // hidden: { display: true } (no card), { rating: true } (not in the average or counts), { schema: true } (not in the JSON-LD).
+    dedupe: true
   },
 
   // schema.org JSON-LD settings.

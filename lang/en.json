@@ -80,6 +80,7 @@
   "media_video": "Play video",
   "media_link": "View post",
   "media_close": "Close",
+  "also_on": "Also on {platforms}",
   "credit": "CRED Social Reviews",
   "credit_title": "Reviews gathered from across the web, shown with CRED."
 }

@@ -91,6 +91,8 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
 .rw-who{flex:1;min-width:0}
 .rw-name{font-weight:700;font-size:15px;color:var(--rw-ink,#111);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rw-who time{font-size:12.5px;color:var(--rw-muted,#888)}
+/* "Also on …": the same review on other platforms (merged into this card). */
+.rw-also{font-size:12px;line-height:1.3;color:var(--rw-muted,#888);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rw-platform{width:20px;height:20px;flex:none}
 .rw-rec{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--rw-accent,#333)}
 .rw-rec svg{width:16px;height:16px;fill:currentColor}
@@ -213,7 +215,7 @@ div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:
   .rw-fixed .rw-nav{width:24px;height:24px;font-size:18px;padding:0 0 2px}
   .rw-fixed .rw-card{padding:6px 9px;gap:3px}
   .rw-fixed .rw-card-top{gap:8px}.rw-fixed .rw-avatar{width:22px;height:22px}.rw-fixed .rw-name{font-size:13px}
-  .rw-fixed .rw-who time,.rw-fixed .rw-link,.rw-fixed .rw-subtitle{display:none}
+  .rw-fixed .rw-who time,.rw-fixed .rw-link,.rw-fixed .rw-subtitle,.rw-fixed .rw-also{display:none}
   .rw-fixed .rw-stars i{width:12px;height:12px}.rw-fixed .rw-stars svg{display:block}
   .rw-fixed.rw-layout-carousel .rw-text{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.35}
   .rw-fixed .rw-ai{gap:3px}.rw-fixed .rw-ai-top{gap:5px}.rw-fixed .rw-ai-label{font-size:13px}

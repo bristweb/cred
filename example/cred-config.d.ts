@@ -63,6 +63,10 @@ export interface CredConfig {
      */
     hide?: string[];
     /**
+     * Merge copies of one review posted on several platforms (default true): records whose text matches (ignoring case, punctuation and spacing; 40+ characters) show one card with an "Also on …" line and count once in the overall rating, counts and JSON-LD. Each platform filter shows and counts its own copy. false turns off the automatic text match; duplicate_of on a record still applies.
+     */
+    dedupe?: boolean;
+    /**
      * Optional icon for the Awards filter pill: path relative to the data root or an absolute URL (SVG or image, shown at the platform icon size). Omit to use the built-in trophy icon.
      */
     accolades_icon?: string;

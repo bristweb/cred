@@ -124,8 +124,35 @@
         "description": "Optional space-separated rel tokens; when set (or with nofollow/noreferrer), overrides the platform for this card. noopener is always applied."
       },
       "hidden": {
-        "type": "boolean",
-        "description": "Optional. true keeps the review in the data but hides it: not shown, counted, averaged or included in the JSON-LD."
+        "description": "Optional. true keeps the review in the data but hides it everywhere: not shown, counted, averaged or included in the JSON-LD. An object hides only the parts set to true (missing = shown): display = no card; rating = left out of the average and every count; schema = left out of the JSON-LD.",
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "display": {
+                "type": "boolean",
+                "description": "true: no card for this review."
+              },
+              "rating": {
+                "type": "boolean",
+                "description": "true: not in the average or any count (header, filter tabs, badge, JSON-LD aggregateRating)."
+              },
+              "schema": {
+                "type": "boolean",
+                "description": "true: not in the JSON-LD (neither a review item nor the aggregateRating)."
+              }
+            }
+          }
+        ]
+      },
+      "duplicate_of": {
+        "type": "string",
+        "pattern": "^[^-\\s]+-.+$",
+        "description": "Optional. Key <platform>-<platform_review_id> of another record that is the same review (e.g. posted on two platforms with slightly different text). The widget shows and counts them once. Identical text is merged automatically (display.dedupe)."
       },
       "excerpt": {
         "type": "string",

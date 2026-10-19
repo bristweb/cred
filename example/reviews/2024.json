@@ -15,11 +15,28 @@
   },
   {
     "platform": "yelp",
+    "platform_review_id": "ex-yelp-014",
+    "reviewer_name": "Hayden Walsh",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Trade-in on an old hybrid toward a cargo bike. Transparent pricing, no pressure.",
+    "date": "2024-12-13T21:05:44Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-014",
+    "owner_reply": {
+      "text": "Appreciate the kind words. Stop by anytime.",
+      "date": "2024-12-14T16:30:00Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "images/reviewers/yelp-ex-yelp-014.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "yelp",
     "platform_review_id": "ex-yelp-012",
     "reviewer_name": "Avery Ibrahim",
     "reviewer_profile_url": null,
     "rating": 5,
-    "text": "Group ride start point and they opened early for last-minute pump and snack refill. Kind crew.",
+    "text": "Signed up for the Tuesday maintenance clinic. Learned to fix a flat and adjust derailleurs in an hour. Great value.",
     "date": "2024-12-06T17:54:57Z",
     "review_url": "https://example.com/yelp/reviews/ex-yelp-012",
     "owner_reply": {
@@ -36,7 +53,7 @@
     "reviewer_name": "Reese Chen",
     "reviewer_profile_url": null,
     "rating": 5,
-    "text": "Spoke replacement after a pothole. Wheel is true and tension feels even. Will be back.",
+    "text": "Flat on the way to work, walked in at opening and was riding again in twenty minutes. Fair price, friendly crew.",
     "date": "2024-11-04T22:03:37Z",
     "review_url": "https://example.com/facebook/reviews/ex-facebook-008",
     "owner_reply": {
@@ -104,23 +121,6 @@
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
     "reviewer_image": "images/reviewers/facebook-ex-facebook-011.svg",
-    "reviewer_image_source_url": null
-  },
-  {
-    "platform": "yelp",
-    "platform_review_id": "ex-yelp-014",
-    "reviewer_name": "Drew Walsh",
-    "reviewer_profile_url": null,
-    "rating": 5,
-    "text": "Trade-in on an old hybrid toward a cargo bike. Transparent pricing, no pressure.",
-    "date": "2024-06-10T17:12:31Z",
-    "review_url": "https://example.com/yelp/reviews/ex-yelp-014",
-    "owner_reply": {
-      "text": "Appreciate the kind words. Stop by anytime.",
-      "date": "2024-06-11T21:12:31Z"
-    },
-    "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-014.svg",
     "reviewer_image_source_url": null
   },
   {
