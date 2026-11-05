@@ -13,7 +13,7 @@
       "date": "2026-08-22T14:59:40Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-007.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-007.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -30,7 +30,7 @@
       "date": "2026-07-29T09:08:33Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/facebook-ex-facebook-007.svg",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-007.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -47,7 +47,7 @@
       "date": "2026-07-19T01:24:29Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-010.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-010.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -61,7 +61,7 @@
     "review_url": "https://example.com/yelp/reviews/ex-yelp-008",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-008.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-008.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -78,7 +78,7 @@
       "date": "2026-06-22T06:31:53Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/facebook-ex-facebook-004.svg",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-004.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -92,7 +92,7 @@
     "review_url": "https://example.com/yelp/reviews/ex-yelp-011",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-011.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-011.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -106,7 +106,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-001",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-001.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-001.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -120,7 +120,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-007",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-007.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-007.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -134,7 +134,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-011",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-011.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-011.svg",
     "reviewer_image_source_url": null,
     "excerpt": "The mechanic walked me through reseating the bead and showed me how to check the rim tape, so I stop pinching tubes on trails."
   },
@@ -149,7 +149,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-005",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-005.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-005.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -163,7 +163,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-008",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-008.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-008.svg",
     "reviewer_image_source_url": null
   }
 ]

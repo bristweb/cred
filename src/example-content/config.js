@@ -28,14 +28,14 @@ export default {
   platforms: {
     google: {
       name: "Google",
-      icon: "icons/google.svg",
+      icon: "assets/icons/google.svg",
       write_url: "https://example.com/google/write-review",
       page_url: "https://example.com/google/example-bike-shop",
       card_link: "review"
     },
     yelp: {
       name: "Yelp",
-      icon: "icons/yelp.svg",
+      icon: "assets/icons/yelp.svg",
       write_url: "https://example.com/yelp/write-review",
       page_url: "https://example.com/yelp/example-bike-shop",
       card_link: "review",
@@ -43,7 +43,7 @@ export default {
     },
     facebook: {
       name: "Facebook",
-      icon: "icons/facebook.svg",
+      icon: "assets/icons/facebook.svg",
       write_url: "https://example.com/facebook/write-review",
       page_url: "https://example.com/facebook/example-bike-shop",
       card_link: "page"
@@ -122,13 +122,13 @@ export default {
     {
       label: "Local Shop Editors' Pick",
       year: 2025,
-      icon: "icons/award-choice.svg",
+      icon: "assets/icons/award-choice.svg",
       url: "https://example.com/awards/local-shop-editors-pick-2025",
     },
     {
       label: "Trail Town Best Bike Shop",
       year: 2024,
-      icon: "icons/award-bestof.svg",
+      icon: "assets/icons/award-bestof.svg",
       url: "https://example.com/awards/trail-town-best-bike-shop-2024",
     }
   ],
@@ -138,14 +138,14 @@ export default {
     {
       label: "Certified Bike Mechanic",
       issuer: "Example Cycling Mechanics Guild",
-      icon: "icons/credential-mechanic.svg",
+      icon: "assets/icons/credential-mechanic.svg",
       start: "2023-05",
       url: "https://example.com/credentials/example-bike-shop-mechanic",
     },
     {
       label: "E-bike Service Certification",
       issuer: "Example E-Bike Institute",
-      icon: "icons/credential-ebike.svg",
+      icon: "assets/icons/credential-ebike.svg",
       start: "2023-09",
       end: "2025-09",
     }
@@ -161,8 +161,8 @@ export default {
       media: [
         {
           type: "image",
-          url: "media/thank-you-note.jpg",
-          thumbnail: "media/thank-you-note-thumb.jpg",
+          url: "assets/images/thank-you-note.jpg",
+          thumbnail: "assets/images/thank-you-note-thumb.jpg",
           caption: "Thank-you note",
           alt: "Handwritten thank-you note from June Park"
         }
@@ -177,7 +177,7 @@ export default {
       media: [
         {
           type: "audio",
-          url: "media/voicemail.m4a",
+          url: "assets/audio/voicemail.m4a",
           caption: "Voicemail",
           alt: "Play Dana's voicemail"
         }
@@ -186,14 +186,14 @@ export default {
     {
       title: "Riley Chen",
       subtitle: "Fleet Manager, Contoso Logistics",
-      reviewer_image: "images/reviewers/testimonial-riley-chen.svg",
+      reviewer_image: "assets/images/reviewers/testimonial-riley-chen.svg",
       text: "Example Bike Shop keeps our warehouse e-bike fleet rolling. Tune-ups are booked same week, parts are stocked, and the techs explain wear without the hard sell. Our facilities team trusts them with every unit.",
       date: "2025-06-18T14:30:00Z",
       url: "https://example.com/testimonials/contoso-logistics",
       rating: 5,
       source: {
         name: "Contoso Logistics",
-        logo: "icons/contoso-logistics.svg"
+        logo: "assets/icons/contoso-logistics.svg"
       }
     },
     {
@@ -205,13 +205,13 @@ export default {
       rating: 5,
       source: {
         name: "Summit Athletics",
-        logo: "icons/summit-athletics.svg"
+        logo: "assets/icons/summit-athletics.svg"
       },
       media: [
         {
           type: "video",
-          url: "media/ride-recap.mp4",
-          poster: "media/ride-recap-poster.jpg",
+          url: "assets/video/ride-recap.mp4",
+          poster: "assets/images/ride-recap-poster.jpg",
           caption: "Group ride recap",
           alt: "Video: Summit Athletics group ride recap"
         },
@@ -219,7 +219,7 @@ export default {
           type: "link",
           url: "https://example.com/social/summit-athletics/posts/spring-ride",
           caption: "Spring ride post",
-          thumbnail: "media/ride-post.jpg"
+          thumbnail: "assets/images/ride-post.jpg"
         }
       ]
     }

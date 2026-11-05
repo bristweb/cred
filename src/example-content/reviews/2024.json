@@ -10,7 +10,7 @@
     "review_url": "https://example.com/facebook/reviews/ex-facebook-003",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/facebook-ex-facebook-003.svg",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-003.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -27,7 +27,7 @@
       "date": "2024-12-14T16:30:00Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-014.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-014.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -44,7 +44,7 @@
       "date": "2024-12-07T21:54:57Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-012.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-012.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -61,7 +61,7 @@
       "date": "2024-11-05T15:03:37Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/facebook-ex-facebook-008.svg",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-008.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -75,7 +75,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-003",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-003.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-003.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -92,7 +92,7 @@
       "date": "2024-09-25T21:22:23Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/facebook-ex-facebook-005.svg",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-005.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -106,7 +106,7 @@
     "review_url": "https://example.com/google/reviews/ex-google-004",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/google-ex-google-004.svg",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-004.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -120,7 +120,7 @@
     "review_url": "https://example.com/facebook/reviews/ex-facebook-011",
     "owner_reply": null,
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/facebook-ex-facebook-011.svg",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-011.svg",
     "reviewer_image_source_url": null
   },
   {
@@ -137,7 +137,7 @@
       "date": "2024-02-17T08:16:47Z"
     },
     "collected_at": "2026-10-06T18:00:00Z",
-    "reviewer_image": "images/reviewers/yelp-ex-yelp-009.svg",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-009.svg",
     "reviewer_image_source_url": null
   }
 ]
