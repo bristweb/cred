@@ -19,7 +19,7 @@ The demo below runs on **examples**: invented sample content (a fictional bike s
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js" defer></script>
 ```
 
-Paste to try it: with no `data-source` the widget shows the example data from the same site. For a real site, load the script from your own fork and let it read your `content/data/` folder, or set `data-source` if your content lives elsewhere ([Data source](#data-source)). More patterns: [Embed](#embed).
+Paste to try it: with no `data-source` the widget shows the example data from the same site. For a real site, load the script from your own fork and let it read your `content/` folder, or set `data-source` if your content lives elsewhere ([Data source](#data-source)). More patterns: [Embed](#embed).
 
 A static, dependency-free reviews widget. Publish the built site on any static host (Cloudflare Pages recommended; GitHub Pages works as a backup). You are not limited to a vendor's supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
 
@@ -44,10 +44,10 @@ Product comparison: [docs/COMPARISON.md](docs/COMPARISON.md).
 
 ## Fork and replace
 
-The recommended setup: **fork this repo, put your content in its own folder next to the code, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
+The recommended setup: **fork this repo, put your content in the (empty) `content/` folder next to the code, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
 
 1. **Fork** [bristweb/cred](https://github.com/bristweb/cred) and publish the fork: Cloudflare Pages with the included `.github/workflows/deploy.yml` (repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or GitHub Pages (Settings → Pages → Source: *GitHub Actions*, then run the included `.github/workflows/pages.yml`). Both build the site with `npm run build` (see [Repository layout](#repository-layout)). `_headers` opens CORS.
-2. **Copy `content/example/` to `content/data/`** and replace the example content with yours: `config.js`, `reviews/`, `icons/`, `theme/`, images. Leave `content/example/` itself untouched so upstream updates merge without conflicts. Every folder in `content/` is published under its own name (`content/data/` at `/data/`, `content/example/` at `/example/`); `data` is the folder the widget reads by default.
+2. **Copy `src/example/` to `content/`** and replace the example content with yours: `config.js`, `reviews/`, `icons/`, `theme/`, images. Leave `src/example/` itself untouched so upstream updates merge without conflicts. `content/` is published at `/content/` and `src/example/` at `/example/`. With no `data-source`, the widget uses `content/` as soon as it has a `config.js`, and the bundled examples until then.
 3. **Embed from your own origin.** No `data-source` is needed: the widget reads the content from the same site as the script ([Data source](#data-source)).
 
 ```html
@@ -56,7 +56,7 @@ The recommended setup: **fork this repo, put your content in its own folder next
 
 ### Examples and the `include_examples` switch
 
-Everything that ships as sample content is tagged `example: true`: each record in `content/example/reviews/<year>.json`, and the summary, accolades, credentials and testimonials in `content/example/config.js`. The tag travels with the content, so it still works after you copy `example/` into `data/`.
+Everything that ships as sample content is tagged `example: true`: each record in `src/example/reviews/<year>.json`, and the summary, accolades, credentials and testimonials in `src/example/config.js`. The tag travels with the content, so it still works after you copy `example/` into `content/`.
 
 `include_examples` is a top-level key in `config.js`. It defaults to `true`, so the upstream demo shows its examples:
 
@@ -69,14 +69,14 @@ export default {
 
 With `false`, tagged content is left out of the cards, counts, averages, summary card, JSON-LD and rating badge, the same way `hidden: true` works on a review. Nothing is deleted. That lets you:
 
-- start from a copy of `content/example/`, set `include_examples: false`, and add your own (untagged) records while you replace the samples; or
-- keep `content/example/` in your fork as a reference and let upstream refresh the examples later: they never reach your published widget, because the widget reads `content/data/` (published as `/data/`) (or you hide them with the switch).
+- start from a copy of `src/example/`, set `include_examples: false`, and add your own (untagged) records while you replace the samples; or
+- keep `src/example/` in your fork as a reference and let upstream refresh the examples later: they never reach your published widget once `content/` has a `config.js`, because the widget then reads `content/` (published as `/content/`) instead of the examples (or you hide them with the switch).
 
 To remove examples for good, delete the tagged items or files. You do not have to. `include_examples` needs widget 1.2.0 or later (pin `version: "^1.2.0"` if you use it).
 
 ### Repository layout
 
-Code and content sit in separate top-level folders, so nothing is interspersed:
+Code (including the bundled examples) is in `src/`; your content has its own top-level `content/` folder, so nothing is interspersed:
 
 ```
 cred/
@@ -86,31 +86,30 @@ cred/
 │   ├── schemas/            JSON Schemas for config.js and reviews/<year>.json
 │   ├── types/              editor typings for config.js (generated)
 │   ├── scripts/            build, validate, badge, dedupe, versions, config-to-js
-│   └── site/               demo pages and host files: index.html, embed.html, 404.html, _headers, robots.txt, sitemap.xml
-├── content/                all the content, one folder per data set
-│   ├── example/            sample content, tagged example: true (upstream's; leave it alone)
-│   └── data/               yours (you create it by copying example/)
+│   ├── site/               demo pages and host files: index.html, embed.html, 404.html, _headers, robots.txt, sitemap.xml
+│   └── example/            the bundled sample content, tagged example: true (upstream's; leave it alone)
+├── content/                yours: empty upstream (just a README); a fork puts config.js, reviews/, theme/ ... here
 ├── docs/                   screenshots and COMPARISON.md
 ├── .github/workflows/      check, deploy (Cloudflare Pages), pages (GitHub Pages), validate (reusable)
 └── README.md, CHANGELOG.md, AGENTS.md, LICENSE, package.json
 ```
 
-`npm run build` (`node src/scripts/build.mjs dist`) assembles the published site into `dist/`, so public URLs do not depend on the folder layout: `src/assets/` is served at `/assets/`, `src/lang/` at `/lang/`, `src/site/*` at `/`, and each `content/<name>/` at `/<name>/`. The embed code is unchanged: `…/assets/js/cred.js`.
+`npm run build` (`node src/scripts/build.mjs dist`) assembles the published site into `dist/`, so public URLs do not depend on the folder layout: `src/assets/` is served at `/assets/`, `src/lang/` at `/lang/`, `src/site/*` at `/`, `content/` at `/content/` and `src/example/` at `/example/`. The embed code is unchanged: `…/assets/js/cred.js`.
 
 | Upstream provides (pull these from upstream) | Yours (never has to match upstream) |
 |---|---|
-| `src/assets/`, `src/lang/`: the widget (`cred.js`, CSS, built-in icons, UI wording) | `content/data/` (the default; `data-source` can point elsewhere): `config.js`, `reviews/`, `icons/`, `images/`, `theme/`, `lang/` overrides |
+| `src/assets/`, `src/lang/`: the widget (`cred.js`, CSS, built-in icons, UI wording) | `content/` (used when the embed has no `data-source`; `data-source` can point elsewhere): `config.js`, `reviews/`, `icons/`, `images/`, `theme/`, `lang/` overrides |
 | `src/schemas/`, `src/types/`, `src/scripts/`: build, validate and badge tooling; use the validators or ignore them | Your own import scripts, sync jobs and workflows |
-| `content/example/`: sample content, tagged `example: true` | Your site's pages (edit or replace `src/site/`), `CNAME`, `robots.txt`, `sitemap.xml`, secrets |
+| `src/example/`: sample content, tagged `example: true` | Your site's pages (edit or replace `src/site/`), `CNAME`, `robots.txt`, `sitemap.xml`, secrets |
 | `src/site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` | Your choice of hosting workflow (`deploy.yml` or `pages.yml`) |
 
-Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (by default `/data/`, or `data-source`), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge scripts here, which only check and tidy what you produce:
+Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `/content/` when it has a `config.js`, else the examples), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge scripts here, which only check and tidy what you produce:
 
 ```sh
 npm ci                                        # once, for the validator
 npm run build                                 # assemble dist/ (what gets published)
-node src/scripts/validate.mjs content/data    # schema and file checks
-node src/scripts/badge.mjs content/data       # optional rating badge files
+node src/scripts/validate.mjs content         # schema and file checks
+node src/scripts/badge.mjs content            # optional rating badge files
 ```
 
 ### Pull the latest Cred from upstream
@@ -121,7 +120,7 @@ git fetch upstream --tags
 git merge upstream/main
 ```
 
-Rebase instead of merge if you prefer. Your content lives in `content/data/`, which upstream never touches, so merges stay clean and `content/example/` and the code simply update. Fetching tags matters if you serve `/v/<x.y.z>/` builds ([Versions](#versions)). Read [CHANGELOG.md](CHANGELOG.md) first when a major version is involved.
+Rebase instead of merge if you prefer. Your content lives in `content/`, which upstream never touches, so merges stay clean and `src/example/` and the code simply update. Fetching tags matters if you serve `/v/<x.y.z>/` builds ([Versions](#versions)). Read [CHANGELOG.md](CHANGELOG.md) first when a major version is involved.
 
 ---
 
@@ -131,7 +130,13 @@ Same live demo as at the top of this README. For a real site, point the script `
 
 ### Data source
 
-The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and the rest from a data folder. `data-source` (or `?source=`) is **optional**. Left out, it uses the same site as the script: the site root is the folder that holds the script's `assets/` directory, and the widget reads `<site root>/data/` if that has a `config.js` (your fork's own content), otherwise `<site root>/example/` (the bundled examples). That is why a fork needs no attribute, and why the upstream demo works with the bare snippet. Set `data-source="https://…/"` (trailing `/` added if missing) to read content from a different folder, site or repo. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
+The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and the rest from a data folder. It picks the folder in this order:
+
+1. **`data-source`** (or `?source=`), if the embed has one: that folder is used, and nothing else is tried. Set `data-source="https://…/"` (trailing `/` added if missing) to read content from a different folder, site or repo.
+2. **`content/`**, if it has content: the widget looks for `<site root>/content/config.js`. The site root is the folder that holds the script's `assets/` directory. This is your fork's own content.
+3. **The bundled examples** (`src/example/`, published at `<site root>/example/`) when `content/` is empty.
+
+So `data-source` is **optional**: a fork needs no attribute, and the upstream demo (whose `content/` is empty) works with the bare snippet. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
 
 ### JavaScript (recommended)
 
@@ -175,7 +180,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-`index.html` and `embed.html` are bare, transparent, `noindex` pages. With no `?source=` they use the default data folder (`/data/` if present, else `/example/`).
+`index.html` and `embed.html` are bare, transparent, `noindex` pages. With no `?source=` they use the default data folder (`/content/` if present, else `/example/`).
 
 ---
 
@@ -185,7 +190,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 
 | Option | Values | Default |
 |---|---|---|
-| `source` | Data folder URL (trailing `/` added if missing). Optional: see [Data source](#data-source) | `<site root>/data/` if it has a `config.js`, else `<site root>/example/` |
+| `source` | Data folder URL (trailing `/` added if missing). Optional: see [Data source](#data-source) | `<site root>/content/` if it has a `config.js`, else `<site root>/example/` |
 | `layout` | `carousel` \| `grid` | `display.layout` or `carousel` |
 | `platform` | One key from `config.platforms`, or `accolades` / `credentials` / `testimonials` (filters to that tab). Omit for every platform. Clicking the active filter tab again clears it back to All | all platforms |
 | `limit` | Max review cards (`0` = no limit) | `0` |
@@ -217,7 +222,7 @@ theme/fonts/             optional self-hosted fonts
 
 ### `config.js`
 
-An ES module whose default export is the config object, so it can carry comments. `// @ts-check` plus the `/** @type {import('./cred-config').CredConfig} */` line above `export default` gives editor autocomplete and type checks from `cred-config.d.ts` (copy it from `content/example/`; it is generated from `src/schemas/config.schema.json`). Migrating from an older `config.json`: `node src/scripts/config-to-js.mjs <data-dir>`, then delete `config.json`. `reviews.years` stays on one line (`years: [2026, 2025]`) so import scripts can update it.
+An ES module whose default export is the config object, so it can carry comments. `// @ts-check` plus the `/** @type {import('./cred-config').CredConfig} */` line above `export default` gives editor autocomplete and type checks from `cred-config.d.ts` (copy it from `src/example/`; it is generated from `src/schemas/config.schema.json`). Migrating from an older `config.json`: `node src/scripts/config-to-js.mjs <data-dir>`, then delete `config.json`. `reviews.years` stays on one line (`years: [2026, 2025]`) so import scripts can update it.
 
 | Key | Role |
 |---|---|
@@ -323,7 +328,7 @@ Formal shape: `src/schemas/reviews.schema.json` in this repo.
 
 Optional check: from a checkout of this repo, run `node src/scripts/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
 
-A data repo can run the same check on every push. The sample at `content/example/.github/workflows/validate.yml` is that thin caller — copy `content/example/` and it becomes `.github/workflows/validate.yml` at the repo root:
+A data repo can run the same check on every push. The sample at `src/example/.github/workflows/validate.yml` is that thin caller — copy `src/example/` and it becomes `.github/workflows/validate.yml` at the repo root:
 
 ```yaml
 # .github/workflows/validate.yml
@@ -352,7 +357,7 @@ After validating, the same workflow writes `badge.json` and `badge.svg` at the d
 
 ## Updating data
 
-Edit the cloned data repo (same shape as `content/example/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / icons / theme as needed, then publish. Optionally run `node src/scripts/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
+Edit the cloned data repo (same shape as `src/example/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / icons / theme as needed, then publish. Optionally run `node src/scripts/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
 
 ---
 
@@ -415,7 +420,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ## Alternative: a separate data repo
 
-[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `content/example/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `content/example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
+[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `src/example/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `src/example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
 
 **Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` builds the site (`npm run build`, plus the `/v/` copies) and publishes it on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages through `.github/workflows/pages.yml` (Settings → Pages → Source: *GitHub Actions*, then run it).
 
@@ -425,10 +430,10 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 ## Technical details
 
 - Loads `config.js` (an ES module), then all year files in parallel; injects CSS if missing.
-- Without `data-source` / `?source=`, reads `/data/` (published from `content/data/`, if it has a `config.js`) or `/example/` (from `content/example/`) on the script's site; if neither loads, shows the unavailable message.
+- Without `data-source` / `?source=`, reads `/content/` (published from `content/`, if it has a `config.js`) or `/example/` (from `src/example/`) on the script's site; if neither loads, shows the unavailable message.
 - Fixed-height mode: host height 100% or viewport remainder; card text scrolls without blocking horizontal swipe.
 - Icons: data-repo SVG, then Simple Icons CDN fallback.
-- Local preview: run `npm run build`, serve `dist/` from any static origin with CORS (`Access-Control-Allow-Origin: *`) and open `index.html` (it uses `/data/` or `/example/`) or point `data-source` at a local URL.
+- Local preview: run `npm run build`, serve `dist/` from any static origin with CORS (`Access-Control-Allow-Origin: *`) and open `index.html` (it uses `/content/` or `/example/`) or point `data-source` at a local URL.
 
 Review text belongs to its authors; platform marks belong to their owners.
 

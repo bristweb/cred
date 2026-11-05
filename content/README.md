@@ -1,8 +1,9 @@
 # Content
 
-Everything a site shows lives here, one folder per data set; the code is in `../src/`. Each folder is published under its own name (`content/example/` at `/example/`, `content/data/` at `/data/`).
+This folder is for **your** content, and it is empty in upstream on purpose. The code is in `../src/`, and the bundled examples are in `../src/example/`.
 
-- `example/`: the sample content that ships with upstream, tagged `example: true`. Leave it untouched so upstream updates merge cleanly.
-- `data/`: yours. Create it by copying `example/`, then replace the content. The widget reads `/data/` by default when it has a `config.js`, otherwise `/example/`.
+In a fork, copy the files of `../src/example/` here (`config.js`, `reviews/`, `theme/`, `icons/`, `images/`, `lang/`) and replace them with your own. `content/` is published at `/content/`.
+
+With no `data-source` on the embed, the widget uses this folder as soon as it has a `config.js`; until then it shows the bundled examples. A `data-source` (or `?source=`) always wins.
 
 See the main README, "Fork and replace".

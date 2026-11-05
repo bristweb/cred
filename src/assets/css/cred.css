@@ -1,5 +1,5 @@
 /* Reviews widget — generic layout and behavior. All site-specific look (fonts, colors, radius) comes from the
-   CSS custom properties in data/theme/theme.css; the fallbacks below are neutral defaults. */
+   CSS custom properties in content/theme/theme.css; the fallbacks below are neutral defaults. */
 /* Host = the inserted container (or your data-target / [data-reviews-widget] element). Doubled class for
    specificity so page-builder rules (flex/grid centering, text-align, floats) can't shrink it. .rw-clip (default;
    data-overflow="visible" turns it off) trims the carousel arrows' 8px overhang at the edges instead of causing
