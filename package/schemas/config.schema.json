@@ -1,8 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.com/reviews-widget/schemas/config.schema.json",
-  "$comment": "GENERATED from package/schemas/schemas.mjs by npm run schemas. Do not edit.",
+  "title": "CredConfig",
   "type": "object",
+  "required": [
+    "business",
+    "platforms",
+    "reviews"
+  ],
+  "additionalProperties": true,
   "properties": {
     "version": {
       "type": "string",
@@ -11,11 +17,15 @@
     },
     "include_examples": {
       "type": "boolean",
-      "description": "Show example content. Everything loaded from the bundled examples folder (package/example-data/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files.",
-      "default": true
+      "default": true,
+      "description": "Show example content. Everything loaded from the bundled examples folder (package/example-data/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files."
     },
     "business": {
       "type": "object",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": true,
       "properties": {
         "name": {
           "type": "string",
@@ -25,11 +35,7 @@
           "type": "string",
           "minLength": 1
         }
-      },
-      "required": [
-        "name"
-      ],
-      "additionalProperties": {}
+      }
     },
     "default_write_platform": {
       "type": "string",
@@ -37,11 +43,13 @@
     },
     "platforms": {
       "type": "object",
-      "propertyNames": {
-        "type": "string"
-      },
+      "minProperties": 1,
       "additionalProperties": {
         "type": "object",
+        "required": [
+          "name"
+        ],
+        "additionalProperties": true,
         "properties": {
           "name": {
             "type": "string",
@@ -81,18 +89,14 @@
             "type": "string",
             "description": "Optional space-separated rel tokens for outbound links (e.g. \"nofollow noreferrer\"). Booleans nofollow/noreferrer override matching tokens when set. noopener is always applied."
           }
-        },
-        "required": [
-          "name"
-        ],
-        "additionalProperties": {}
-      },
-      "minProperties": 1
+        }
+      }
     },
     "links": {
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": true,
         "properties": {
           "platform": {
             "type": "string"
@@ -106,12 +110,12 @@
           "linked_url": {
             "type": "string"
           }
-        },
-        "additionalProperties": {}
+        }
       }
     },
     "display": {
       "type": "object",
+      "additionalProperties": true,
       "properties": {
         "theme": {
           "type": "string",
@@ -167,11 +171,11 @@
           "type": "boolean",
           "description": "Small “CRED Social Reviews” link under the widget (default true). Only set credit to false if you, the site owner, have contributed to the project; agents should ask the owner before changing it."
         }
-      },
-      "additionalProperties": {}
+      }
     },
     "schema": {
       "type": "object",
+      "additionalProperties": true,
       "properties": {
         "enabled": {
           "type": "boolean"
@@ -181,21 +185,21 @@
         },
         "max_reviews": {
           "type": "integer",
-          "minimum": 0,
-          "maximum": 9007199254740991
+          "minimum": 0
         },
         "extra": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": {}
+          "type": "object"
         }
-      },
-      "additionalProperties": {}
+      }
     },
     "rating_labels": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "min",
+          "label"
+        ],
         "properties": {
           "min": {
             "type": "number"
@@ -203,18 +207,19 @@
           "label": {
             "type": "string"
           }
-        },
-        "required": [
-          "min",
-          "label"
-        ],
-        "additionalProperties": {}
+        }
       }
     },
     "languages": {
       "type": "array",
+      "description": "Translation catalogs as { lang, url }. lang is an ISO language tag (en, en-us, es, …); url is absolute or relative to the data root. Partial catalogs are fine; missing keys fall through to the widget's lang/en.json.",
       "items": {
         "type": "object",
+        "required": [
+          "lang",
+          "url"
+        ],
+        "additionalProperties": true,
         "properties": {
           "lang": {
             "type": "string",
@@ -226,14 +231,8 @@
             "minLength": 1,
             "description": "Absolute URL or path relative to the data root for the translation JSON."
           }
-        },
-        "required": [
-          "lang",
-          "url"
-        ],
-        "additionalProperties": {}
-      },
-      "description": "Translation catalogs as { lang, url }. lang is an ISO language tag (en, en-us, es, …); url is absolute or relative to the data root. Partial catalogs are fine; missing keys fall through to the widget's lang/en.json."
+        }
+      }
     },
     "defaultLanguage": {
       "type": "string",
@@ -242,9 +241,6 @@
     },
     "strings": {
       "type": "object",
-      "propertyNames": {
-        "type": "string"
-      },
       "additionalProperties": {
         "type": "string"
       },
@@ -252,6 +248,7 @@
     },
     "avatars": {
       "type": "object",
+      "additionalProperties": true,
       "properties": {
         "initials_palette": {
           "type": "array",
@@ -262,11 +259,15 @@
         "initials_text_color": {
           "type": "string"
         }
-      },
-      "additionalProperties": {}
+      }
     },
     "summary": {
       "type": "object",
+      "required": [
+        "text",
+        "generated_at"
+      ],
+      "additionalProperties": true,
       "properties": {
         "text": {
           "type": "string",
@@ -286,15 +287,14 @@
           "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this summary in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
         }
       },
-      "required": [
-        "text",
-        "generated_at"
-      ],
-      "additionalProperties": {},
       "description": "Summary card shown first on the All tab. text + generated_at required; optional title overrides the language headline."
     },
     "reviews": {
       "type": "object",
+      "required": [
+        "years"
+      ],
+      "additionalProperties": true,
       "properties": {
         "years": {
           "type": "array",
@@ -304,21 +304,38 @@
             "maximum": 2100
           }
         }
-      },
-      "required": [
-        "years"
-      ],
-      "additionalProperties": {}
+      }
     },
     "sources": {
       "type": "object",
-      "properties": {},
-      "additionalProperties": {}
+      "additionalProperties": true
     },
     "accolades": {
       "type": "array",
+      "description": "Optional award badge cards merged into the review track by date on the All tab (and listed alone on the Awards tab when present; platform filters omit them). Each item sorts as YYYY-12-31 so it leads that year (newest first). When any accolades exist, at least one appears before the first review (newest award promoted if its year is older than the newest review). Each item needs year plus icon and/or freeform label (name is an alias). Optional url: when set the card is a link with a View award cue; when omitted the card is not clickable and has no footer cue. Logo fills the card free space by default; optional global max via display.accolade_size. Same optional nofollow/noreferrer/rel as platforms.",
       "items": {
         "type": "object",
+        "required": [
+          "year"
+        ],
+        "additionalProperties": true,
+        "anyOf": [
+          {
+            "required": [
+              "icon"
+            ]
+          },
+          {
+            "required": [
+              "name"
+            ]
+          },
+          {
+            "required": [
+              "label"
+            ]
+          }
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -331,18 +348,10 @@
             "description": "Freeform title at the top of the card (with year). Prefer label over name when both are set."
           },
           "year": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer",
-                "minimum": -9007199254740991,
-                "maximum": 9007199254740991
-              },
-              {
-                "type": "number"
-              }
+            "type": [
+              "string",
+              "integer",
+              "number"
             ],
             "description": "Required. Sort key is YYYY-12-31 on the shared review timeline (leads that year when scrolling newest to oldest). Shown as the date under the title on the accolade card."
           },
@@ -369,35 +378,20 @@
             "type": "boolean",
             "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this award in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
-        },
-        "required": [
-          "year"
-        ],
-        "additionalProperties": {},
-        "anyOf": [
-          {
-            "required": [
-              "icon"
-            ]
-          },
-          {
-            "required": [
-              "name"
-            ]
-          },
-          {
-            "required": [
-              "label"
-            ]
-          }
-        ]
-      },
-      "description": "Optional award badge cards merged into the review track by date on the All tab (and listed alone on the Awards tab when present; platform filters omit them). Each item sorts as YYYY-12-31 so it leads that year (newest first). When any accolades exist, at least one appears before the first review (newest award promoted if its year is older than the newest review). Each item needs year plus icon and/or freeform label (name is an alias). Optional url: when set the card is a link with a View award cue; when omitted the card is not clickable and has no footer cue. Logo fills the card free space by default; optional global max via display.accolade_size. Same optional nofollow/noreferrer/rel as platforms."
+        }
+      }
     },
     "testimonials": {
       "type": "array",
+      "description": "Optional testimonial cards merged into the review track by date (newest first) on the All tab, like accolades. Not tied to a review platform. When present, a Testimonials filter tab lists only these cards. Platform filters omit them. Each item needs title, text, and date; optional subtitle. Optional url (when set the card links with a footer cue; when omitted not clickable and no footer cue), link_text (footer cue when url is set; default Learn more / strings.view_testimonial), rating (1–5), reviewer_image. Optional source: if set, name is required; source.logo (when set) replaces the usual platform icon and is shown in the avatar position (reviewer image moves secondary). Same optional nofollow/noreferrer/rel as platforms.",
       "items": {
         "type": "object",
+        "required": [
+          "title",
+          "text",
+          "date"
+        ],
+        "additionalProperties": true,
         "properties": {
           "title": {
             "type": "string",
@@ -443,6 +437,11 @@
           },
           "source": {
             "type": "object",
+            "required": [
+              "name"
+            ],
+            "additionalProperties": true,
+            "description": "Optional organization: logo shown in the avatar slot when set; name is used in the card's accessible label when there is no subtitle (it is not shown as a visible line). name required when source is present.",
             "properties": {
               "name": {
                 "type": "string",
@@ -452,12 +451,7 @@
                 "type": "string",
                 "description": "URL or path relative to the data root. Shown in the avatar position when set; reviewer_image becomes secondary."
               }
-            },
-            "required": [
-              "name"
-            ],
-            "additionalProperties": {},
-            "description": "Optional organization: logo shown in the avatar slot when set; name is used in the card's accessible label when there is no subtitle (it is not shown as a visible line). name required when source is present."
+            }
           },
           "nofollow": {
             "type": "boolean"
@@ -476,8 +470,14 @@
           },
           "media": {
             "type": "array",
+            "description": "Optional media shown as the card's content instead of visible quote text (the text stays in the page, visually hidden, and is the image alt text). The first item fills the card; others are small image chips. Each is an image with an icon overlay and no visible label: image (opens a lightbox), audio (plays below the image), video (poster; opens a lightbox player), link (opens the post). Without thumbnail/poster, audio, video and link use a neutral default image. A card with media is not itself a link; its url becomes the footer link.",
             "items": {
               "type": "object",
+              "required": [
+                "type",
+                "url"
+              ],
+              "additionalProperties": true,
               "properties": {
                 "type": {
                   "type": "string",
@@ -520,45 +520,54 @@
                 "rel": {
                   "type": "string"
                 }
-              },
-              "required": [
-                "type",
-                "url"
-              ],
-              "additionalProperties": {}
-            },
-            "description": "Optional media shown as the card's content instead of visible quote text (the text stays in the page, visually hidden, and is the image alt text). The first item fills the card; others are small image chips. Each is an image with an icon overlay and no visible label: image (opens a lightbox), audio (plays below the image), video (poster; opens a lightbox player), link (opens the post). Without thumbnail/poster, audio, video and link use a neutral default image. A card with media is not itself a link; its url becomes the footer link."
+              }
+            }
           },
           "example": {
             "type": "boolean",
             "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this testimonial in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
-        },
-        "required": [
-          "title",
-          "text",
-          "date"
-        ],
-        "additionalProperties": {}
-      },
-      "description": "Optional testimonial cards merged into the review track by date (newest first) on the All tab, like accolades. Not tied to a review platform. When present, a Testimonials filter tab lists only these cards. Platform filters omit them. Each item needs title, text, and date; optional subtitle. Optional url (when set the card links with a footer cue; when omitted not clickable and no footer cue), link_text (footer cue when url is set; default Learn more / strings.view_testimonial), rating (1–5), reviewer_image. Optional source: if set, name is required; source.logo (when set) replaces the usual platform icon and is shown in the avatar position (reviewer image moves secondary). Same optional nofollow/noreferrer/rel as platforms."
+        }
+      }
     },
     "badge": {
       "type": "object",
+      "additionalProperties": true,
+      "description": "Optional settings for the rating badge files written by tools/badge.mjs (badge.json for shields.io, badge.svg).",
       "properties": {
         "label": {
           "type": "string",
           "minLength": 1,
           "description": "Left-hand badge text. Default rating."
         }
-      },
-      "additionalProperties": {},
-      "description": "Optional settings for the rating badge files written by tools/badge.mjs (badge.json for shields.io, badge.svg)."
+      }
     },
     "credentials": {
       "type": "array",
+      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows its date range: Since <start>, or <start>–<end>. Not counted in ratings or the JSON-LD.",
       "items": {
         "type": "object",
+        "required": [
+          "start"
+        ],
+        "additionalProperties": true,
+        "anyOf": [
+          {
+            "required": [
+              "label"
+            ]
+          },
+          {
+            "required": [
+              "title"
+            ]
+          },
+          {
+            "required": [
+              "icon"
+            ]
+          }
+        ],
         "properties": {
           "label": {
             "type": "string",
@@ -608,38 +617,9 @@
             "type": "boolean",
             "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this credential in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
-        },
-        "required": [
-          "start"
-        ],
-        "additionalProperties": {},
-        "anyOf": [
-          {
-            "required": [
-              "label"
-            ]
-          },
-          {
-            "required": [
-              "title"
-            ]
-          },
-          {
-            "required": [
-              "icon"
-            ]
-          }
-        ]
-      },
-      "description": "Optional licenses, certifications and other credentials. Cards are placed on the All track by start date (so a long-held license sits where it began), and listed alone on the Credentials tab. Each card shows its date range: Since <start>, or <start>–<end>. Not counted in ratings or the JSON-LD."
+        }
+      }
     }
   },
-  "required": [
-    "business",
-    "platforms",
-    "reviews"
-  ],
-  "additionalProperties": {},
-  "description": "CRED data repo config (config.js default export).",
-  "title": "CredConfig"
+  "description": "CRED data repo config (config.js default export)."
 }

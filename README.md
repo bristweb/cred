@@ -87,7 +87,7 @@ cred/
 ├── package/                  the product: upstream's, a fork leaves it alone (merges stay clean)
 │   ├── assets/               the widget: js/cred.js, css/cred.css, default icons/
 │   ├── lang/                 the widget's built-in English wording (en.json); used by every embed
-│   ├── schemas/  types/      the data format (schemas.mjs, Zod) and the JSON Schemas / typings generated from it
+│   ├── schemas/  types/      JSON Schemas and editor typings for config.js
 │   ├── tools/                Node tools: validate, badge, dedupe, config-to-js, build-versions, export-site.sh, smoke-test
 │   └── example-data/         the bundled examples: a mirror of data/ (config.js, reviews/, theme/, lang/, assets/)
 ├── data/                     yours: everything client-specific. Empty upstream (just a README)
@@ -361,16 +361,12 @@ Formal shape: `package/schemas/reviews.schema.json` in this repo.
 
 ## JSON Schema and validation
 
-The data format is defined once, as [Zod](https://zod.dev) schemas in `package/schemas/schemas.mjs` (`configSchema` for `config.js`, `reviewsSchema` for each `reviews/<year>.json` array). Zod is a development dependency of the tools only; the widget has no dependencies.
-
-| Generated file (`npm run schemas`, do not edit) | For |
+| Schema | Validates |
 |---|---|
-| `package/schemas/config.schema.json`, `package/schemas/reviews.schema.json` | editors and other JSON Schema (draft-07) tools |
-| `package/types/config.d.ts` (copied to `package/example-data/cred-config.d.ts`) | editor type hints in `config.js` |
+| `package/schemas/config.schema.json` | `config.js` |
+| `package/schemas/reviews.schema.json` | each `reviews/<year>.json` array |
 
-After changing `schemas.mjs`, run `npm run schemas`; `npm test` fails if the generated JSON Schemas are out of date.
-
-Optional check: from a checkout of this repo, run `node package/tools/validate.mjs <data-dir>` (install the development dependencies in this repo first with `npm ci`). It checks the schemas (without changing the data) plus light filesystem rules (icons and media files exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
+Optional check: from a checkout of this repo, run `node package/tools/validate.mjs <data-dir>` (install the development dependency, Zod, with `npm ci` first). It checks the JSON schemas (with Zod, without changing the data) plus light filesystem rules (icons and media files exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
 
 A data repo can run the same check on every push. The sample at `docs/data-repo-workflows/validate.yml` is that thin caller; copy it to `.github/workflows/validate.yml` at the data repo's root:
 

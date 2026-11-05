@@ -4,7 +4,7 @@ All notable changes to CRED. Versions follow [semantic versioning](https://semve
 
 ## Unreleased
 
-- Tools: the data format is defined once as Zod schemas (`package/schemas/schemas.mjs`); `validate.mjs` checks with them and the JSON Schemas and config typings are generated from them (`npm run schemas`, replaces `npm run types`). Ajv and ajv-formats are gone; Zod is a development dependency only. The widget and the data format are unchanged.
+- Tools: `validate.mjs` checks the JSON Schemas with Zod (`z.fromJSONSchema` + `safeParse`) instead of Ajv; Zod is a development dependency only. Schemas, typings, the widget and the data format are unchanged.
 - Tests: `npm test` runs validator regression tests (`node --test`) before the smoke test; the smoke test accepts a fork's own `data/config.js`.
 
 ## 1.2.0 (2026-11-05)

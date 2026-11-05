@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validate a reviews data repo against the Zod schemas in package/schemas/schemas.mjs, plus filesystem checks
+ * Validate a reviews data repo against the JSON Schemas in package/schemas/ (checked with Zod), plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
  *   node package/tools/validate.mjs <data-dir>   # e.g. package/example-data   # default: .
@@ -10,19 +10,23 @@
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { deduper, exampleOut, hid, isExamplesDir, keyOf } from './dedupe.mjs';
 
 const root = path.resolve(process.argv[2] || '.');
 const errors = [], warnings = [];
 const err = m => errors.push(m), warn = m => warnings.push(m);
 
-let configSchema, reviewsSchema;
-try {
-  ({ configSchema, reviewsSchema } = await import('../schemas/schemas.mjs'));
-} catch (e) {
-  console.error(`Cannot load the schemas (zod missing?). Run: npm ci   (in the cred checkout)\n${e.message}`);
-  process.exit(2);
-}
+let z;
+try { ({ z } = await import('zod')); }
+catch (e) { console.error(`Cannot load zod. Run: npm ci   (in the cred checkout)\n${e.message}`); process.exit(2); }
+// The JSON Schemas stay the source of truth (editors use them too); Zod turns them into validators.
+const schemaDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'schemas');
+const loadSchema = name => z.fromJSONSchema(JSON.parse(readFileSync(path.join(schemaDir, name), 'utf8')), { defaultTarget: 'draft-7' });
+const configSchema = loadSchema('config.schema.json');
+const reviewsSchema = loadSchema('reviews.schema.json');
+// Zod's fromJSONSchema (4.6.7, marked semi-experimental) skips an anyOf next to "type": "object"; the schema's
+// "one of these keys" rules for accolades and credentials are therefore checked below with the other config checks.
 // One line per problem: "<file>: /path/to/field message". A union (e.g. rating: 1-5 or null) lists why each option failed.
 const where = p => '/' + p.join('/');
 const issueLines = (iss, base = []) => iss.flatMap(i => {
@@ -64,11 +68,13 @@ for (const l of (config && config.links) || []) relIcon(`links.${l.platform}`, l
 for (const k of ['accolades_icon', 'credentials_icon', 'testimonials_icon']) if (config?.display?.[k]) relIcon(`display.${k}`, String(config.display[k]));
 (Array.isArray(config?.credentials) ? config.credentials : []).forEach((c, i) => {
   if (!c || typeof c !== 'object') return;
+  if (!('label' in c || 'title' in c || 'icon' in c)) err(`config.js: /credentials/${i} needs one of label, title, icon`);
   if (c.icon) relIcon(`credentials[${i}]`, c.icon);
   if (c.start && c.end && String(c.end) < String(c.start)) err(`config.js credentials[${i}]: end ${c.end} is before start ${c.start}`);
 });
 (Array.isArray(config?.accolades) ? config.accolades : []).forEach((a, i) => {
   if (!a || typeof a !== 'object') return;
+  if (!('icon' in a || 'name' in a || 'label' in a)) err(`config.js: /accolades/${i} needs one of icon, name, label`);
   if (a.icon) relIcon(`accolades[${i}]`, a.icon);
 });
 (Array.isArray(config?.testimonials) ? config.testimonials : []).forEach((t, i) => {
