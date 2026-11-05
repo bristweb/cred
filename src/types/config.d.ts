@@ -9,7 +9,7 @@ export interface CredConfig {
    */
   version?: string;
   /**
-   * Show the bundled example content (records, testimonials, awards, credentials and summary marked example: true). Default true, so the upstream demo shows them. Set false in a fork to leave all example-tagged content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files, so later upstream updates to the examples never reach your site.
+   * Show example content. Everything loaded from the bundled examples folder (src/example-content/, published at /example/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files.
    */
   include_examples?: boolean;
   business: {
@@ -142,7 +142,7 @@ export interface CredConfig {
      */
     title?: string;
     /**
-     * Optional. true marks this summary as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
+     * Optional, and rarely needed: everything in the bundled examples folder (src/example-content/) already counts as example content without it. true marks this summary in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
      */
     example?: boolean;
     [k: string]: unknown;
@@ -239,13 +239,13 @@ export interface CredConfig {
       [k: string]: unknown;
     }[];
     /**
-     * Optional. true marks this testimonial as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
+     * Optional, and rarely needed: everything in the bundled examples folder (src/example-content/) already counts as example content without it. true marks this testimonial in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
      */
     example?: boolean;
     [k: string]: unknown;
   }[];
   /**
-   * Optional settings for the rating badge files written by src/scripts/badge.mjs (badge.json for shields.io, badge.svg).
+   * Optional settings for the rating badge files written by scripts/badge.mjs (badge.json for shields.io, badge.svg).
    */
   badge?: {
     /**

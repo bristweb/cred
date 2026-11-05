@@ -4,12 +4,12 @@
   "description": "Static reviews widget (code only)",
   "main": "index.js",
   "directories": {
-    "example": "src/example"
+    "example": "src/example-content"
   },
   "scripts": {
     "build": "node src/scripts/build.mjs dist",
-    "validate": "node src/scripts/validate.mjs src/example",
-    "types": "npx --yes json-schema-to-typescript@15 -i src/schemas/config.schema.json -o src/types/config.d.ts --bannerComment \"// Generated from src/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.\" && cp src/types/config.d.ts src/example/cred-config.d.ts"
+    "validate": "node src/scripts/validate.mjs src/example-content",
+    "types": "npx --yes json-schema-to-typescript@15 -i src/schemas/config.schema.json -o src/types/config.d.ts --bannerComment \"// Generated from src/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.\" && cp src/types/config.d.ts src/example-content/cred-config.d.ts"
   },
   "repository": {
     "type": "git",

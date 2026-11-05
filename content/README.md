@@ -1,9 +1,11 @@
-# Content
+# content/
 
-This folder is for **your** content, and it is empty in upstream on purpose. The code is in `../src/`, and the bundled examples are in `../src/example/`.
+Everything that is **yours** goes here: reviews, images, icons, styles, wording overrides, your own pages. It is empty in upstream on purpose.
 
-In a fork, copy the files of `../src/example/` here (`config.js`, `reviews/`, `theme/`, `icons/`, `images/`, `lang/`) and replace them with your own. `content/` is published at `/content/`.
+**`src/` is upstream's code and is left alone in a fork.** To start, copy the files of [`../src/example-content/`](../src/example-content/) into this folder (`config.js`, `reviews/`, `theme/`, `icons/`, `images/`, `lang/`, `media/`) and replace them with your own.
 
-With no `data-source` on the embed, the widget uses this folder as soon as it has a `config.js`; until then it shows the bundled examples. A `data-source` (or `?source=`) always wins.
+Optional `site/` here holds your own pages and host files (`robots.txt`, `sitemap.xml`, `_headers`, `CNAME`); the build lays them over `src/site/` at the site root.
 
-See the main README, "Fork and replace".
+Which data the widget uses when the embed has no `data-source`: this folder once it has a `config.js`, otherwise the bundled examples. A `data-source` (or `?source=`) always wins.
+
+This is not `dist/`: that is the generated build output and is git-ignored. See the main README, "Fork and replace".

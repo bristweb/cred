@@ -1,6 +1,7 @@
 /* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
- * The code lives in src/ of this repo (published at /assets/ and /lang/); everything about a site lives in a content folder
- * (content/ in a fork) or a separate data repo; the bundled examples are in src/example/ (published at /example/).
+ * The code lives in src/ of this repo (published at /assets/ and /lang/) and a fork leaves it alone; everything about a site
+ * lives in the top-level content/ folder (published at /content/) or a separate data repo. The bundled examples are in
+ * src/example-content/ (a sample of content/; published at /example/).
  * The data folder is chosen in this order: 1) data-source (or ?source=) if the embed has one; 2) else <site root>/content/
  * if it has a config.js (a fork's own content); 3) else the bundled examples at <site root>/example/
  * (site root = where this script's published assets/ folder is served from). Folder layout:
@@ -20,7 +21,8 @@
  * Public options: data-source (optional, see above), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
  *   data-limit, data-summary="off", data-theme="light|dark|auto", data-schema="off", data-constrained="true",
  *   data-lang (ISO language code).
- * config.include_examples: false leaves out everything tagged example: true (reviews, summary, accolades, credentials, testimonials).
+ * config.include_examples: false leaves out example content: everything loaded from the bundled examples folder, or elsewhere only
+ *   items tagged example: true (reviews, summary, accolades, credentials, testimonials).
  * Bare pages index.html / embed.html have no data-source and use the default above.
  * Optional: data-target="#id" on the script for a non-in-place mount (compatibility / special layouts).
  * Code root is inferred from the script URL. CSS loads from this repo + <source>theme/theme.css.
@@ -41,7 +43,7 @@
   const VERSION = '1.2.0';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   // Without data-source / ?source= the content is in this same repo: <site root>/content/ (a fork's own content) when it
-  // has a config.js, else <site root>/example/ (the bundled examples; they live in src/example/). A /v/<x.y.z>/ copy looks at the site root too.
+  // has a config.js, else <site root>/example/ (the bundled examples; they live in src/example-content/). A /v/<x.y.z>/ copy looks at the site root too.
   const SITE_ROOT = DEFAULT_BASE.replace(/v\/[^/]+\/$/, '');
   const defaultSource = () => (SHARED.defaultSource ??= (async () => {
     const root = new URL(SITE_ROOT, location.href).href;
@@ -550,11 +552,13 @@
       return out;
     }
 
-    // Example content (records, testimonials, awards, credentials and the summary marked "example": true) is shown
-    // unless config.include_examples is false; then it is left out of every card, count, average and the JSON-LD.
-    // The files stay in the data repo.
+    // Example content is shown unless config.include_examples is false; then it is left out of every card, count,
+    // average and the JSON-LD (the files stay where they are). Everything loaded from the bundled examples folder
+    // (<site root>/example/, src/example-content/ in the repo) is example content, no tagging needed; elsewhere only
+    // items marked "example": true (records, testimonials, awards, credentials, summary) count as examples.
     const showExamples = toBool(config.include_examples ?? true);
-    const isExample = x => Boolean(x) && x.example === true && !showExamples;
+    const fromExamples = new URL(base, location.href).href === new URL(SITE_ROOT + 'example/', location.href).href;
+    const isExample = x => Boolean(x) && (fromExamples || x.example === true) && !showExamples;
     const summary = config.summary && !isExample(config.summary) ? config.summary : null;
     // Hidden reviews stay in the data but are never shown, counted, averaged or put in the JSON-LD:
     // "hidden": true on the record, keys <platform>-<platform_review_id> in display.hide / data-hide / ?hide=

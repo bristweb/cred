@@ -1,4 +1,4 @@
-# Syntax check, build the site, and validate the bundled example content (src/example/).
+# Syntax check, build the site, and validate the bundled example content (src/example-content/).
 name: Check
 on:
   push:
@@ -16,4 +16,4 @@ jobs:
         run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" src/assets/js/cred.js
       - name: Build publishes the widget, pages and example at their public URLs
         run: node src/scripts/build.mjs dist && test -f dist/assets/js/cred.js && test -f dist/lang/en.json && test -f dist/index.html && test -f dist/example/config.js
-      - run: node src/scripts/validate.mjs src/example && node src/scripts/badge.mjs src/example && git diff --exit-code src/example/badge.json
+      - run: node src/scripts/validate.mjs src/example-content && node src/scripts/badge.mjs src/example-content && git diff --exit-code src/example-content/badge.json
