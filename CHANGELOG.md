@@ -6,6 +6,7 @@ All notable changes to CRED. Versions follow [semantic versioning](https://semve
 
 - `include_examples` (top-level in `config.js`, default `true`): `false` leaves everything tagged `example: true` out of the cards, counts, averages, summary card, JSON-LD and rating badge, without deleting any file. `example: true` is accepted on review records, the summary, accolades, credentials and testimonials. The validator and badge script follow the switch.
 - The bundled sample content is now called **examples** (business name "Example Bike Shop") instead of a branded name, and is tagged `example: true`; the demo still shows it.
+- `data-source` is optional. Left out (and with no `?source=`), the widget reads `<site root>/data/` when it has a `config.js` (a fork's own content), otherwise `<site root>/example/`, where the site root is the folder that serves the script's `assets/`. Embed snippets, `index.html`, `embed.html` and the demo links no longer need the attribute; content hosted elsewhere still uses `data-source`.
 - With no reviews to count, the header omits the rating block (it shows the "Write a review" button only).
 - README: new Fork and replace guide (fork, own data folder, hide examples, what is code and what is content, pull from upstream); a separate data repo is now the alternative.
 
