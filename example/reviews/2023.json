@@ -2,6 +2,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-013",
+    "example": true,
     "reviewer_name": "Casey Kowalski",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -16,6 +17,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-013",
+    "example": true,
     "reviewer_name": "Drew Okada",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -30,6 +32,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-006",
+    "example": true,
     "reviewer_name": "Finley Jensen",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -44,6 +47,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-009",
+    "example": true,
     "reviewer_name": "Taylor Chen",
     "reviewer_profile_url": null,
     "rating": 3,
@@ -64,6 +68,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-002",
+    "example": true,
     "reviewer_name": "Cameron Okada",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -78,6 +83,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-006",
+    "example": true,
     "reviewer_name": "Winter Jensen",
     "reviewer_profile_url": null,
     "rating": 5,

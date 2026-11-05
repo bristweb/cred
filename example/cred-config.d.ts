@@ -8,6 +8,10 @@ export interface CredConfig {
    * Widget version to load (semver, full major.minor.patch): exact "1.0.2", caret "^1.0.0" (same major), tilde "~1.0.0" (same minor), or "latest" (default). Pin a caret range in production.
    */
   version?: string;
+  /**
+   * Show the bundled example content (records, testimonials, awards, credentials and summary marked example: true). Default true, so the upstream demo shows them. Set false in a fork to leave all example-tagged content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files, so later upstream updates to the examples never reach your site.
+   */
+  include_examples?: boolean;
   business: {
     name: string;
     website?: string;
@@ -137,6 +141,10 @@ export interface CredConfig {
      * Optional card headline for the summary card. Falls back to language/strings ai_summary (e.g. Highlights / Summary).
      */
     title?: string;
+    /**
+     * Optional. true marks this summary as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
+     */
+    example?: boolean;
     [k: string]: unknown;
   };
   reviews: {
@@ -230,6 +238,10 @@ export interface CredConfig {
       rel?: string;
       [k: string]: unknown;
     }[];
+    /**
+     * Optional. true marks this testimonial as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
+     */
+    example?: boolean;
     [k: string]: unknown;
   }[];
   /**

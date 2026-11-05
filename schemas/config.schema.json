@@ -15,6 +15,11 @@
       "pattern": "^(latest|\\*|[~^]?\\d+(\\.\\d+){0,2}|\\d+(\\.\\d+)?\\.x)$",
       "description": "Widget version to load (semver, full major.minor.patch): exact \"1.0.2\", caret \"^1.0.0\" (same major), tilde \"~1.0.0\" (same minor), or \"latest\" (default). Pin a caret range in production."
     },
+    "include_examples": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show the bundled example content (records, testimonials, awards, credentials and summary marked example: true). Default true, so the upstream demo shows them. Set false in a fork to leave all example-tagged content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files, so later upstream updates to the examples never reach your site."
+    },
     "business": {
       "type": "object",
       "required": [
@@ -276,6 +281,10 @@
           "type": "string",
           "minLength": 1,
           "description": "Optional card headline for the summary card. Falls back to language/strings ai_summary (e.g. Highlights / Summary)."
+        },
+        "example": {
+          "type": "boolean",
+          "description": "Optional. true marks this summary as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
         }
       },
       "description": "Summary card shown first on the All tab. text + generated_at required; optional title overrides the language headline."
@@ -364,6 +373,10 @@
           "rel": {
             "type": "string",
             "description": "Optional space-separated rel tokens; same rules as platforms.*.rel."
+          },
+          "example": {
+            "type": "boolean",
+            "description": "Optional. true marks this award as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
         }
       }
@@ -509,6 +522,10 @@
                 }
               }
             }
+          },
+          "example": {
+            "type": "boolean",
+            "description": "Optional. true marks this testimonial as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
         }
       }
@@ -595,6 +612,10 @@
           },
           "rel": {
             "type": "string"
+          },
+          "example": {
+            "type": "boolean",
+            "description": "Optional. true marks this credential as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
         }
       }

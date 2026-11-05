@@ -16,6 +16,7 @@
  * Public options: data-source (required), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
  *   data-limit, data-summary="off", data-theme="light|dark|auto", data-schema="off", data-constrained="true",
  *   data-lang (ISO language code).
+ * config.include_examples: false leaves out everything tagged example: true (reviews, summary, accolades, credentials, testimonials).
  * Bare pages index.html / embed.html default data via ?source= when the script has no data-source.
  * Optional: data-target="#id" on the script for a non-in-place mount (compatibility / special layouts).
  * Code root is inferred from the script URL. CSS loads from this repo + <source>theme/theme.css.
@@ -33,7 +34,7 @@
   // Build version (kept equal to package.json). config.js `version` may ask for another release: the newest
   // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   const num = v => v.split('.').map(Number);
   const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
@@ -538,7 +539,12 @@
       return out;
     }
 
-    const summary = config.summary || null;
+    // Example content (records, testimonials, awards, credentials and the summary marked "example": true) is shown
+    // unless config.include_examples is false; then it is left out of every card, count, average and the JSON-LD.
+    // The files stay in the data repo.
+    const showExamples = toBool(config.include_examples ?? true);
+    const isExample = x => Boolean(x) && x.example === true && !showExamples;
+    const summary = config.summary && !isExample(config.summary) ? config.summary : null;
     // Hidden reviews stay in the data but are never shown, counted, averaged or put in the JSON-LD:
     // "hidden": true on the record, keys <platform>-<platform_review_id> in display.hide / data-hide / ?hide=
     // (all three combine), and rated reviews below min_rating (unrated reviews stay).
@@ -549,7 +555,8 @@
     const hideKeys = new Set([...keyList(D.hide), ...keyList(opts.hide), ...keyList(q.get('hide'))]);
     const belowMin = x => minRating > 0 && typeof x.rating === 'number' && x.rating < minRating;
     const keyOf = r => `${r.platform}-${r.platform_review_id}`;
-    const kept = reviews.filter(r => r.hidden !== true && !hideKeys.has(keyOf(r)) && !belowMin(r));
+    const live = reviews.filter(r => !isExample(r));
+    const kept = live.filter(r => r.hidden !== true && !hideKeys.has(keyOf(r)) && !belowMin(r));
     const hid = (r, part) => Boolean(r.hidden && typeof r.hidden === 'object' && r.hidden[part] === true);
     for (const r of kept) {
       r.id = r.id || `${r.platform}:${r.platform_review_id}`;
@@ -561,7 +568,7 @@
     // duplicate_of ("<platform>-<platform_review_id>"). Hiding applies to each copy first, so a hidden copy never
     // comes back through its twin. dedupe() keeps one copy per review: one without duplicate_of, then one with a
     // star rating, then the platform listed first in config.platforms, then the oldest.
-    const byKey = new Map(reviews.map(r => [keyOf(r), r]));
+    const byKey = new Map(live.map(r => [keyOf(r), r]));
     const groups = new Map();
     const normText = t => String(t ?? '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
     const groupOf = (r, seen = new Set()) => {
@@ -638,7 +645,7 @@
     // Accolades (config-level): reused for the Awards tab and for merging into the review track.
     const accoladesList = Array.isArray(config.accolades)
       ? config.accolades
-          .filter(a => a && a.year != null && String(a.year).trim() && (a.icon || a.label || a.name))
+          .filter(a => a && !isExample(a) && a.year != null && String(a.year).trim() && (a.icon || a.label || a.name))
           .slice()
           .sort((a, b) => {
             const ya = Number(a.year), yb = Number(b.year);
@@ -666,7 +673,7 @@
     };
     const testimonialsList = Array.isArray(config.testimonials)
       ? config.testimonials
-          .filter(t => t && !isBlank(t.text) && t.date && t.title != null && String(t.title).trim() && !belowMin(t))
+          .filter(t => t && !isExample(t) && !isBlank(t.text) && t.date && t.title != null && String(t.title).trim() && !belowMin(t))
           .map(t => ({
             ...t,
             _source: testimonialSource(t),
@@ -682,7 +689,7 @@
     const DATE_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
     const credentialsList = Array.isArray(config.credentials)
       ? config.credentials
-          .filter(c => c && DATE_RE.test(String(c.start ?? '')) && [c.label, c.title, c.icon].some(v => v != null && String(v).trim()))
+          .filter(c => c && !isExample(c) && DATE_RE.test(String(c.start ?? '')) && [c.label, c.title, c.icon].some(v => v != null && String(v).trim()))
           .map(c => {
             const end = DATE_RE.test(String(c.end ?? '')) ? String(c.end) : '';
             return { ...c, start: String(c.start), end, sortDate: (String(c.start) + '-01-01').slice(0, 10) };
@@ -773,15 +780,16 @@
       const basedPlatform = (!onSpecial && active !== 'all')
         ? esc(fill(S.on_platform, { platform: pname(active) }))
         : '';
+      // With no reviews to count (e.g. every record is an example and include_examples is false) the rating block is left out.
       const header = `<header class="rw-header">
-        <div class="rw-summary">
+        ${basedCount ? `<div class="rw-summary">
           <div class="rw-score">${avg.toFixed(1)}</div>
           <div>
             <div class="rw-label">${esc(label(avg))}</div>
             ${stars(avg, 'rw-stars-lg')}
             <div class="rw-based"><span class="rw-based-pre">${esc((S.based_on || '').trimEnd())} </span><strong>${basedCount}</strong> ${esc(basedUnit)}<span class="rw-based-pre">${basedPlatform}</span></div>
           </div>
-        </div>
+        </div>` : ''}
         <a class="rw-write" href="${esc(write)}" target="_blank" rel="${esc(platformRel(writeKey))}" aria-label="${esc(S.write_review)}"><span class="rw-write-long">${esc(S.write_review)}</span><span class="rw-write-short">${esc(S.write_review_short)}</span></a>
         ${tabs}
       </header>`;

@@ -2,6 +2,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-003",
+    "example": true,
     "reviewer_name": "Hayden Walsh",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -16,6 +17,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-014",
+    "example": true,
     "reviewer_name": "Hayden Walsh",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -33,6 +35,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-012",
+    "example": true,
     "reviewer_name": "Avery Ibrahim",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -50,6 +53,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-008",
+    "example": true,
     "reviewer_name": "Reese Chen",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -67,6 +71,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-003",
+    "example": true,
     "reviewer_name": "Cameron Hughes",
     "reviewer_profile_url": null,
     "rating": 4,
@@ -81,6 +86,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-005",
+    "example": true,
     "reviewer_name": "Logan Garcia",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -98,6 +104,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-004",
+    "example": true,
     "reviewer_name": "Remy Garcia",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -112,6 +119,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-011",
+    "example": true,
     "reviewer_name": "Sage Kowalski",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -126,6 +134,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-009",
+    "example": true,
     "reviewer_name": "Drew Chen",
     "reviewer_profile_url": null,
     "rating": 5,

@@ -5,6 +5,8 @@
 // with a star rating, then the platform listed first in config.platforms, then the oldest.
 export const keyOf = r => `${r.platform}-${r.platform_review_id}`;
 export const hid = (r, part) => r.hidden === true || Boolean(r.hidden && typeof r.hidden === 'object' && r.hidden[part] === true);
+// include_examples: false leaves out every record marked example: true (assets/js/cred.js does the same).
+export const exampleOut = (config, x) => x?.example === true && config?.include_examples === false;
 const normText = t => String(t ?? '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
 
 export function deduper(config, reviews) {

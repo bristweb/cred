@@ -1,13 +1,15 @@
 # CRED
 
-The open-source (MIT) widget for reviews, testimonials, awards and credentials. Unlimited sources and reviews, no tracking or third-party scripts, schema.org JSON-LD built in, and your data stays in your own repo.
+The open-source (MIT) widget for reviews, testimonials, awards and credentials. Unlimited sources and reviews, no tracking or third-party scripts, schema.org JSON-LD built in, and your data stays in your own repo. Unencumbered: fork it, host it on your own origin, change anything.
+
+The demo below runs on **examples**: invented sample content (a fictional bike shop, not a real business) that ships with the repo, is tagged `example: true`, and can be switched off with one setting. See [Fork and replace](#fork-and-replace).
 
 ## <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v5.png" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/example-widget-light-v5.png" />
-  <img src="docs/example-widget-light-v5.png" alt="Live example: Northwind Cycles (fictional bike shop)" />
+  <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v6.png" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/example-widget-light-v6.png" />
+  <img src="docs/example-widget-light-v6.png" alt="Live demo showing the bundled example data (a fictional bike shop)" />
 </picture>
 
 
@@ -26,23 +28,86 @@ Product comparison: [COMPARISON.md](COMPARISON.md).
 
 ## Contents
 
-1. [Embed](#embed)
-2. [Options](#options)
-3. [Data format](#data-format)
-4. [JSON Schema and validation](#json-schema-and-validation)
-5. [Updating data](#updating-data)
-6. [Structured data (JSON-LD)](#structured-data-json-ld)
-7. [Header behavior](#header-behavior)
-8. [Versions](#versions)
-9. [Privacy and presentation](#privacy-and-presentation)
-10. [New data repo](#new-data-repo)
-11. [Technical details](#technical-details)
+1. [Fork and replace](#fork-and-replace) (recommended setup)
+2. [Embed](#embed)
+3. [Options](#options)
+4. [Data format](#data-format)
+5. [JSON Schema and validation](#json-schema-and-validation)
+6. [Updating data](#updating-data)
+7. [Structured data (JSON-LD)](#structured-data-json-ld)
+8. [Header behavior](#header-behavior)
+9. [Versions](#versions)
+10. [Privacy and presentation](#privacy-and-presentation)
+11. [Alternative: a separate data repo](#alternative-a-separate-data-repo)
+12. [Technical details](#technical-details)
+
+---
+
+## Fork and replace
+
+The recommended setup: **fork this repo, put your content next to the code, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
+
+1. **Fork** [bristweb/cred](https://github.com/bristweb/cred) and publish the fork: Cloudflare Pages with the included `.github/workflows/deploy.yml` (repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or GitHub Pages (Settings → Pages → *Deploy from a branch*, `main`, `/ (root)`; `.nojekyll` is included). `_headers` opens CORS.
+2. **Copy `example/` to `data/`** (any folder name works) and replace the example content with yours: `config.js`, `reviews/`, `icons/`, `theme/`, images. Leave `example/` itself untouched so upstream updates merge without conflicts.
+3. **Embed from your own origin**, with `data-source` pointing at your folder:
+
+```html
+<script src="https://YOUR-FORK-SITE/assets/js/cred.js"
+        data-source="https://YOUR-FORK-SITE/data/" defer></script>
+```
+
+### Examples and the `include_examples` switch
+
+Everything that ships as sample content is tagged `example: true`: each record in `example/reviews/<year>.json`, and the summary, accolades, credentials and testimonials in `example/config.js`. The tag travels with the content, so it still works after you copy `example/` into `data/`.
+
+`include_examples` is a top-level key in `config.js`. It defaults to `true`, so the upstream demo shows its examples:
+
+```js
+export default {
+  include_examples: false, // leave out everything tagged example: true
+  // …
+};
+```
+
+With `false`, tagged content is left out of the cards, counts, averages, summary card, JSON-LD and rating badge, the same way `hidden: true` works on a review. Nothing is deleted. That lets you:
+
+- start from a copy of `example/`, set `include_examples: false`, and add your own (untagged) records while you replace the samples; or
+- keep `example/` in your fork as a reference and let upstream refresh the examples later: they never reach your published widget, because you point `data-source` at `data/` (or hide them with the switch).
+
+To remove examples for good, delete the tagged items or files. You do not have to. `include_examples` needs widget 1.2.0 or later (pin `version: "^1.2.0"` if you use it).
+
+### What is code, what is content
+
+| Upstream provides (pull these from upstream) | Yours (never has to match upstream) |
+|---|---|
+| `assets/`, `lang/`: the widget (`cred.js`, CSS, built-in icons, UI wording) | `data/` (or whatever you named it): `config.js`, `reviews/`, `icons/`, `images/`, `theme/`, `lang/` overrides |
+| `schemas/`, `types/`, `scripts/`: optional import, validate and badge tooling; use it or ignore it | Your own import scripts, sync jobs and workflows |
+| `example/`: sample content, tagged `example: true` | Your site's pages, `CNAME`, `robots.txt`, `sitemap.xml`, secrets |
+| `index.html`, `embed.html`, `README.md`, `CHANGELOG.md`, `COMPARISON.md`, `docs/` | Your choice of hosting workflow (`deploy.yml`) |
+
+Upstream **provides** the tooling; it does not require it. The widget only reads the files under `data-source`, so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge scripts here, which only check and tidy what you produce:
+
+```sh
+npm ci                              # once, for the validator
+node scripts/validate.mjs data      # schema and file checks
+node scripts/badge.mjs data         # optional rating badge files
+```
+
+### Pull the latest Cred from upstream
+
+```sh
+git remote add upstream https://github.com/bristweb/cred.git   # once
+git fetch upstream --tags
+git merge upstream/main
+```
+
+Rebase instead of merge if you prefer. Your content lives in `data/`, which upstream never touches, so merges stay clean and `example/` and the code simply update. Fetching tags matters if you serve `/v/<x.y.z>/` builds ([Versions](#versions)). Read [CHANGELOG.md](CHANGELOG.md) first when a major version is involved.
 
 ---
 
 ## Embed
 
-Same live demo URLs as at the top of this README. For a real site, keep the script `src` and change only `data-source` (or the iframe `?source=`) to your own data store URL.
+Same live demo URLs as at the top of this README. For a real site, point the script `src` at your own fork's origin ([Fork and replace](#fork-and-replace)) and `data-source` (or the iframe `?source=`) at your own data folder. The demo `src` also works while you try things out.
 
 ### JavaScript (recommended)
 
@@ -88,7 +153,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-`index.html` and `embed.html` are bare, transparent, `noindex` pages. With no `?source=` they load the bundled fictional demo data the same way.
+`index.html` and `embed.html` are bare, transparent, `noindex` pages. With no `?source=` they load the bundled example data the same way.
 
 ---
 
@@ -138,6 +203,7 @@ An ES module whose default export is the config object, so it can carry comments
 | `platforms` | review platforms in **tab order**: `name`, `icon`, `write_url`, `page_url`, `card_link` (`review`\|`page`), optional `invert_icon_when_active`, optional `nofollow` / `noreferrer` (or `rel`) for outbound write/card links. Extra fields (scrape URLs, notes, …) are ignored by the widget |
 | `default_write_platform` | `write_url` used on the “All” tab |
 | `version` | optional widget version, e.g. `"^1.0.0"`; see [Versions](#versions) |
+| `include_examples` | `true` (default) shows content tagged `example: true`; `false` leaves it out of cards, counts, averages, summary, JSON-LD and badge without deleting anything. See [Examples and the `include_examples` switch](#examples-and-the-include_examples-switch) |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
 | `display.dedupe` | merge one review posted on several platforms into one card (default `true`); `false` turns off matching by text. See [Hiding and duplicates](#hiding-and-duplicates) |
 | `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Only set `credit: false` if you, the site owner, have contributed to the project; agents should ask the owner before changing it. Text: `strings.credit` |
@@ -150,6 +216,7 @@ An ES module whose default export is the config object, so it can carry comments
 | `accolades` | optional award badges merged into the **All** track by date (each sorts as `YYYY-12-31` so it leads that year; newest first). Always at least one accolade before the first review when any exist (newest award promoted if needed). Platform filters omit them. When present, an **Awards** filter tab lists only accolade cards. Each item needs `year` plus `icon` and/or freeform `label` (`name` alias). Optional `url`: when set the card links with a “View award” cue; when omitted the card is not clickable and has no footer cue. Logo fills the card’s free space by default; optional global max: `display.accolade_size` (px). Filter pill icon: built-in trophy, or `display.accolades_icon` (path or URL). Same optional `nofollow` / `noreferrer` / `rel` as platforms |
 | `credentials` | optional licenses and certifications: `label` (or `title`), optional `issuer`, `icon`, `url` (no link text without it), `start` (required) and optional `end` (`YYYY`, `YYYY-MM` or `YYYY-MM-DD`). Cards sit on the **All** track at their start date, and a **Credentials** filter lists only them. The date line reads “Since 2019” or “2019–2024”. Not counted in ratings or the JSON-LD. Filter pill icon: built-in badge, or `display.credentials_icon` |
 | `testimonials` | optional testimonial cards (review-like) merged into the **All** track by date, newest first. No required platform/source. When present, a **Testimonials** filter tab lists only these cards; platform filters omit them. Each item needs `title` (shown like a reviewer name, not abbreviated), `text`, `date`; optional `subtitle` is a smaller line under the title (e.g. role and company). Filter pill icon: built-in quote bubble, or `display.testimonials_icon` (path or URL). Optional `url`, `link_text` (footer cue; default **Learn more** / `strings.view_testimonial`), `rating`, `reviewer_image`. Optional `source` (`name` required when set; `logo` shown in the avatar slot, reviewer image secondary; `name` is used in the accessible label, not as a visible line). Same optional `nofollow` / `noreferrer` / `rel` Optional `media` list: `{ type: image | audio | video | link, url, thumbnail, poster, caption, alt }`. With media, the first item's image is the card's content and the quote text is kept only as hidden text and alt text; extra items are small image chips. Images and videos open in a lightbox, audio plays below its image, links open the post. `caption` / `alt` label each item for screen readers and tooltips; audio, video and link fall back to a neutral image without `thumbnail` / `poster`. A card with media is not itself a link; its `url` becomes the footer link. Optional `excerpt` as for reviews |
+| `example` (on `summary`, an accolade, credential or testimonial) | `true` marks bundled sample content; see `include_examples` |
 | `reviews.years` | year files to fetch, newest first, e.g. `[2026, 2025]` |
 
 Formal shape: `schemas/config.schema.json` in this repo.
@@ -189,13 +256,15 @@ Array of records for that calendar year, newest first. Store full names, full te
 
 `reviewer_image` may be any working URL or path (absolute, `data:`, or relative to the data root). A local convention like `images/reviewers/<platform>-<id>.<ext>` is only a suggestion for sync scripts — not required.
 
+Optional `"example": true` marks a record as bundled sample content: it is left out when `config.js` sets `include_examples: false` ([Fork and replace](#fork-and-replace)). Your own records need no tag.
+
 Optional `excerpt`: an exact passage of `text` to show on the card instead of the opening ~160 characters (ellipses mark where it starts or ends mid-text). The validator checks it is a real passage.
 
 Optional per-review `nofollow` / `noreferrer` (or `rel`) override the platform for that card’s link. Outbound links always keep `noopener`; unset review → platform → just `noopener`.
 
 ### Hiding and duplicates
 
-Records always stay in the data; these change only what the widget shows and counts.
+Records always stay in the data; these change only what the widget shows and counts. (To leave out all bundled example content at once, use `include_examples: false`.)
 
 `"hidden"` on a record:
 
@@ -249,7 +318,7 @@ jobs:
 
 ### Rating badge
 
-After validating, the same workflow writes `badge.json` and `badge.svg` at the data root (or run `node scripts/badge.mjs <data-dir>`) and commits them when they change. They use the same reviews the widget counts (`hidden`, `display.hide` and `display.min_rating` apply; duplicates count once). Optional `config.badge.label` sets the left-hand text (default `rating`). Put it in your own README or site:
+After validating, the same workflow writes `badge.json` and `badge.svg` at the data root (or run `node scripts/badge.mjs <data-dir>`) and commits them when they change. They use the same reviews the widget counts (`include_examples`, `hidden`, `display.hide` and `display.min_rating` apply; duplicates count once). Optional `config.badge.label` sets the left-hand text (default `rating`). Put it in your own README or site:
 
 ```markdown
 ![Rating](https://img.shields.io/endpoint?url=https://<your-data-repo>.pages.dev/badge.json)
@@ -322,9 +391,9 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ---
 
-## New data repo
+## Alternative: a separate data repo
 
-Clone this repo’s `example/` folder (or copy it into a new repo) and replace the fictional content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL.
+[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `example/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL.
 
 **Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
 

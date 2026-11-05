@@ -12,7 +12,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { deduper, hid, keyOf } from './dedupe.mjs';
+import { deduper, exampleOut, hid, keyOf } from './dedupe.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WIDGET = path.resolve(HERE, '..');
@@ -183,8 +183,10 @@ for (const { r, at } of records) {
   for (let t = byKey.get(k), n = 0; t && t.duplicate_of != null; t = byKey.get(String(t.duplicate_of)))
     if (t === r || ++n > records.length) { err(`${at}: duplicate_of loops back to this review`); break; }
 }
-const kept = records.map(x => x.r).filter(r => !hid(r, 'rating') && !hideList.includes(keyOf(r)));
-const merged = kept.length - deduper(config, records.map(x => x.r))(kept).length;
+const live = records.map(x => x.r).filter(r => !exampleOut(config, r));
+const kept = live.filter(r => !hid(r, 'rating') && !hideList.includes(keyOf(r)));
+const merged = kept.length - deduper(config, live)(kept).length;
+const exampleItems = [...records.map(x => x.r), config?.summary, ...['accolades', 'credentials', 'testimonials'].flatMap(k => (Array.isArray(config?.[k]) ? config[k] : []))].filter(x => x?.example === true).length;
 const imgDir = path.join(root, 'images', 'reviewers');
 if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`images/reviewers/${f}`)) warn(`images/reviewers/${f}: not referenced by any review or testimonial (ok if unused)`);
 
@@ -196,6 +198,7 @@ const nTes = Array.isArray(config?.testimonials) ? config.testimonials.length : 
 console.log(`ok: ${total} reviews (${Object.entries(counts).map(([k, n]) => `${k} ${n}`).join(', ') || 'none'}) in ${years.length} year file(s)` +
   (hidden || partly || hideList.length ? `; hidden: ${hidden} record(s) marked hidden${partly ? `, ${partly} partly hidden` : ''}, ${hideList.length} display.hide key(s)` : '') +
   (merged ? `; ${merged} duplicate(s) counted once` : '') +
+  (exampleItems ? `; ${exampleItems} example item(s) ${config?.include_examples === false ? 'left out (include_examples: false)' : 'shown (include_examples is on)'}` : '') +
   (config?.display?.min_rating ? `; min_rating ${config.display.min_rating}` : '') +
   (nAcc ? `; ${nAcc} accolade(s)` : '') +
   (nCred ? `; ${nCred} credential(s)` : '') +
