@@ -4,7 +4,7 @@ The open-source (MIT) widget for reviews, testimonials, awards and credentials. 
 
 The demo below runs on **examples**: invented sample content (a fictional bike shop, not a real business) that ships with the repo, is tagged `example: true`, and can be switched off with one setting. See [Fork and replace](#fork-and-replace).
 
-## <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?source=https://cred.bristleconeweb.com/example/&theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
+## <a href="https://cred.bristleconeweb.com/?theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v6.png" />
@@ -13,14 +13,13 @@ The demo below runs on **examples**: invented sample content (a fictional bike s
 </picture>
 
 
-<a href="https://cred.bristleconeweb.com/embed.html?source=https://cred.bristleconeweb.com/example/" target="_blank" rel="noopener">iframe version</a> · <a href="https://cred.bristleconeweb.com/embed.html?source=https://cred.bristleconeweb.com/example/&constrained=true" target="_blank" rel="noopener">constrained / fixed-height box</a>
+<a href="https://cred.bristleconeweb.com/embed.html" target="_blank" rel="noopener">iframe version</a> · <a href="https://cred.bristleconeweb.com/embed.html?constrained=true" target="_blank" rel="noopener">constrained / fixed-height box</a>
 
 ```html
-<script src="https://cred.bristleconeweb.com/assets/js/cred.js"
-        data-source="https://cred.bristleconeweb.com/example/" defer></script>
+<script src="https://cred.bristleconeweb.com/assets/js/cred.js" defer></script>
 ```
 
-Paste to try it. For a real site, keep the script `src` and change only `data-source` to your data store. More patterns: [Embed](#embed).
+Paste to try it: with no `data-source` the widget shows the example data from the same site. For a real site, load the script from your own fork and let it read your `data/` folder, or set `data-source` if your content lives elsewhere ([Data source](#data-source)). More patterns: [Embed](#embed).
 
 A static, dependency-free reviews widget. Host the files on any static host (Cloudflare Pages recommended; GitHub Pages works as a backup with no setup). You are not limited to a vendor's supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
 
@@ -49,11 +48,10 @@ The recommended setup: **fork this repo, put your content next to the code, and 
 
 1. **Fork** [bristweb/cred](https://github.com/bristweb/cred) and publish the fork: Cloudflare Pages with the included `.github/workflows/deploy.yml` (repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or GitHub Pages (Settings → Pages → *Deploy from a branch*, `main`, `/ (root)`; `.nojekyll` is included). `_headers` opens CORS.
 2. **Copy `example/` to `data/`** (any folder name works) and replace the example content with yours: `config.js`, `reviews/`, `icons/`, `theme/`, images. Leave `example/` itself untouched so upstream updates merge without conflicts.
-3. **Embed from your own origin**, with `data-source` pointing at your folder:
+3. **Embed from your own origin.** No `data-source` is needed: the widget reads the content from the same site as the script ([Data source](#data-source)).
 
 ```html
-<script src="https://YOUR-FORK-SITE/assets/js/cred.js"
-        data-source="https://YOUR-FORK-SITE/data/" defer></script>
+<script src="https://YOUR-FORK-SITE/assets/js/cred.js" defer></script>
 ```
 
 ### Examples and the `include_examples` switch
@@ -72,7 +70,7 @@ export default {
 With `false`, tagged content is left out of the cards, counts, averages, summary card, JSON-LD and rating badge, the same way `hidden: true` works on a review. Nothing is deleted. That lets you:
 
 - start from a copy of `example/`, set `include_examples: false`, and add your own (untagged) records while you replace the samples; or
-- keep `example/` in your fork as a reference and let upstream refresh the examples later: they never reach your published widget, because you point `data-source` at `data/` (or hide them with the switch).
+- keep `example/` in your fork as a reference and let upstream refresh the examples later: they never reach your published widget, because the widget reads `data/` (or you hide them with the switch).
 
 To remove examples for good, delete the tagged items or files. You do not have to. `include_examples` needs widget 1.2.0 or later (pin `version: "^1.2.0"` if you use it).
 
@@ -85,7 +83,7 @@ To remove examples for good, delete the tagged items or files. You do not have t
 | `example/`: sample content, tagged `example: true` | Your site's pages, `CNAME`, `robots.txt`, `sitemap.xml`, secrets |
 | `index.html`, `embed.html`, `README.md`, `CHANGELOG.md`, `COMPARISON.md`, `docs/` | Your choice of hosting workflow (`deploy.yml`) |
 
-Upstream **provides** the tooling; it does not require it. The widget only reads the files under `data-source`, so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge scripts here, which only check and tidy what you produce:
+Upstream **provides** the tooling; it does not require it. The widget only reads the files in your data folder (the default `data/`, or `data-source`), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge scripts here, which only check and tidy what you produce:
 
 ```sh
 npm ci                              # once, for the validator
@@ -107,16 +105,19 @@ Rebase instead of merge if you prefer. Your content lives in `data/`, which upst
 
 ## Embed
 
-Same live demo URLs as at the top of this README. For a real site, point the script `src` at your own fork's origin ([Fork and replace](#fork-and-replace)) and `data-source` (or the iframe `?source=`) at your own data folder. The demo `src` also works while you try things out.
+Same live demo as at the top of this README. For a real site, point the script `src` at your own fork's origin ([Fork and replace](#fork-and-replace)); `data-source` (or the iframe `?source=`) is optional and only needed when your content is somewhere else. The demo `src` also works while you try things out.
+
+### Data source
+
+The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and the rest from a data folder. `data-source` (or `?source=`) is **optional**. Left out, it uses the same site as the script: the site root is the folder that holds the script's `assets/` directory, and the widget reads `<site root>/data/` if that has a `config.js` (your fork's own content), otherwise `<site root>/example/` (the bundled examples). That is why a fork needs no attribute, and why the upstream demo works with the bare snippet. Set `data-source="https://…/"` (trailing `/` added if missing) to read content from a different folder, site or repo. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
 
 ### JavaScript (recommended)
 
 ```html
-<script src="https://cred.bristleconeweb.com/assets/js/cred.js"
-        data-source="https://cred.bristleconeweb.com/example/" defer></script>
+<script src="https://cred.bristleconeweb.com/assets/js/cred.js" defer></script>
 ```
 
-The widget renders where the tag is. It loads CSS from this repo and `theme/theme.css`, `config.js`, and every `reviews/<year>.json` from `data-source`, in parallel. Options go on the same tag ([list](#options)).
+The widget renders where the tag is. It loads CSS from this repo and `theme/theme.css`, `config.js`, and every `reviews/<year>.json` from the data folder ([Data source](#data-source)), in parallel. Options go on the same tag ([list](#options)).
 
 - Sizes itself in the page; no resize script needed for the JS embed.
 - Invisible until font and first layout are ready, then fades in once.
@@ -132,17 +133,16 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 
 ```html
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js"
-        data-source="https://cred.bristleconeweb.com/example/"
         data-constrained="true"></script>
 ```
 
-`data-constrained="true"` packs the widget into that box: fill the height, arrows inside, nothing drawn outside the box, no hover lift, focus rings drawn inside. It is named “constrained” (not “fixed proportions”) because it follows the box you give it rather than locking an aspect ratio. Stretch the box full width and about **420px** tall; swap `data-source` for your data when you go live. See [Header behavior](#header-behavior) for short heights (tested down to 140px). Extra fitting tweaks (beyond this preset) are CSS classes — see [Options](#options).
+`data-constrained="true"` packs the widget into that box: fill the height, arrows inside, nothing drawn outside the box, no hover lift, focus rings drawn inside. It is named “constrained” (not “fixed proportions”) because it follows the box you give it rather than locking an aspect ratio. Stretch the box full width and about **420px** tall; on your own fork the same tag reads your `data/` folder. See [Header behavior](#header-behavior) for short heights (tested down to 140px). Extra fitting tweaks (beyond this preset) are CSS classes — see [Options](#options).
 
 ### Iframe
 
 ```html
 <iframe id="reviews-widget"
-        src="https://cred.bristleconeweb.com/embed.html?source=https://cred.bristleconeweb.com/example/"
+        src="https://cred.bristleconeweb.com/embed.html"
         title="Reviews" loading="lazy" scrolling="no"
         style="width:100%;border:0;height:420px"></iframe>
 <script>
@@ -153,7 +153,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-`index.html` and `embed.html` are bare, transparent, `noindex` pages. With no `?source=` they load the bundled example data the same way.
+`index.html` and `embed.html` are bare, transparent, `noindex` pages. With no `?source=` they use the default data folder (`data/` if present, else `example/`).
 
 ---
 
@@ -163,7 +163,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 
 | Option | Values | Default |
 |---|---|---|
-| `source` | Data repo root URL (trailing `/` added if missing). **Required** on real embeds | — |
+| `source` | Data folder URL (trailing `/` added if missing). Optional: see [Data source](#data-source) | `<site root>/data/` if it has a `config.js`, else `<site root>/example/` |
 | `layout` | `carousel` \| `grid` | `display.layout` or `carousel` |
 | `platform` | One key from `config.platforms`, or `accolades` / `credentials` / `testimonials` (filters to that tab). Omit for every platform. Clicking the active filter tab again clears it back to All | all platforms |
 | `limit` | Max review cards (`0` = no limit) | `0` |
@@ -393,7 +393,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ## Alternative: a separate data repo
 
-[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `example/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL.
+[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `example/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `example/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
 
 **Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
 
@@ -403,10 +403,10 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 ## Technical details
 
 - Loads `config.js` (an ES module), then all year files in parallel; injects CSS if missing.
-- Without `data-source` / `?source=`, shows the unavailable message.
+- Without `data-source` / `?source=`, reads `data/` (if it has a `config.js`) or `example/` from the script's site; if neither loads, shows the unavailable message.
 - Fixed-height mode: host height 100% or viewport remainder; card text scrolls without blocking horizontal swipe.
 - Icons: data-repo SVG, then Simple Icons CDN fallback.
-- Local preview: serve this repo (and your data) from any static origin with CORS (`Access-Control-Allow-Origin: *`) and open `index.html` or point `data-source` at a local URL.
+- Local preview: serve this repo (and your data) from any static origin with CORS (`Access-Control-Allow-Origin: *`) and open `index.html` (it uses `data/` or `example/`) or point `data-source` at a local URL.
 
 Review text belongs to its authors; platform marks belong to their owners.
 

@@ -12,7 +12,7 @@ Copy this whole folder to start your own data folder, or a separate data repo (i
 
 **Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
 
-Then point the widget at the published URL:
+Then point the widget at the published URL (`data-source` is only needed when this folder is served from a different site than the script; in a fork that holds both, omit it and the widget reads `data/`, or `example/` if there is no `data/`):
 
 ```html
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js"

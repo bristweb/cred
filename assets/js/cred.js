@@ -1,5 +1,7 @@
 /* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
- * The code lives in this repo; everything about a site lives in a separate data repo, named by data-source:
+ * The code lives in this repo; everything about a site lives in a data folder (data/ in a fork, example/ upstream) or a
+ * separate data repo. data-source names it and is optional: omitted, it defaults to <site root>/data/ if that has a
+ * config.js, else <site root>/example/ (site root = where this script's assets/ folder is served from):
  *   <source>config.js            business, platforms, display defaults, languages/defaultLanguage/strings, schema,
  *                                summary card, optional accolades/testimonials, and reviews.years
  *   <source>lang/<code>.json     optional UI wording files listed in config.languages[{lang,url}]. Partial OK.
@@ -11,19 +13,19 @@
  * snippet (both computed here at render time).
  *
  * Usage (JS embed) — one script tag renders the widget right where the tag is (defer/async are fine):
- *   <script src="…/assets/js/cred.js"
- *           data-source="…/<your-data-repo>/" defer></script>
- * Public options: data-source (required), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
+ *   <script src="…/assets/js/cred.js" defer></script>                      (content in the same repo: data/ or example/)
+ *   <script src="…/assets/js/cred.js" data-source="…/<your-data-repo>/" defer></script>   (content elsewhere)
+ * Public options: data-source (optional, see above), data-layout, data-platform (one platforms key, accolades, credentials, testimonials, or omit for all),
  *   data-limit, data-summary="off", data-theme="light|dark|auto", data-schema="off", data-constrained="true",
  *   data-lang (ISO language code).
  * config.include_examples: false leaves out everything tagged example: true (reviews, summary, accolades, credentials, testimonials).
- * Bare pages index.html / embed.html default data via ?source= when the script has no data-source.
+ * Bare pages index.html / embed.html have no data-source and use the default above.
  * Optional: data-target="#id" on the script for a non-in-place mount (compatibility / special layouts).
  * Code root is inferred from the script URL. CSS loads from this repo + <source>theme/theme.css.
  * data-constrained="true" = tight-box preset (fixed height, arrows inside, overflow hidden, no hover-lift,
  *   focus rings inside). Further fitting tweaks are CSS classes on .rw-host / .rw-root (see README).
  * URL params (?layout=&platform=&limit=&summary=off&theme=&constrained=true&lang=) override data attributes.
- * ?source= applies only when there is no data-source.
+ * ?source= applies only when there is no data-source; with neither, the same-repo default is used.
  */
 (function () {
   // Captured at execution time (works for plain, defer and async scripts; null only for ES modules).
@@ -36,6 +38,13 @@
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
   const VERSION = '1.2.0';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
+  // Without data-source / ?source= the content is in this same repo: <site root>/data/ (a fork's own content) when it
+  // has a config.js, else <site root>/example/ (the bundled examples). A /v/<x.y.z>/ copy looks at the site root too.
+  const SITE_ROOT = DEFAULT_BASE.replace(/v\/[^/]+\/$/, '');
+  const defaultSource = () => (SHARED.defaultSource ??= (async () => {
+    const root = new URL(SITE_ROOT, location.href).href;
+    try { await import(root + 'data/config.js'); return root + 'data/'; } catch { return root + 'example/'; }
+  })());
   const num = v => v.split('.').map(Number);
   const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
   // "1.4.2" exact; "^1", "^1.4", "1", "1.x" same major; "~1.4", "1.4", "1.4.x" same minor. Returns a test or null (= latest).
@@ -344,7 +353,6 @@
     if (!code.endsWith('/')) code += '/';
     // data-source (script tag or target) wins; ?source= is for the bare pages, whose script tag has none.
     let base = opts.source || q.get('source') || '';
-    if (base && !base.endsWith('/')) base += '/';
     host.classList.add('rw-host');
     host.classList.add('rw-clip');
     host.innerHTML = `<div class="rw-sizer" aria-hidden="true">${'<i></i> '.repeat(24)}</div>`;
@@ -377,14 +385,15 @@
     }));
     let config, reviews;
     try {
-      if (!base) throw new Error('[reviews-widget] data-source is required (URL of a data repo root, ending in /)');
+      if (!base) base = await defaultSource(); // data-source is optional: same-repo content
+      if (!base.endsWith('/')) base += '/';
       if (!VERSIONED && !opts.noVersion) {
         // Data first (shared and cached), so a version switch never refetches it or loads this build's CSS.
         ensureCss(code + 'assets/css/cred.css'); // in parallel; dropped again if another build takes over
         loadData(base);
         const c = await SHARED.configs[base];
         const v = await versionPath(c.version);
-        if (v) { host.innerHTML = ''; handOff(DEFAULT_BASE + v + 'assets/js/cred.js', host, opts); return; }
+        if (v) { host.innerHTML = ''; handOff(DEFAULT_BASE + v + 'assets/js/cred.js', host, { ...opts, source: base }); return; }
       }
       [config, reviews] = await load(code, base);
     } catch (e) {
