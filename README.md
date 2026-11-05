@@ -145,10 +145,10 @@ GitHub Pages ignores `_redirects`: use the real paths there (for example `https:
 Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
 
 ```sh
-npm ci                                       # once, for the validator
+npm ci                                       # once: development dependencies (zod) for the tools
 node package/tools/validate.mjs data         # schema and file checks
 node package/tools/badge.mjs data            # optional rating badge files
-npm test                                     # syntax, schema and static HTTP smoke test of the real paths
+npm test                                     # validator tests and static HTTP smoke test of the real paths
 ```
 
 ### Pull the latest Cred from upstream
@@ -366,7 +366,7 @@ Formal shape: `package/schemas/reviews.schema.json` in this repo.
 | `package/schemas/config.schema.json` | `config.js` |
 | `package/schemas/reviews.schema.json` | each `reviews/<year>.json` array |
 
-Optional check: from a checkout of this repo, run `node package/tools/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons and media files exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
+Optional check: from a checkout of this repo, run `node package/tools/validate.mjs <data-dir>` (install the development dependency, Zod, with `npm ci` first). It checks the JSON schemas (with Zod, without changing the data) plus light filesystem rules (icons and media files exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
 
 A data repo can run the same check on every push. The sample at `docs/data-repo-workflows/validate.yml` is that thin caller; copy it to `.github/workflows/validate.yml` at the data repo's root:
 

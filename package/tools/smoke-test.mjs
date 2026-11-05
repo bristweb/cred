@@ -62,7 +62,8 @@ async function checkSite(dir, prefix, label) {
     ok(code === base, `${label}: widget site root is ${prefix}`);
     for (const p of ['package/assets/css/cred.css', 'package/lang/en.json', 'package/assets/icons/trophy.svg', 'data/README.md'])
       ok((await get(code + p)).status === 200, `${label}: ${p}`);
-    ok((await get(code + 'data/config.js')).status === 404, `${label}: data/config.js absent upstream → examples are the default`);
+    const own = existsSync(path.join(dir, 'data/config.js')); // a fork's own data, else (upstream) the examples are the default
+    ok((await get(code + 'data/config.js')).status === (own ? 200 : 404), `${label}: data/config.js ${own ? 'served (own data is the default)' : 'absent → examples are the default'}`);
     const ex = code + 'package/example-data/';
     const cfg = await get(ex + 'config.js');
     ok(cfg.status === 200, `${label}: package/example-data/config.js`);

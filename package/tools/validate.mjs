@@ -1,46 +1,51 @@
 #!/usr/bin/env node
 /**
- * Validate a reviews data repo against the JSON Schemas in package/schemas/, plus filesystem checks
+ * Validate a reviews data repo against the JSON Schemas in package/schemas/ (checked with Zod), plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
  *   node package/tools/validate.mjs <data-dir>   # e.g. package/example-data   # default: .
  *
- * Requires the `ajv` dependency from this repo (`npm ci` in cred). The reusable workflow
- * installs it before running. Schemas: package/schemas/config.schema.json, package/schemas/reviews.schema.json.
+ * Needs the development dependency zod (`npm ci` in the cred checkout; the reusable workflow does it).
+ * The data is only checked, never changed.
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 import { deduper, exampleOut, hid, isExamplesDir, keyOf } from './dedupe.mjs';
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const WIDGET = path.resolve(HERE, '..');
 const root = path.resolve(process.argv[2] || '.');
 const errors = [], warnings = [];
 const err = m => errors.push(m), warn = m => warnings.push(m);
 
-let Ajv, addFormats;
-try {
-  const require = createRequire(path.join(WIDGET, 'package.json'));
-  Ajv = require('ajv');
-  addFormats = require('ajv-formats');
-} catch (e) {
-  console.error(`Cannot load ajv from ${WIDGET}. Run: npm ci   (in the cred checkout)\n${e.message}`);
-  process.exit(2);
-}
-
-const ajv = new (Ajv.default || Ajv)({ allErrors: true, strict: false });
-(addFormats.default || addFormats)(ajv);
-const loadSchema = name => JSON.parse(readFileSync(path.join(WIDGET, 'schemas', name), 'utf8'));
-const validateConfig = ajv.compile(loadSchema('config.schema.json'));
-const validateReviews = ajv.compile(loadSchema('reviews.schema.json'));
+let z;
+try { ({ z } = await import('zod')); }
+catch (e) { console.error(`Cannot load zod. Run: npm ci   (in the cred checkout)\n${e.message}`); process.exit(2); }
+// The JSON Schemas stay the source of truth (editors use them too); Zod turns them into validators.
+const schemaDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'schemas');
+const loadSchema = name => z.fromJSONSchema(JSON.parse(readFileSync(path.join(schemaDir, name), 'utf8')), { defaultTarget: 'draft-7' });
+const configSchema = loadSchema('config.schema.json');
+const reviewsSchema = loadSchema('reviews.schema.json');
+// Zod's fromJSONSchema (4.6.7, marked semi-experimental) skips an anyOf next to "type": "object"; the schema's
+// "one of these keys" rules for accolades and credentials are therefore checked below with the other config checks.
+// One line per problem: "<file>: /path/to/field message". A union (e.g. rating: 1-5 or null) lists why each option failed.
+const where = p => '/' + p.join('/');
+const issueLines = (iss, base = []) => iss.flatMap(i => {
+  const p = [...base, ...i.path];
+  if (i.code === 'invalid_union' && i.errors?.length) {
+    const why = [...new Set(i.errors.flatMap(e => e.map(x => (x.path.length ? where(x.path) + ' ' : '') + x.message)))];
+    return [`${where(p)} ${why.join('; or ')}`];
+  }
+  return [`${where(p)} ${i.message}`];
+});
+const check = (schema, data, prefix) => {
+  const r = schema.safeParse(data);
+  if (!r.success) for (const line of issueLines(r.error.issues)) err(`${prefix}: ${line}`);
+};
 
 const readJson = f => {
   try { return JSON.parse(readFileSync(path.join(root, f), 'utf8')); }
   catch (e) { err(`${f}: ${e.code === 'ENOENT' ? 'missing' : 'invalid JSON (' + e.message + ')'}`); return null; }
 };
-const fmt = (prefix, e) => `${prefix}: ${e.instancePath || '/'} ${e.message}${e.params?.allowedValues ? ` (${e.params.allowedValues.join('|')})` : ''}`;
 const norm = s => String(s ?? '').replace(/\s+/g, ' ').trim();
 const checkExcerpt = (at, r) => { if (r?.excerpt != null && !norm(r.text).includes(norm(r.excerpt))) err(`${at}: excerpt is not an exact passage of text`); };
 const isIso = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(s) && !Number.isNaN(Date.parse(s));
@@ -51,7 +56,7 @@ try { config = (await import('data:text/javascript,' + encodeURIComponent(readFi
 catch (e) { err(`config.js: ${e.code === 'ENOENT' ? 'missing' : 'cannot load (' + e.message + ')'}`); }
 if (existsSync(path.join(root, 'config.json'))) warn('config.json is no longer read; config.js is the config (node package/tools/config-to-js.mjs converts it)');
 if (config) {
-  if (!validateConfig(config)) for (const e of validateConfig.errors) err(fmt('config.js', e));
+  check(configSchema, config, 'config.js');
 }
 const platforms = (config && config.platforms) || {};
 const relIcon = (where, icon) => {
@@ -63,11 +68,13 @@ for (const l of (config && config.links) || []) relIcon(`links.${l.platform}`, l
 for (const k of ['accolades_icon', 'credentials_icon', 'testimonials_icon']) if (config?.display?.[k]) relIcon(`display.${k}`, String(config.display[k]));
 (Array.isArray(config?.credentials) ? config.credentials : []).forEach((c, i) => {
   if (!c || typeof c !== 'object') return;
+  if (!('label' in c || 'title' in c || 'icon' in c)) err(`config.js: /credentials/${i} needs one of label, title, icon`);
   if (c.icon) relIcon(`credentials[${i}]`, c.icon);
   if (c.start && c.end && String(c.end) < String(c.start)) err(`config.js credentials[${i}]: end ${c.end} is before start ${c.start}`);
 });
 (Array.isArray(config?.accolades) ? config.accolades : []).forEach((a, i) => {
   if (!a || typeof a !== 'object') return;
+  if (!('icon' in a || 'name' in a || 'label' in a)) err(`config.js: /accolades/${i} needs one of icon, name, label`);
   if (a.icon) relIcon(`accolades[${i}]`, a.icon);
 });
 (Array.isArray(config?.testimonials) ? config.testimonials : []).forEach((t, i) => {
@@ -138,7 +145,7 @@ for (const y of years) {
   const f = `reviews/${y}.json`;
   const list = readJson(f);
   if (!list) continue;
-  if (!validateReviews(list)) for (const e of validateReviews.errors) err(fmt(f, e));
+  check(reviewsSchema, list, f);
   if (!Array.isArray(list)) continue;
   list.forEach((r, i) => {
     const at = `${f}[${i}]`;
