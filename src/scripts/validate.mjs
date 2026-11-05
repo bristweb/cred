@@ -3,7 +3,7 @@
  * Validate a reviews data repo against the JSON Schemas in src/schemas/, plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
- *   node src/scripts/validate.mjs <data-dir>   # e.g. content/example   # default: .
+ *   node src/scripts/validate.mjs <data-dir>   # e.g. src/example   # default: .
  *
  * Requires the `ajv` dependency from this repo (`npm ci` in cred). The reusable workflow
  * installs it before running. Schemas: src/schemas/config.schema.json, src/schemas/reviews.schema.json.
