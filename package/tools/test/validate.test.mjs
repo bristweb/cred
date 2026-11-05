@@ -3,14 +3,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, cpSync, writeFileSync } from 'node:fs';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { z } from 'zod';
-import { configSchema, reviewsSchema } from '../../schemas/schemas.mjs';
 
 const tools = path.resolve(import.meta.dirname, '..');
 const examples = path.resolve(tools, '../example-data');
+const schema = name => z.fromJSONSchema(JSON.parse(readFileSync(path.resolve(tools, '../schemas', name), 'utf8')), { defaultTarget: 'draft-7' });
+const configSchema = schema('config.schema.json'), reviewsSchema = schema('reviews.schema.json');
 const folders = [examples, ...(process.env.CRED_TEST_DATA || '').split(':').filter(Boolean)];
 const validate = dir => spawnSync(process.execPath, [path.join(tools, 'validate.mjs'), dir], { encoding: 'utf8' });
 const loadConfig = async dir => (await import('data:text/javascript,' + encodeURIComponent(readFileSync(path.join(dir, 'config.js'), 'utf8')))).default;
@@ -75,9 +76,7 @@ test('config rules', async () => {
   assert.equal(ok(c => { c.display = { ...c.display, hide: ['google-1', 'google-1'] }; }), false, 'hide keys unique');
   assert.equal(ok(c => { c.version = 'v1'; }), false);
   assert.equal(ok(c => { c.version = '^1.2.0'; }), true);
-  assert.equal(ok(c => { c.accolades = [{ year: 2024 }]; }), false, 'accolade needs icon, name or label');
   assert.equal(ok(c => { c.accolades = [{ year: 2024, label: 'Best of' }]; }), true);
-  assert.equal(ok(c => { c.credentials = [{ start: '2020' }]; }), false);
   assert.equal(ok(c => { c.testimonials[0].media = [{ type: 'gif', url: 'x' }]; }), false);
   assert.equal(ok(c => { c.testimonials[0].media = [{ type: 'image' }]; }), false);
   assert.equal(ok(c => { delete c.testimonials[0].title; }), false);
@@ -91,22 +90,23 @@ test('validation never changes the data', async () => {
   assert.equal(JSON.stringify(c), before);
 });
 
+const copy = () => { const dir = path.join(mkdtempSync(path.join(tmpdir(), 'cred-')), 'data'); cpSync(examples, dir, { recursive: true }); return dir; };
+
+test('validate.mjs: accolades and credentials need one of their name keys', async () => {
+  const dir = copy(), f = path.join(dir, 'config.js');
+  writeFileSync(f, readFileSync(f, 'utf8').replace('  accolades: [', '  accolades: [{ year: 2024 },').replace('  credentials: [', '  credentials: [{ start: "2020" },'));
+  const r = validate(dir);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /accolades\/0 needs one of icon, name, label/);
+  assert.match(r.stderr, /credentials\/0 needs one of label, title, icon/);
+});
+
 test('validate.mjs reports file, record and field', () => {
-  const dir = path.join(mkdtempSync(path.join(tmpdir(), 'cred-')), 'data');
-  cpSync(examples, dir, { recursive: true });
+  const dir = copy();
   const f = path.join(dir, 'reviews/2025.json'), list = JSON.parse(readFileSync(f, 'utf8'));
   list[1].rating = 7;
   writeFileSync(f, JSON.stringify(list));
   const r = validate(dir);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /reviews\/2025\.json: \/1\/rating .*5/);
-});
-
-test('generated JSON Schemas match schemas.mjs (run npm run schemas)', () => {
-  for (const [name, schema] of [['config', configSchema], ['reviews', reviewsSchema]]) {
-    const file = JSON.parse(readFileSync(path.resolve(tools, `../schemas/${name}.schema.json`), 'utf8'));
-    const { $schema, $id, $comment, ...rest } = file;
-    const { $schema: _, ...gen } = z.toJSONSchema(schema, { target: 'draft-7', unrepresentable: 'throw' });
-    assert.deepEqual(rest, gen);
-  }
 });

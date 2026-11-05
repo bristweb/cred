@@ -1,4 +1,4 @@
-// Generated from package/schemas/config.schema.json (npm run schemas). Types for a CRED data repo config.js.
+// Generated from package/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.
 
 /**
  * CRED data repo config (config.js default export).
