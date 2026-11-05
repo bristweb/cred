@@ -1,5 +1,5 @@
 // Converts a data repo's config.json to config.js (same values, with comments and editor type hints).
-// Usage: node scripts/config-to-js.mjs <data-dir>   then delete config.json.
+// Usage: node src/scripts/config-to-js.mjs <data-dir>   then delete config.json.
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 const dir = process.argv[2] || '.';
