@@ -1,31 +1,22 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.com/reviews-widget/schemas/reviews.schema.json",
-  "title": "Reviews widget reviews/<year>.json",
-  "type": "array",
+  "$comment": "GENERATED from package/schemas/schemas.mjs by npm run schemas. Do not edit.",
   "minItems": 1,
+  "type": "array",
   "items": {
     "type": "object",
-    "required": [
-      "platform",
-      "platform_review_id",
-      "reviewer_name",
-      "reviewer_image",
-      "text",
-      "date"
-    ],
-    "additionalProperties": true,
     "properties": {
       "platform": {
         "type": "string",
         "minLength": 1
       },
       "platform_review_id": {
+        "description": "Suggested identity key with platform for sync tooling (unique per platform). Not a hard layout rule.",
         "type": [
           "string",
           "number"
-        ],
-        "description": "Suggested identity key with platform for sync tooling (unique per platform). Not a hard layout rule."
+        ]
       },
       "reviewer_name": {
         "type": [
@@ -81,9 +72,6 @@
           },
           {
             "type": "object",
-            "required": [
-              "text"
-            ],
             "properties": {
               "text": {
                 "type": "string"
@@ -99,7 +87,11 @@
                   }
                 ]
               }
-            }
+            },
+            "required": [
+              "text"
+            ],
+            "additionalProperties": {}
           }
         ]
       },
@@ -124,14 +116,12 @@
         "description": "Optional space-separated rel tokens; when set (or with nofollow/noreferrer), overrides the platform for this card. noopener is always applied."
       },
       "hidden": {
-        "description": "Optional. true keeps the review in the data but hides it everywhere: not shown, counted, averaged or included in the JSON-LD. An object hides only the parts set to true (missing = shown): display = no card; rating = left out of the average and every count; schema = left out of the JSON-LD.",
         "anyOf": [
           {
             "type": "boolean"
           },
           {
             "type": "object",
-            "additionalProperties": false,
             "properties": {
               "display": {
                 "type": "boolean",
@@ -145,9 +135,11 @@
                 "type": "boolean",
                 "description": "true: not in the JSON-LD (neither a review item nor the aggregateRating)."
               }
-            }
+            },
+            "additionalProperties": false
           }
-        ]
+        ],
+        "description": "Optional. true keeps the review in the data but hides it everywhere: not shown, counted, averaged or included in the JSON-LD. An object hides only the parts set to true (missing = shown): display = no card; rating = left out of the average and every count; schema = left out of the JSON-LD."
       },
       "example": {
         "type": "boolean",
@@ -163,6 +155,16 @@
         "minLength": 1,
         "description": "Optional. An exact passage of text (whitespace may differ) shown on the card instead of the opening characters, with ellipses where it starts or ends mid-text. The full text stays in the data."
       }
-    }
-  }
+    },
+    "required": [
+      "platform",
+      "platform_review_id",
+      "reviewer_name",
+      "reviewer_image",
+      "text",
+      "date"
+    ],
+    "additionalProperties": {}
+  },
+  "title": "Reviews widget reviews/<year>.json"
 }
