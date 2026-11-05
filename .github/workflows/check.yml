@@ -1,4 +1,5 @@
-# Syntax check + validate the bundled fictional example/.
+# Syntax check, validate the bundled examples (package/example-data/), and a browserless static HTTP smoke test of the
+# real paths, a GitHub Pages project subpath, the deploy export and the /v/ release copies (package/tools/smoke-test.mjs).
 name: Check
 on:
   push:
@@ -10,8 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags, for the /v/ release copies
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: npm ci
-      - run: node --check assets/js/cred.js && node --check scripts/validate.mjs && node --check scripts/badge.mjs && node --check scripts/build-versions.mjs && node --check scripts/dedupe.mjs
+      - run: for f in package/assets/js/cred.js package/tools/*.mjs; do node --check "$f"; done
+      - run: sh -n package/tools/export-site.sh
       - name: VERSION matches package.json
-        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" assets/js/cred.js
-      - run: node scripts/validate.mjs example && node scripts/badge.mjs example && git diff --exit-code example/badge.json
+        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" package/assets/js/cred.js
+      - name: No build output or old layout
+        run: '! test -e dist && ! test -e src && ! test -e content && ! test -e package/example-data/site && ! test -e data/site'
+      - run: node package/tools/validate.mjs package/example-data && node package/tools/badge.mjs package/example-data && git diff --exit-code package/example-data/badge.json
+      - run: npm test

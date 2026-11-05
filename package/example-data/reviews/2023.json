@@ -1,0 +1,95 @@
+[
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-013",
+    "reviewer_name": "Casey Kowalski",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Spoke replacement after a pothole. Wheel is true and tension feels even. Will be back.",
+    "date": "2023-12-10T19:52:30Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-013",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-013.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-013",
+    "reviewer_name": "Drew Okada",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Demo day \u2014 tried three gravel builds. Honest about what fits my weekend loops.",
+    "date": "2023-08-09T07:29:12Z",
+    "review_url": "https://example.com/google/reviews/ex-google-013",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-013.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "facebook",
+    "platform_review_id": "ex-facebook-006",
+    "reviewer_name": "Finley Jensen",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Brought my commuter in for a noisy hub. They diagnosed it in minutes, swapped the bearings while I waited, and the ride is quiet again. Fair price and friendly desk staff.",
+    "date": "2023-06-05T03:20:23Z",
+    "review_url": "https://example.com/facebook/reviews/ex-facebook-006",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-006.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-009",
+    "reviewer_name": "Taylor Chen",
+    "reviewer_profile_url": null,
+    "rating": 3,
+    "text": "Brought my commuter in for a noisy hub. They fixed it, though I waited longer than expected and the counter felt rushed at lunch rush.",
+    "date": "2023-04-24T14:25:36Z",
+    "review_url": "https://example.com/google/reviews/ex-google-009",
+    "owner_reply": {
+      "text": "Sorry this wasn't a five-star visit \u2014 please email us and we'll make it right.",
+      "date": "2023-04-25T00:25:36Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-009.svg",
+    "reviewer_image_source_url": null,
+    "hidden": {
+      "display": true
+    }
+  },
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-002",
+    "reviewer_name": "Cameron Okada",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Kids' bike fitting was patient and practical. Left with the right size and a clear maintenance checklist.",
+    "date": "2023-03-07T21:32:14Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-002",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-002.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-006",
+    "reviewer_name": "Winter Jensen",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Flat fix was quick and they showed me how to reseat the bead so I stop pinching tubes on trails.",
+    "date": "2023-02-22T12:16:49Z",
+    "review_url": "https://example.com/google/reviews/ex-google-006",
+    "owner_reply": {
+      "text": "Happy to help \u2014 rolling stock ready whenever you are.",
+      "date": "2023-02-23T12:16:49Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-006.svg",
+    "reviewer_image_source_url": null
+  }
+]

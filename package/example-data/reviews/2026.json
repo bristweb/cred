@@ -1,0 +1,169 @@
+[
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-007",
+    "reviewer_name": "Micah Berg",
+    "reviewer_profile_url": null,
+    "rating": 3,
+    "text": "Winterized my road bike: grease, bar tape, wheel true. Work was fine, but pickup ran a day later than quoted and nobody texted.",
+    "date": "2026-08-22T00:59:40Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-007",
+    "owner_reply": {
+      "text": "Sorry this wasn't a five-star visit \u2014 please email us and we'll make it right.",
+      "date": "2026-08-22T14:59:40Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-007.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "facebook",
+    "platform_review_id": "ex-facebook-007",
+    "reviewer_name": "Emery Okada",
+    "reviewer_profile_url": null,
+    "rating": 4,
+    "text": "Helpful staff and a solid e-bike test ride. Weekend afternoons get busy, so expect a short wait.",
+    "date": "2026-07-28T01:08:33Z",
+    "review_url": "https://example.com/facebook/reviews/ex-facebook-007",
+    "owner_reply": {
+      "text": "Thanks for riding with us!",
+      "date": "2026-07-29T09:08:33Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-007.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-010",
+    "reviewer_name": "Reese Walsh",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Tubeless conversion done the same day. Clear explanation of sealant top-ups. No more pinch flats.",
+    "date": "2026-07-18T05:24:29Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-010",
+    "owner_reply": {
+      "text": "Appreciate the kind words. Stop by anytime.",
+      "date": "2026-07-19T01:24:29Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-010.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-008",
+    "reviewer_name": "Remy Singh",
+    "reviewer_profile_url": null,
+    "rating": 4,
+    "text": "E-bike brake pads replaced same day. Test ride around the block before I paid \u2014 appreciated that.",
+    "date": "2026-07-14T19:58:01Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-008",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-008.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "facebook",
+    "platform_review_id": "ex-facebook-004",
+    "reviewer_name": "Parker Andersen",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Cleat install and brief fit tips. Pedaling feels more efficient already.",
+    "date": "2026-06-21T14:31:53Z",
+    "review_url": "https://example.com/facebook/reviews/ex-facebook-004",
+    "owner_reply": {
+      "text": "Appreciate the kind words. Stop by anytime.",
+      "date": "2026-06-22T06:31:53Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-004.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-011",
+    "reviewer_name": "Rowan Berg",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Came in for a basic tune-up and left with a bike that shifts better than when it was new. Honest about what could wait.",
+    "date": "2026-05-15T16:15:38Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-011",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-011.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-001",
+    "reviewer_name": "Logan Andersen",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Winter storage and spring tune-up package. Bike came back clean, lubed, and ready on the first warm day.",
+    "date": "2026-05-09T01:43:05Z",
+    "review_url": "https://example.com/google/reviews/ex-google-001",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-001.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-007",
+    "reviewer_name": "Quinn Ibrahim",
+    "reviewer_profile_url": null,
+    "rating": 4,
+    "text": "Good advice on commuter tires. Took a few days longer than quoted, but they called ahead to let me know.",
+    "date": "2026-04-01T22:59:55Z",
+    "review_url": "https://example.com/google/reviews/ex-google-007",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-007.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-011",
+    "reviewer_name": "Jamie Berg",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "I came in on a Saturday morning with a rear tire that kept going flat on every ride, and I was pretty sure I needed a new wheel. The shop was busy but someone checked me in right away and gave me an honest time estimate. Turns out the tube was fine; I had been pinching it when I seated the bead. The mechanic walked me through reseating the bead and showed me how to check the rim tape, so I stop pinching tubes on trails. Twenty minutes, no upsell, and I left knowing how to fix it myself.",
+    "date": "2026-03-20T16:51:27Z",
+    "review_url": "https://example.com/google/reviews/ex-google-011",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-011.svg",
+    "reviewer_image_source_url": null,
+    "excerpt": "The mechanic walked me through reseating the bead and showed me how to check the rim tape, so I stop pinching tubes on trails."
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-005",
+    "reviewer_name": "Remy Diaz",
+    "reviewer_profile_url": null,
+    "rating": 4,
+    "text": "Fitting for my first road bike took longer than expected, but the result is comfortable on long rides. Worth booking ahead.",
+    "date": "2026-02-28T05:48:19Z",
+    "review_url": "https://example.com/google/reviews/ex-google-005",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-005.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-008",
+    "reviewer_name": "Reese Singh",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Helmet fit and swap after a minor crash. Patient with my questions and checked the bike over for free.",
+    "date": "2026-02-08T11:32:36Z",
+    "review_url": "https://example.com/google/reviews/ex-google-008",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-008.svg",
+    "reviewer_image_source_url": null
+  }
+]
