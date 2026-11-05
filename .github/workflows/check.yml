@@ -1,4 +1,5 @@
-# Syntax check, build the site, and validate the bundled example content (src/example-content/).
+# Syntax check, validate the bundled examples (package/example-data/), and a browserless static HTTP smoke test of the
+# real paths, a GitHub Pages project subpath, the deploy export and the /v/ release copies (package/tools/smoke-test.mjs).
 name: Check
 on:
   push:
@@ -10,10 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags, for the /v/ release copies
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: npm ci
-      - run: for f in src/assets/js/cred.js src/scripts/*.mjs; do node --check "$f"; done
+      - run: for f in package/assets/js/cred.js package/tools/*.mjs; do node --check "$f"; done
+      - run: sh -n package/tools/export-site.sh
       - name: VERSION matches package.json
-        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" src/assets/js/cred.js
-      - name: Build publishes the widget, pages and example at their public URLs
-        run: node src/scripts/build.mjs dist && test -f dist/assets/js/cred.js && test -f dist/lang/en.json && test -f dist/index.html && test -f dist/example/config.js && test -f dist/example/index.html && test -f dist/example/assets/icons/google.svg && ! test -e dist/example/site
-      - run: node src/scripts/validate.mjs src/example-content && node src/scripts/badge.mjs src/example-content && git diff --exit-code src/example-content/badge.json
+        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" package/assets/js/cred.js
+      - name: No build output or old layout
+        run: '! test -e dist && ! test -e src && ! test -e content && ! test -e package/example-data/site && ! test -e data/site'
+      - run: node package/tools/validate.mjs package/example-data && node package/tools/badge.mjs package/example-data && git diff --exit-code package/example-data/badge.json
+      - run: npm test

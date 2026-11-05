@@ -1,0 +1,99 @@
+#!/usr/bin/env node
+// Browserless smoke test of the published layout. No dependencies; run from the repo root: node package/tools/smoke-test.mjs
+// 1. Serves the repo with a plain static server under a project subpath (/cred/, like GitHub Pages) and at the root,
+//    and fetches the real paths the pages and the widget use (pages, cred.js, CSS, lang, examples, every review file).
+// 2. Runs the widget's own site-root rule (taken from cred.js) on every script URL form: real path, GitHub subpath,
+//    /v/<x.y.z>/ release, Cloudflare short URL /assets/js/cred.js, and an external data-source page.
+// 3. Exports the site (export-site.sh; staged changes included) and checks the /v/ releases, versions.json, and that nothing private is uploaded.
+import { createServer } from 'node:http';
+import { readFileSync, existsSync, statSync, mkdtempSync, readdirSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+
+let failed = 0;
+const ok = (cond, msg) => { console.log(`${cond ? 'ok  ' : 'FAIL'} ${msg}`); if (!cond) failed++; };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' };
+
+function serve(dir, prefix) {
+  const server = createServer((req, res) => {
+    const u = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    if (!u.startsWith(prefix)) { res.writeHead(404).end(); return; }
+    let f = path.join(path.resolve(dir), u.slice(prefix.length));
+    if (existsSync(f) && statSync(f).isDirectory()) f = path.join(f, 'index.html');
+    if (!f.startsWith(path.resolve(dir)) || !existsSync(f)) { res.writeHead(404).end(); return; }
+    res.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }).end(readFileSync(f));
+  });
+  return new Promise(r => server.listen(0, '127.0.0.1', () => r(server)));
+}
+const get = async url => { const r = await fetch(url); return { status: r.status, text: r.status === 200 ? await r.text() : '' }; };
+
+// The widget's rules, read from cred.js so this test follows the code.
+const src = readFileSync('package/assets/js/cred.js', 'utf8');
+const rootRule = src.match(/const SITE_ROOT = DEFAULT_BASE\.replace\((\/.*\/), '\/'\);/);
+ok(rootRule, 'cred.js: SITE_ROOT rule found');
+const siteRoot = scriptUrl => new URL('../../', scriptUrl).href.replace(eval(rootRule[1]), '/');
+ok(src.includes("'package/example-data/'") && src.includes("'data/config.js'"), 'cred.js: default data paths are data/ then package/example-data/');
+ok(src.includes("SITE_ROOT + 'versions.json'") && src.includes("SITE_ROOT + v + 'assets/js/cred.js'"), 'cred.js: versions.json and /v/ copies are read from the site root');
+ok(!/https?:\/\/[^'"\s]*bristleconeweb\.com[^'"\s]*\.(js|css|json)/.test(src), 'cred.js: no runtime dependency on bristleconeweb.com');
+
+for (const [script, root] of [
+  ['https://h.example/package/assets/js/cred.js', 'https://h.example/'],
+  ['https://u.github.io/cred/package/assets/js/cred.js', 'https://u.github.io/cred/'],
+  ['https://h.example/v/1.1.0/assets/js/cred.js', 'https://h.example/'],
+  ['https://u.github.io/cred/v/1.2.0/assets/js/cred.js', 'https://u.github.io/cred/'],
+  ['https://h.example/assets/js/cred.js', 'https://h.example/'],
+  ['https://u.github.io/mypackage/assets/js/cred.js', 'https://u.github.io/mypackage/'],
+]) ok(siteRoot(script) === root, `site root of ${script} is ${root}`);
+
+async function checkSite(dir, prefix, label) {
+  const server = await serve(dir, prefix);
+  const base = `http://127.0.0.1:${server.address().port}${prefix}`;
+  try {
+    for (const page of ['site/index.html', 'site/embed.html', 'site/example.html', 'site/robots.txt', '404.html']) {
+      const { status, text } = await get(base + page);
+      ok(status === 200, `${label}: ${page}`);
+      for (const m of text.matchAll(/(?:src|href)="(\.\.\/package\/[^"]+)"/g)) {
+        const url = new URL(m[1], base + page).href;
+        ok((await get(url)).status === 200, `${label}: ${page} → ${url.slice(base.length)}`);
+      }
+    }
+    const code = siteRoot(base + 'package/assets/js/cred.js');
+    ok(code === base, `${label}: widget site root is ${prefix}`);
+    for (const p of ['package/assets/css/cred.css', 'package/lang/en.json', 'package/assets/icons/trophy.svg', 'data/README.md'])
+      ok((await get(code + p)).status === 200, `${label}: ${p}`);
+    ok((await get(code + 'data/config.js')).status === 404, `${label}: data/config.js absent upstream → examples are the default`);
+    const ex = code + 'package/example-data/';
+    const cfg = await get(ex + 'config.js');
+    ok(cfg.status === 200, `${label}: package/example-data/config.js`);
+    const conf = (await import('data:text/javascript;base64,' + Buffer.from(cfg.text).toString('base64'))).default;
+    for (const y of conf.reviews?.years || []) ok((await get(ex + `reviews/${y}.json`)).status === 200, `${label}: example reviews/${y}.json`);
+    ok((await get(ex + 'theme/theme.css')).status === 200, `${label}: example theme/theme.css`);
+    for (const l of conf.languages || []) if (l.url) ok((await get(new URL(l.url, ex).href)).status === 200, `${label}: example ${l.url}`);
+    ok((await get(ex + 'assets/icons/google.svg')).status === 200, `${label}: example assets/icons/google.svg`);
+  } finally { server.close(); }
+}
+
+await checkSite('.', '/cred/', 'repo under /cred/ (GitHub Pages project path)');
+await checkSite('.', '/', 'repo at /');
+
+// Export: what a deploy uploads.
+const out = path.join(mkdtempSync(path.join(tmpdir(), 'cred-')), '_publish');
+// Uncommitted (staged or tracked) changes are tested too: git stash create makes a commit of them without touching anything.
+const ref = execSync('git stash create', { encoding: 'utf8' }).trim() || 'HEAD';
+execSync(`sh package/tools/export-site.sh ${out} ${ref}`, { stdio: 'inherit' });
+const top = readdirSync(out).sort();
+ok(!top.some(f => ['.git', 'node_modules', '.github', 'docs'].includes(f)), `export: top level is ${top.join(' ')}`);
+const versions = JSON.parse(readFileSync(path.join(out, 'versions.json'), 'utf8'));
+ok(versions.latest === JSON.parse(readFileSync('package.json', 'utf8')).version, `export: versions.json latest ${versions.latest}`);
+for (const v of versions.versions) ok(existsSync(path.join(out, 'v', v, 'assets/js/cred.js')) && existsSync(path.join(out, 'v', v, 'lang/en.json')), `export: v/${v}/assets/js/cred.js and lang/en.json`);
+await checkSite(out, '/cred/', 'export under /cred/');
+const server = await serve(out, '/');
+const b = `http://127.0.0.1:${server.address().port}/`;
+for (const v of versions.versions) ok((await get(b + `v/${v}/assets/css/cred.css`)).status === 200, `export: GET /v/${v}/assets/css/cred.css`);
+ok((await get(b + 'versions.json')).status === 200, 'export: GET /versions.json');
+server.close();
+ok(readFileSync(path.join(out, '_headers'), 'utf8').includes('/versions.json'), 'export: cache rules appended to _headers');
+
+console.log(failed ? `\n${failed} check(s) failed` : '\nall checks passed');
+process.exit(failed ? 1 : 0);
