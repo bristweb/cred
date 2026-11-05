@@ -47,7 +47,7 @@ Product comparison: [docs/COMPARISON.md](docs/COMPARISON.md).
 The recommended setup: **fork this repo, leave `src/` alone, put everything that is yours in the (empty) `content/` folder, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
 
 1. **Fork** [bristweb/cred](https://github.com/bristweb/cred) and publish the fork: Cloudflare Pages with the included `.github/workflows/deploy.yml` (repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or GitHub Pages (Settings → Pages → Source: *GitHub Actions*, then run the included `.github/workflows/pages.yml`). Both build the site with `npm run build` (see [Repository layout](#repository-layout)). `_headers` opens CORS.
-2. **Leave `src/` alone and copy `src/example-content/` into `content/`**, then replace the example content with yours: `config.js`, `reviews/`, `icons/`, `theme/`, images. Leave `src/example-content/` itself untouched so upstream updates merge without conflicts. `content/` is published at `/content/`. With no `data-source`, the widget uses `content/` as soon as it has a `config.js`, and the bundled examples until then.
+2. **Leave `src/` alone and copy `src/example-content/` into `content/`**, then replace the example content with yours: `config.js`, `reviews/`, `theme/`, and your files under `assets/` (`icons/`, `images/`, `video/`, `audio/`). Leave `src/example-content/` itself untouched so upstream updates merge without conflicts. `content/` is published at `/content/`. With no `data-source`, the widget uses `content/` as soon as it has a `config.js`, and the bundled examples until then.
 3. **Embed from your own origin.** No `data-source` is needed: the widget reads the content from the same site as the script ([Data source](#data-source)).
 
 ```html
@@ -82,33 +82,46 @@ One rule: **`src/` is upstream's code and is left alone in a fork; everything th
 ```
 cred/
 ├── src/                      upstream's, leave alone (merges stay clean)
-│   ├── assets/               the widget and its defaults: js/cred.js, css/, icons/, media/
+│   ├── assets/               the widget and its defaults: js/cred.js, css/, icons/
 │   ├── lang/                 default UI wording (en.json); override with content/lang/
 │   ├── schemas/  types/      JSON Schemas and editor typings
 │   ├── scripts/              build, validate, badge, dedupe, versions, config-to-js
 │   ├── site/                 upstream's demo host pages: index.html, embed.html, 404.html, _headers, robots.txt, sitemap.xml
 │   └── example-content/      a sample of what goes in content/ (the bundled examples)
 ├── content/                  yours: everything client-specific. Empty upstream (just a README)
-│                             config.js, reviews/, images/, icons/, theme/, lang/, media/, optional site/
-├── docs/                     screenshots and COMPARISON.md
+│                             config.js, reviews/, theme/, lang/, assets/, optional site/
+├── docs/                     screenshots, COMPARISON.md, data-repo-workflows/ (sample workflows for a standalone data repo)
 ├── .github/workflows/        check, deploy (Cloudflare Pages), pages (GitHub Pages), validate (reusable)
 └── README.md, CHANGELOG.md, AGENTS.md, LICENSE, package.json
 ```
 
 Why `content/` and not `dist/`: `dist/` is the generated build output (it is git-ignored), while `content/` is hand-made and committed.
 
-There is no `example/` folder at the top level of the repo. The sample content is `src/example-content/`. **Only the published site has an `/example/` URL**: the build copies `src/example-content/` to `dist/example/` so the upstream demo and its old links keep working. Your fork can ignore it.
+There is no `example/` folder at the top level of the repo. `src/example-content/` is a **mirror of `content/`**: the same folder names and nesting a client puts in `content/` (`config.js`, `reviews/`, `theme/`, `lang/`, `assets/`, `site/`). **Only the published site has an `/example/` URL**: the build copies `src/example-content/` to `dist/example/` so the upstream demo and its old links keep working. Your fork can ignore it. The one exception to "same as `/content/`": `src/example-content/site/` holds the sample's own host files (its demo page, `_headers`, `.nojekyll`). The build never publishes that folder as `/example/site/` and never lays it over the site root; it lifts its files to `/example/` so the `/example/` page keeps working. (A fork's `content/site/`, in contrast, is laid over the site root.)
+
+**Where files go: one `assets/` folder, sorted by kind** (same in `content/` and `src/example-content/`):
+
+```
+assets/
+├── icons/            platform logos, award and credential badges, company marks (SVG)
+├── images/           photos, posters, thumbnails; images/reviewers/ holds reviewer avatars
+├── video/            video clips
+├── audio/            audio clips
+└── ATTRIBUTION.md    optional: credits and licences for what is in assets/
+```
+
+Paths in `config.js` and `reviews/*.json` are relative to the data folder, e.g. `assets/icons/google.svg`, `assets/images/reviewers/google-1.svg`, `assets/video/clip.mp4`. With no `icon` set, a platform looks for `assets/icons/<platform>.svg`.
 
 How `src/` stays untouched but still customizable:
 
-- **Widget defaults** (`src/assets/`, `src/lang/`) are optional. Your `content/` can adopt them or replace them: your `config.js` lists its own platform icons, `content/theme/theme.css` sets fonts and colours, `content/lang/<code>.json` overrides wording (partial files are fine), and `content/images/` and `content/media/` hold your pictures.
+- **Widget defaults** (`src/assets/`, `src/lang/`) are optional. Your `content/` can adopt them or replace them: your `config.js` lists its own platform icons, `content/theme/theme.css` sets fonts and colours, `content/lang/<code>.json` overrides wording (partial files are fine), and everything you add (icons, pictures, video, audio) lives under one folder, `content/assets/` (see below).
 - **Your own pages and host files** (`robots.txt`, `sitemap.xml`, `_headers`, `CNAME`, a landing page) go in `content/site/`. The build lays them over `src/site/` at the site root; they are not published under `/content/`.
 
 `npm run build` (`node src/scripts/build.mjs dist`) assembles the published site into `dist/`, so public URLs do not depend on the folder layout: `src/assets/` is served at `/assets/`, `src/lang/` at `/lang/`, `src/site/*` at `/`, `content/` at `/content/` (and `content/site/*` at `/`), and `src/example-content/` at `/example/`. The embed code is unchanged: `…/assets/js/cred.js`.
 
 | Upstream provides (`src/`, pull from upstream) | Yours (`content/`, never has to match upstream) |
 |---|---|
-| `src/assets/`, `src/lang/`: the widget and its default icons and wording | `config.js`, `reviews/`, `icons/`, `images/`, `media/`, `theme/`, `lang/` overrides |
+| `src/assets/`, `src/lang/`: the widget and its default icons and wording | `config.js`, `reviews/`, `assets/`, `theme/`, `lang/` overrides |
 | `src/schemas/`, `src/types/`, `src/scripts/`: build, validate and badge tooling; use the validators or ignore them | `site/` (your pages, `robots.txt`, `sitemap.xml`, `_headers`, `CNAME`) |
 | `src/example-content/`: a sample of `content/` (all of it is example content) | Your own import scripts, sync jobs and secrets |
 | `src/site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` | Your choice of hosting workflow (`deploy.yml` or `pages.yml`) |
@@ -224,8 +237,9 @@ Plain files at the data root, served over HTTPS with CORS open enough for your p
 config.js                business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, credentials, testimonials, reviews.years, …
 lang/<code>.json         optional UI wording (listed in config.languages; partial OK)
 reviews/<year>.json      reviews dated that year (array, newest first)
-images/reviewers/        optional local avatars (any path/URL works in records)
-icons/                   platform logos
+assets/icons/            platform logos, award and credential badges (SVG)
+assets/images/           photos, posters, thumbnails; assets/images/reviewers/ for avatars (any path/URL works in records)
+assets/video/, audio/    optional clips (any URL works too)
 theme/theme.css          @font-face + --rw-* variables
 theme/fonts/             optional self-hosted fonts
 ```
@@ -278,7 +292,7 @@ Array of records for that calendar year, newest first. Store full names, full te
   "platform_review_id": "ex-google-001",
   "reviewer_name": "Avery Quinn",
   "reviewer_profile_url": null,
-  "reviewer_image": "images/reviewers/google-ex-google-001.svg",
+  "reviewer_image": "assets/images/reviewers/google-ex-google-001.svg",
   "reviewer_image_source_url": null,
   "rating": 5,
   "text": "full review text",
@@ -291,7 +305,7 @@ Array of records for that calendar year, newest first. Store full names, full te
 
 `platform` + `platform_review_id` is a **suggested** identity for sync tooling (keep them unique per platform). How a review was collected belongs in your tooling/config, not on the record.
 
-`reviewer_image` may be any working URL or path (absolute, `data:`, or relative to the data root). A local convention like `images/reviewers/<platform>-<id>.<ext>` is only a suggestion for sync scripts — not required.
+`reviewer_image` may be any working URL or path (absolute, `data:`, or relative to the data root). A local convention like `assets/images/reviewers/<platform>-<id>.<ext>` is only a suggestion for sync scripts — not required.
 
 Optional `"example": true` marks a record as bundled sample content: it is left out when `config.js` sets `include_examples: false` ([Fork and replace](#fork-and-replace)). Your own records need no tag.
 
@@ -336,9 +350,9 @@ Formal shape: `src/schemas/reviews.schema.json` in this repo.
 | `src/schemas/config.schema.json` | `config.js` |
 | `src/schemas/reviews.schema.json` | each `reviews/<year>.json` array |
 
-Optional check: from a checkout of this repo, run `node src/scripts/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
+Optional check: from a checkout of this repo, run `node src/scripts/validate.mjs <data-dir>` (install deps in this repo first with `npm ci`). It checks the JSON schemas plus light filesystem rules (icons and media files exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
 
-A data repo can run the same check on every push. The sample at `src/example-content/.github/workflows/validate.yml` is that thin caller — copy `src/example-content/` and it becomes `.github/workflows/validate.yml` at the repo root:
+A data repo can run the same check on every push. The sample at `docs/data-repo-workflows/validate.yml` is that thin caller; copy it to `.github/workflows/validate.yml` at the data repo's root:
 
 ```yaml
 # .github/workflows/validate.yml
@@ -367,7 +381,7 @@ After validating, the same workflow writes `badge.json` and `badge.svg` at the d
 
 ## Updating data
 
-Edit the cloned data repo (same shape as `src/example-content/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / icons / theme as needed, then publish. Optionally run `node src/scripts/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
+Edit the cloned data repo (same shape as `src/example-content/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / `assets/` / theme as needed, then publish. Optionally run `node src/scripts/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
 
 ---
 
@@ -430,7 +444,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ## Alternative: a separate data repo
 
-[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `src/example-content/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `icons/`, `theme/`, optional images, and `.github/workflows/validate.yml` (already under `src/example-content/`, so a full copy of that tree gets the workflow at the data-repo root). Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
+[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `src/example-content/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `theme/`, `assets/`, and then add the host files and workflows a standalone repo needs: move the files in `site/` (`_headers`, `.nojekyll`) to the repo root, and copy `docs/data-repo-workflows/validate.yml` (and `deploy.yml`) to `.github/workflows/`. Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
 
 **Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` builds the site (`npm run build`, plus the `/v/` copies) and publishes it on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages through `.github/workflows/pages.yml` (Settings → Pages → Source: *GitHub Actions*, then run it).
 

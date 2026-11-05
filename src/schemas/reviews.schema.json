@@ -42,7 +42,7 @@
       "reviewer_image": {
         "type": "string",
         "minLength": 1,
-        "description": "Avatar URL or path relative to the data root. Any working URL/path is fine; images/reviewers/<platform>-<id>.<ext> is only a sync-tooling convention."
+        "description": "Avatar URL or path relative to the data root. Any working URL/path is fine; assets/images/reviewers/<platform>-<id>.<ext> is only a sync-tooling convention."
       },
       "reviewer_image_source_url": {
         "type": [

@@ -10,7 +10,7 @@
  *   <source>lang/<code>.json     optional UI wording files listed in config.languages[{lang,url}]. Partial OK.
  *   <source>reviews/<year>.json  the reviews (plain records, newest first) — the only copy of the review data
  *   <source>theme/theme.css      fonts + CSS custom properties (colors, radius)
- *   <source>icons/, images/      platform icons, reviewer avatars
+ *   <source>assets/              icons/, images/ (reviewers/), video/, audio/: all local files, one folder
  * Counts, averages and the schema.org JSON-LD are computed here on load. The data carries full records;
  * presentation only: reviewer names are shown as first name + last initial and review text is clipped to a short
  * snippet (both computed here at render time).
@@ -476,13 +476,13 @@
     const label = avg => (RL.find(x => avg >= x.min) || { label: '' }).label;
     const fmtDate = d => new Date(d).toLocaleDateString(D.date_locale, D.date_options);
     const stars = (n, cls = '') => `<span class="rw-stars ${cls}" role="img" aria-label="${fill(S.stars_aria, { rating: n })}">${[1, 2, 3, 4, 5].map(i => `<i class="${i <= Math.round(n) ? 'on' : ''}">${STAR}</i>`).join('')}</span>`;
-    // Icons: the site's own SVG (config `icon`, else <source>icons/<platform>.svg). Only if that file is missing or
+    // Icons: the site's own SVG (config `icon`, else <source>assets/icons/<platform>.svg). Only if that file is missing or
     // fails to load does the widget fall back to the Simple Icons CDN (slug = config `simple_icon` or the platform key).
     const icon = (p, cls) => {
       const P = PLATFORMS[p] || {};
       const c = [cls, P.invert_icon_when_active ? 'rw-icon-invert' : ''].filter(Boolean).join(' ');
       const fallback = SIMPLE_ICONS + encodeURIComponent(P.simple_icon || p);
-      return `<img${c ? ` class="${c}"` : ''} src="${esc(url(P.icon || `icons/${p}.svg`))}" data-fallback="${esc(fallback)}" alt="">`;
+      return `<img${c ? ` class="${c}"` : ''} src="${esc(url(P.icon || `assets/icons/${p}.svg`))}" data-fallback="${esc(fallback)}" alt="">`;
     };
     // Awards / Credentials / Testimonials pills: display.<kind>_icon (path or URL), else the built-in icon.
     const tabIcon = p => (D[p + '_icon'] ? `<img src="${esc(url(D[p + '_icon']))}" alt="">` : TAB_ICONS[p]);
@@ -891,7 +891,7 @@
       const MEDIA_DEFAULT = { audio: 'audio.svg', video: 'video.svg', link: 'link.svg' };
       const mediaItem = (t, m, i, alt) => {
         const label = m.alt || m.caption || S['media_' + m.type];
-        const src = m.thumbnail || m.poster || (m.type === 'image' ? m.url : code + 'assets/media/' + MEDIA_DEFAULT[m.type]);
+        const src = m.thumbnail || m.poster || (m.type === 'image' ? m.url : code + 'assets/icons/' + MEDIA_DEFAULT[m.type]);
         const cls = `rw-media-item rw-media-${m.type} ${i ? 'rw-media-chip' : 'rw-media-hero'}`;
         const inner = `<img src="${esc(url(src))}" alt="${i ? '' : esc(alt)}" loading="lazy"><span class="rw-media-icon" aria-hidden="true">${MEDIA_ICON[m.type]}</span>`;
         if (m.type === 'link') return `<a class="${cls}" href="${esc(url(m.url))}" target="_blank" rel="${esc(linkRel(m, t))}" aria-label="${esc(label)}" title="${esc(label)}">${inner}</a>`;

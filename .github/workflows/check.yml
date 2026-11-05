@@ -15,5 +15,5 @@ jobs:
       - name: VERSION matches package.json
         run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" src/assets/js/cred.js
       - name: Build publishes the widget, pages and example at their public URLs
-        run: node src/scripts/build.mjs dist && test -f dist/assets/js/cred.js && test -f dist/lang/en.json && test -f dist/index.html && test -f dist/example/config.js
+        run: node src/scripts/build.mjs dist && test -f dist/assets/js/cred.js && test -f dist/lang/en.json && test -f dist/index.html && test -f dist/example/config.js && test -f dist/example/index.html && test -f dist/example/assets/icons/google.svg && ! test -e dist/example/site
       - run: node src/scripts/validate.mjs src/example-content && node src/scripts/badge.mjs src/example-content && git diff --exit-code src/example-content/badge.json

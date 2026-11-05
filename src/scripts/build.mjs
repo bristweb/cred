@@ -3,7 +3,9 @@
 //   src/site/*              -> /            (index.html, embed.html, 404.html, _headers, robots.txt, sitemap.xml)
 //   src/assets/, src/lang/  -> /assets/, /lang/   (the widget: /assets/js/cred.js)
 //   src/schemas/, src/types/ -> /schemas/, /types/ (JSON Schemas and config typings for editors)
-//   src/example-content/            -> /example/    (the bundled examples)
+//   src/example-content/    -> /example/    (the bundled examples: the data folders as they are, assets/ included)
+//   src/example-content/site/* -> /example/ (the examples' own host files: index.html, _headers, .nojekyll. `site/` itself is
+//                                            never published as /example/site/, and is never laid over the site root)
 //   content/                -> /content/    (a fork's own content; empty upstream, so only its README is published)
 //   content/site/*          -> /            (optional: a fork's own pages, robots.txt, sitemap.xml, _headers, CNAME; laid over
 //                                            src/site/ and not published under /content/)
@@ -21,6 +23,9 @@ copy('src/lang', path.join(dist, 'lang'));
 copy('src/schemas', path.join(dist, 'schemas'));
 copy('src/types', path.join(dist, 'types'));
 copy('src/example-content', path.join(dist, 'example'));
+// site/ is a structural sample of content/site/, not data: lift its files to the root of /example/ (keeps the /example/ page) and drop the folder.
+rmSync(path.join(dist, 'example', 'site'), { recursive: true, force: true });
+if (existsSync('src/example-content/site')) copy('src/example-content/site', path.join(dist, 'example'));
 mkdirSync(path.join(dist, 'content'), { recursive: true });
 if (existsSync('content')) cpSync('content', path.join(dist, 'content'), { recursive: true, filter: p => path.relative('content', p).split(path.sep)[0] !== 'site' });
 if (existsSync('content/site')) copy('content/site', dist);

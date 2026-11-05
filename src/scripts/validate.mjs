@@ -58,7 +58,7 @@ const relIcon = (where, icon) => {
   if (icon && !/^(https?:)?\/\//.test(icon) && !icon.startsWith('data:') && !existsSync(path.join(root, icon)))
     err(`config.js ${where}: ${icon} not found`);
 };
-for (const [k, p] of Object.entries(platforms)) relIcon(`platforms.${k}`, p.icon || `icons/${k}.svg`);
+for (const [k, p] of Object.entries(platforms)) relIcon(`platforms.${k}`, p.icon || `assets/icons/${k}.svg`);
 for (const l of (config && config.links) || []) relIcon(`links.${l.platform}`, l.icon);
 for (const k of ['accolades_icon', 'credentials_icon', 'testimonials_icon']) if (config?.display?.[k]) relIcon(`display.${k}`, String(config.display[k]));
 (Array.isArray(config?.credentials) ? config.credentials : []).forEach((c, i) => {
@@ -187,8 +187,8 @@ const live = records.map(x => x.r).filter(r => !exampleOut(config, r, isExamples
 const kept = live.filter(r => !hid(r, 'rating') && !hideList.includes(keyOf(r)));
 const merged = kept.length - deduper(config, live)(kept).length;
 const exampleItems = [...records.map(x => x.r), config?.summary, ...['accolades', 'credentials', 'testimonials'].flatMap(k => (Array.isArray(config?.[k]) ? config[k] : []))].filter(x => x && (isExamplesDir(root) || x.example === true)).length;
-const imgDir = path.join(root, 'images', 'reviewers');
-if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`images/reviewers/${f}`)) warn(`images/reviewers/${f}: not referenced by any review or testimonial (ok if unused)`);
+const imgDir = path.join(root, 'assets', 'images', 'reviewers');
+if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`assets/images/reviewers/${f}`)) warn(`assets/images/reviewers/${f}: not referenced by any review or testimonial (ok if unused)`);
 
 for (const w of warnings) console.warn('warning:', w);
 if (errors.length) { console.error(errors.join('\n')); console.error(`\n${errors.length} problem(s)`); process.exit(1); }
