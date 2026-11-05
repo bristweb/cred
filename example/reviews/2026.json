@@ -2,6 +2,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-007",
+    "example": true,
     "reviewer_name": "Micah Berg",
     "reviewer_profile_url": null,
     "rating": 3,
@@ -19,6 +20,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-007",
+    "example": true,
     "reviewer_name": "Emery Okada",
     "reviewer_profile_url": null,
     "rating": 4,
@@ -36,6 +38,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-010",
+    "example": true,
     "reviewer_name": "Reese Walsh",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -53,6 +56,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-008",
+    "example": true,
     "reviewer_name": "Remy Singh",
     "reviewer_profile_url": null,
     "rating": 4,
@@ -67,6 +71,7 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-004",
+    "example": true,
     "reviewer_name": "Parker Andersen",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -84,6 +89,7 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-011",
+    "example": true,
     "reviewer_name": "Rowan Berg",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -98,6 +104,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-001",
+    "example": true,
     "reviewer_name": "Logan Andersen",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -112,6 +119,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-007",
+    "example": true,
     "reviewer_name": "Quinn Ibrahim",
     "reviewer_profile_url": null,
     "rating": 4,
@@ -126,6 +134,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-011",
+    "example": true,
     "reviewer_name": "Jamie Berg",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -141,6 +150,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-005",
+    "example": true,
     "reviewer_name": "Remy Diaz",
     "reviewer_profile_url": null,
     "rating": 4,
@@ -155,6 +165,7 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-008",
+    "example": true,
     "reviewer_name": "Reese Singh",
     "reviewer_profile_url": null,
     "rating": 5,

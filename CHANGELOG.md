@@ -2,6 +2,13 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.2.0 (2026-11-05)
+
+- `include_examples` (top-level in `config.js`, default `true`): `false` leaves everything tagged `example: true` out of the cards, counts, averages, summary card, JSON-LD and rating badge, without deleting any file. `example: true` is accepted on review records, the summary, accolades, credentials and testimonials. The validator and badge script follow the switch.
+- The bundled sample content is now called **examples** (business name "Example Bike Shop") instead of a branded name, and is tagged `example: true`; the demo still shows it.
+- With no reviews to count, the header omits the rating block (it shows the "Write a review" button only).
+- README: new Fork and replace guide (fork, own data folder, hide examples, what is code and what is content, pull from upstream); a separate data repo is now the alternative.
+
 ## 1.1.0 (2026-10-19)
 
 - `hidden` on a review can be an object that hides only some parts: `{ "display": true }` (no card), `{ "rating": true }` (left out of the average and counts), `{ "schema": true }` (left out of the JSON-LD). `true` still hides everything.

@@ -1,10 +1,12 @@
-# Example reviews data (fictional)
+# Example data (fictional)
 
-Sample data for [bristweb/cred](https://github.com/bristweb/cred). **Northwind Cycles** is an invented bike shop — not a real business. Do not present these as real testimonials.
+The **examples** that ship with [bristweb/cred](https://github.com/bristweb/cred): sample content for an invented bike shop, not a real business. Do not present it as real reviews or testimonials.
+
+Everything here is tagged `example: true` (each review record, and the summary, accolades, credentials and testimonials in `config.js`). `include_examples` in `config.js` (default `true`) shows it; set it to `false` to leave all tagged content out of the published widget without deleting any file. Keep this folder untouched in a fork so upstream updates merge cleanly, and put your own content in a copy of it (for example `data/`). See [Fork and replace](https://github.com/bristweb/cred#fork-and-replace).
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional; the platform names identify where each sample would appear.
 
-Copy this whole folder to start a new data repo (includes `.github/workflows/validate.yml` and `deploy.yml`, `.nojekyll`, `_headers` and `.gitignore`).
+Copy this whole folder to start your own data folder, or a separate data repo (includes `.github/workflows/validate.yml` and `deploy.yml`, `.nojekyll`, `_headers` and `.gitignore`).
 
 ## Publish
 
@@ -21,9 +23,9 @@ Google Sites / fixed-height box: add `data-constrained="true"`.
 
 ## Layout
 
-- `config.js` (with `cred-config.d.ts` for editor type hints) — business, platforms, display, summary, optional `accolades` / `testimonials`, `reviews.years` (optional `languages` / `defaultLanguage`)
+- `config.js` (with `cred-config.d.ts` for editor type hints) — `include_examples`, business, platforms, display, summary, optional `accolades` / `testimonials`, `reviews.years` (optional `languages` / `defaultLanguage`)
 - `lang/` — optional UI wording listed in `languages` (partial OK; widget ships English)
-- `reviews/<year>.json` — review records
+- `reviews/<year>.json` — review records (tagged `example: true`)
 - `theme/theme.css` — `--rw-*` colors (light + dark)
 - `icons/`, `images/` — optional local assets
 - `.github/workflows/validate.yml` — validates against cred on push

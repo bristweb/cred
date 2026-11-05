@@ -149,6 +149,10 @@
           }
         ]
       },
+      "example": {
+        "type": "boolean",
+        "description": "Optional. true marks this review as bundled example content. It is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
+      },
       "duplicate_of": {
         "type": "string",
         "pattern": "^[^-\\s]+-.+$",
