@@ -22,9 +22,9 @@ jobs:
         if: env.CF_PAGES_PROJECT != ''
         with:
           node-version: 22
-      - name: Build
+      - name: Export the committed files (no .git, .github or untracked files)
         if: env.CF_PAGES_PROJECT != ''
-        run: rsync -a --exclude .git --exclude .github --exclude node_modules --exclude dist ./ dist/
+        run: mkdir _publish && git archive HEAD | tar -x -C _publish && rm -rf _publish/.github
       - name: Deploy
         if: env.CF_PAGES_PROJECT != ''
-        run: npx --yes wrangler@4 pages deploy dist --project-name "$CF_PAGES_PROJECT" --branch main
+        run: npx --yes wrangler@4 pages deploy _publish --project-name "$CF_PAGES_PROJECT" --branch main

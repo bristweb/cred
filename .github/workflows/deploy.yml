@@ -16,12 +16,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Build
-        run: |
-          node src/scripts/build.mjs dist
-          node src/scripts/build-versions.mjs dist
+      - name: Export the committed files and add the /v/ releases
+        run: sh package/tools/export-site.sh _publish
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 pages deploy dist --project-name "${{ secrets.CF_PAGES_PROJECT }}" --branch main
+        run: npx --yes wrangler@4 pages deploy _publish --project-name "${{ secrets.CF_PAGES_PROJECT }}" --branch main

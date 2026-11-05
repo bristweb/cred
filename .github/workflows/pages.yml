@@ -1,5 +1,7 @@
-# Optional: publish the built site with GitHub Pages instead of Cloudflare Pages.
+# Optional: publish the site with GitHub Pages instead of Cloudflare Pages.
 # In the repo, Settings → Pages → Source: GitHub Actions, then run this workflow (Actions tab → Run workflow).
+# GitHub Pages has no rewrites (_redirects is ignored): use the real paths, e.g. https://<user>.github.io/<repo>/site/
+# and https://<user>.github.io/<repo>/package/assets/js/cred.js. The bare /<repo>/ shows 404.html (no root page; Cloudflare serves site/ at / instead).
 name: Deploy to GitHub Pages
 on:
   workflow_dispatch:
@@ -23,12 +25,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Build
-        run: |
-          node src/scripts/build.mjs dist
-          node src/scripts/build-versions.mjs dist
+      - name: Export the committed files and add the /v/ releases
+        run: sh package/tools/export-site.sh _publish
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: _publish
       - id: deployment
         uses: actions/deploy-pages@v4

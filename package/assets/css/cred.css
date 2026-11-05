@@ -1,0 +1,226 @@
+/* Reviews widget — generic layout and behavior. All site-specific look (fonts, colors, radius) comes from the
+   CSS custom properties in <data folder>/theme/theme.css; the fallbacks below are neutral defaults. */
+/* Host = the inserted container (or your data-target / [data-reviews-widget] element). Doubled class for
+   specificity so page-builder rules (flex/grid centering, text-align, floats) can't shrink it. .rw-clip (default;
+   data-overflow="visible" turns it off) trims the carousel arrows' 8px overhang at the edges instead of causing
+   horizontal page scroll. */
+.rw-host.rw-host{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;flex:1 1 100%;align-self:stretch;justify-self:stretch;float:none;text-align:left}
+.rw-host.rw-clip{overflow-x:clip}
+.rw-host.rw-overflow-hidden{overflow:hidden}
+
+/* Color scheme: light by default. Dark when JS adds .rw-dark (auto → host page theme) or data-theme="dark".
+   Data themes redefine these --rw-* for brand colors in both modes. */
+.rw-host{color-scheme:light}
+.rw-host.rw-dark,.rw-host[data-theme="dark"]{
+  color-scheme:dark;
+  --rw-ink:#e8e8e8;--rw-body:#c4c4c4;--rw-muted:#9a9a9a;
+  --rw-line:#333;--rw-line-strong:#444;--rw-card:#1c1c1c;--rw-tint:#2a2a2a;
+  --rw-accent:#c8c8c8;--rw-accent-2:#e8e8e8;--rw-on-accent:#111;
+  --rw-on-accent-soft:rgba(0,0,0,.22);--rw-star:#f5b301;--rw-star-off:#555;
+  --rw-nav-shadow:0 2px 12px rgba(0,0,0,.45);
+}
+/* Intrinsic width for shrink-to-fit parents: max-content = --rw-max-width, min-content = 1/24 of it. Zero height. */
+.rw-sizer{display:block;height:0;overflow:hidden;visibility:hidden;font-size:0;line-height:0;margin:0;padding:0;white-space:normal}
+.rw-sizer i{display:inline-block;width:calc(var(--rw-max-width,1200px) / 24);height:0;vertical-align:top}
+.rw-root{container:rw / inline-size;
+  font-family:var(--rw-font,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif);letter-spacing:var(--rw-letter-spacing,normal);color:var(--rw-ink,#111);max-width:var(--rw-max-width,1200px);margin:0 auto;padding:var(--rw-pad,6px);box-sizing:border-box;background:transparent;opacity:0;transition:opacity .18s ease-out}
+.rw-root.rw-ready{opacity:1}
+@media (prefers-reduced-motion:reduce){.rw-root{transition:none}}
+.rw-root *{box-sizing:border-box}
+/* light reset so host-page styles don't leak in (values equal browser defaults on a bare page) */
+.rw-root{line-height:normal;font-size:16px;text-align:start}
+.rw-root img{border:0;max-width:none;margin:0;padding:0}
+.rw-loading{padding:40px;text-align:center;color:var(--rw-muted,#888)}
+.rw-tabs{order:2;flex:1 1 auto;min-width:0;display:flex;align-items:center;align-self:center;gap:6px;flex-wrap:nowrap;justify-content:safe center;overflow:visible}
+.rw-tab:focus-visible,.rw-write:focus-visible,.rw-nav:focus-visible,.rw-tabs-more:focus-visible,.rw-accolade-card:focus-visible,.rw-testimonial-card:focus-visible{outline:2px solid var(--rw-accent,#333);outline-offset:2px}
+/* Overflow “More” control: remaining filters in a dropdown; no horizontal scroll / wrap on the pill row. */
+.rw-tabs-overflow{position:relative;flex:none;display:inline-flex;align-items:center}
+.rw-tabs > .rw-tab[hidden],.rw-tabs-overflow[hidden]{display:none!important}
+.rw-tabs-more{display:inline-flex;align-items:center;gap:4px;flex:none;border:1px solid var(--rw-line,#e3e3e3);background:var(--rw-card,#fff);border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;color:var(--rw-ink,#111);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap}
+.rw-tabs-more:hover{border-color:var(--rw-line-strong,#c8c8c8)}
+.rw-tabs-more.is-open{border-color:var(--rw-line-strong,#c8c8c8)}
+.rw-tabs-more-caret{font-size:10px;line-height:1;opacity:.75}
+.rw-tabs-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:6;min-width:min(240px,70vw);max-width:min(320px,85vw);display:flex;flex-direction:column;gap:4px;padding:6px;margin:0;background:var(--rw-card,#fff);border:1px solid var(--rw-line,#e3e3e3);border-radius:12px;box-shadow:var(--rw-nav-shadow,0 2px 12px rgba(0,0,0,.12))}
+.rw-tabs-menu[hidden]{display:none!important}
+.rw-tabs-menu .rw-tab{width:100%;justify-content:flex-start;border-radius:8px}
+/* Menu always shows names (even when the pill row is icon-only). */
+.rw-tabs-menu .rw-tab-name,.rw-tabs-menu .rw-tab-long{display:inline!important}
+.rw-tab{display:inline-flex;align-items:center;gap:6px;flex:none;border:1px solid var(--rw-line,#e3e3e3);background:var(--rw-card,#fff);border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;color:var(--rw-ink,#111);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap}
+.rw-tab img,.rw-tab-icon{width:16px;height:16px;flex:none}
+.rw-tab-icon{color:var(--rw-accent,#333)}.rw-tab.is-active .rw-tab-icon{color:inherit}
+.rw-tab em{font-style:normal;font-size:12px;color:var(--rw-accent-2,#555);background:var(--rw-tint,#f1f1f1);border-radius:999px;padding:1px 7px}
+.rw-tab:hover{border-color:var(--rw-line-strong,#c8c8c8)}
+.rw-tab.is-active{background:var(--rw-accent,#333);color:var(--rw-on-accent,#fff);border-color:var(--rw-accent,#333)}
+.rw-tab.is-active img.rw-icon-invert{filter:brightness(0) invert(1)}
+.rw-tab.is-active em{background:var(--rw-on-accent-soft,rgba(255,255,255,.18));color:var(--rw-on-accent,#fff)}
+.rw-header{display:flex;align-items:center;flex-wrap:nowrap;gap:12px 20px;min-width:0;background:var(--rw-card,#fff);border:1px solid var(--rw-line,#e3e3e3);border-radius:var(--rw-radius,14px);padding:12px 18px;margin-bottom:14px;box-shadow:none}
+.rw-summary{display:flex;align-items:center;align-self:center;gap:12px;flex:none;order:1}
+.rw-score{font-size:38px;font-weight:700;line-height:1;letter-spacing:-.04em}
+.rw-label{font-weight:700;font-size:15px;line-height:1.2;margin-bottom:1px}
+.rw-based{font-size:12px;color:var(--rw-muted,#888);margin-top:2px;white-space:nowrap}
+.rw-write{order:3;flex:none;align-self:center;background:var(--rw-accent,#333);color:var(--rw-on-accent,#fff);text-decoration:none;font-weight:600;font-size:13.5px;padding:9px 18px;border-radius:999px;transition:background .15s;white-space:nowrap}
+.rw-write:hover{background:var(--rw-accent-2,#555)}
+.rw-stars{display:inline-flex;gap:2px;vertical-align:middle}
+.rw-stars i{display:block;width:17px;height:17px}
+.rw-stars svg{width:100%;height:100%;fill:var(--rw-star-off,#ddd)}
+.rw-stars i.on svg{fill:var(--rw-star,#f5b301)}
+.rw-stars-lg i{width:17px;height:17px}
+.rw-viewport{position:relative}
+.rw-track{display:grid;gap:16px}
+.rw-layout-grid .rw-track{grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.rw-layout-carousel .rw-track{grid-auto-flow:column;grid-auto-columns:calc((100% - 48px)/4);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px 2px 8px}
+.rw-layout-carousel .rw-track::-webkit-scrollbar{display:none}
+.rw-layout-carousel .rw-card{scroll-snap-align:start}
+@container rw (max-width:1000px){.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 32px)/3)}}
+@container rw (max-width:760px){.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 16px)/2)}}
+@container rw (max-width:480px){.rw-layout-carousel .rw-track{grid-auto-columns:88%}}
+.rw-card{color:inherit;text-decoration:none;display:flex;flex-direction:column;gap:10px;background:var(--rw-card,#fff);border:1px solid var(--rw-line,#e3e3e3);border-radius:var(--rw-radius,14px);padding:18px;min-height:240px;box-shadow:none;transition:transform .2s,border-color .2s}
+a.rw-card{cursor:pointer}
+a.rw-card:hover,a.rw-card:focus-visible{border-color:var(--rw-accent,#333);box-shadow:none;transform:translateY(-2px)}
+a.rw-card:focus{outline:none}
+a.rw-card:focus-visible{outline:3px solid var(--rw-accent,#333);outline-offset:-1px;box-shadow:none}
+a.rw-card:active{transform:translateY(0)}
+a.rw-card:hover .rw-link{color:var(--rw-accent-2,#555)}
+a.rw-card:hover .rw-arrow{transform:translateX(3px)}
+/* Non-link cards (no url): not clickable; no hover lift. Summary (.rw-ai) keeps its own chrome. */
+div.rw-card:not(.rw-ai){cursor:default}
+div.rw-card:not(.rw-ai):hover,div.rw-card:not(.rw-ai):focus-visible,div.rw-card:not(.rw-ai):active{transform:none;border-color:var(--rw-line,#e3e3e3)}
+.rw-arrow{display:inline-block;transition:transform .15s}
+.rw-card-top{display:flex;align-items:center;gap:11px}
+.rw-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none;background:var(--rw-tint,#f1f1f1)}
+.rw-who{flex:1;min-width:0}
+.rw-name{font-weight:700;font-size:15px;color:var(--rw-ink,#111);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-who time{font-size:12.5px;color:var(--rw-muted,#888)}
+/* "Also on …": the same review on other platforms (merged into this card). */
+.rw-also{font-size:12px;line-height:1.3;color:var(--rw-muted,#888);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-platform{width:20px;height:20px;flex:none}
+.rw-rec{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--rw-accent,#333)}
+.rw-rec svg{width:16px;height:16px;fill:currentColor}
+.rw-text{margin:0;font-size:15px;line-height:1.6;color:var(--rw-body,#444);font-style:italic;font-weight:300;flex:1}
+.rw-link{font-size:13px;font-weight:600;color:var(--rw-accent,#333);text-decoration:none;align-self:flex-start;margin-top:auto}
+.rw-nav{position:absolute;top:50%;transform:translateY(-60%);z-index:2;width:40px;height:40px;border-radius:50%;border:1px solid var(--rw-line,#e3e3e3);background:var(--rw-card,#fff);box-shadow:var(--rw-nav-shadow,0 2px 10px rgba(0,0,0,.12));font-size:26px;line-height:1;color:var(--rw-accent,#333);cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.rw-prev{left:-14px}.rw-next{right:-14px}
+/* Summary card: first card in "All reviews"; a note, not a link. contain:size keeps it from making its row taller
+   than the review cards (it stretches to the row height; long text scrolls inside).
+   Headline (Highlights / summary.title / ai_summary) matches review card name weight. */
+.rw-ai{cursor:default;contain:size;background:var(--rw-ai-bg,var(--rw-tint,#f4f4f4));border-color:var(--rw-ai-line,var(--rw-line,#e3e3e3));gap:8px}
+.rw-ai:hover{transform:none;border-color:var(--rw-ai-line,var(--rw-line,#e3e3e3))}
+.rw-ai-top{display:flex;align-items:center;gap:8px;flex:none}
+.rw-ai-label{font-size:15px;font-weight:700;line-height:1.2;color:var(--rw-ink,#111);letter-spacing:normal}
+.rw-ai-icon{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--rw-accent,#333);flex:none}
+.rw-ai-icon svg{width:14px;height:14px;fill:var(--rw-on-accent,#fff)}
+.rw-ai-text{margin:0;font-size:14px;line-height:1.55;color:var(--rw-body,#444);flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
+.rw-ai-text.rw-ai-more{-webkit-mask-image:linear-gradient(#000 calc(100% - 2.4em),transparent);mask-image:linear-gradient(#000 calc(100% - 2.4em),transparent)}
+/* Accolade badge cards: same chrome as reviews (title + year up top, link at bottom; badge fills the middle).
+   Interspersed by year in the track, or alone on the Awards tab. Logo grows into the card’s free space
+   (object-fit contain) with inner padding so it is not edge-to-edge; --rw-accolade-size caps the max edge
+   when set (display.accolade_size). Fixed-height compact rules reuse .rw-who time / .rw-link. */
+.rw-accolade-card{background:var(--rw-card,#fff)}
+.rw-accolade-card .rw-card-top,.rw-accolade-card .rw-link{flex:none}
+.rw-root img.rw-accolade-badge{flex:1 1 auto;min-height:0;min-width:0;width:100%;height:0;max-width:min(100%,var(--rw-accolade-size,100%));max-height:min(100%,var(--rw-accolade-size,100%));object-fit:contain;object-position:center;display:block;align-self:stretch;margin:0;padding:12px 16px;box-sizing:border-box}
+/* Testimonials: review-like cards. Source logo sits in the avatar slot (slightly squared); reviewer photo is secondary. */
+.rw-testimonial-card{background:var(--rw-card,#fff)}
+.rw-source-logo{border-radius:10px;object-fit:contain;background:var(--rw-tint,#f1f1f1);padding:3px}
+/* Testimonial subtitle: own line under the title, date-sized but a step stronger than the date; wraps, never ellipsized. */
+.rw-subtitle{font-size:12.5px;font-weight:500;line-height:1.3;color:var(--rw-body,#555);margin:1px 0}
+.rw-avatar-secondary{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none;background:var(--rw-tint,#f1f1f1)}
+/* Testimonial media: shown as images with an icon overlay (no visible labels). The first item fills the card body;
+   extra items are small chips. The quote text stays in the DOM, visually hidden (.rw-sr). */
+.rw-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
+.rw-media-item{position:relative;display:block;flex:none;padding:0;border:1px solid var(--rw-line,#e3e3e3);border-radius:10px;background:var(--rw-tint,#f1f1f1);color:#fff;cursor:pointer;overflow:hidden;text-decoration:none}
+.rw-media-item:hover{border-color:var(--rw-accent,#333)}
+.rw-media-item:focus-visible,.rw-card a.rw-link:focus-visible{outline:2px solid var(--rw-accent,#333);outline-offset:2px}
+.rw-media-hero{flex:1 1 auto;width:100%;min-height:150px}
+.rw-media-chip{width:52px;height:52px}
+.rw-root .rw-media-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rw-root .rw-media-hero.rw-media-image img{object-fit:contain}
+.rw-media-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.55)}
+.rw-media-icon svg{width:22px;height:22px;fill:currentColor}
+.rw-media-image .rw-media-icon,.rw-media-link .rw-media-icon{left:auto;top:auto;right:8px;bottom:8px;transform:none;width:30px;height:30px}
+.rw-media-image .rw-media-icon svg,.rw-media-link .rw-media-icon svg{width:16px;height:16px;fill:none}
+.rw-media-chip .rw-media-icon{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:24px;height:24px}
+.rw-media-chip .rw-media-icon svg{width:13px;height:13px}
+.rw-media-item.is-playing .rw-media-icon{opacity:0}
+.rw-media{display:flex;flex-wrap:wrap;gap:8px}
+.rw-media-player{width:100%;height:36px;flex:none}
+.rw-card a.rw-link:hover{color:var(--rw-accent-2,#555)}
+.rw-lightbox{max-width:min(92vw,960px);max-height:92vh;padding:12px;border:0;border-radius:var(--rw-radius,14px);background:var(--rw-card,#fff);color:var(--rw-ink,#111);font-family:var(--rw-font,system-ui,sans-serif)}
+.rw-lightbox::backdrop{background:rgba(0,0,0,.72)}
+.rw-lightbox img,.rw-lightbox video{display:block;max-width:100%;max-height:calc(92vh - 80px);margin:0 auto;border-radius:8px}
+.rw-lightbox p{margin:10px 4px 2px;font-size:14px;color:var(--rw-body,#444)}
+.rw-lightbox-close{position:absolute;top:6px;right:6px;z-index:1;width:36px;height:36px;border-radius:50%;border:1px solid var(--rw-line,#e3e3e3);background:var(--rw-card,#fff);color:var(--rw-ink,#111);font-size:22px;line-height:1;cursor:pointer}
+.rw-initials{display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1;letter-spacing:.02em;user-select:none}
+.rw-nav:disabled{opacity:0;pointer-events:none}
+@container rw (max-width:480px){.rw-nav{display:none}}
+
+/* Three shared width steps (container queries on the widget's own width); the header and the carousel use the same ones.
+   Between steps, the filter row fits itself: All + as many pills as fit + More (never wraps or scrolls).
+   >1000 rating | filters with names | Write; 4 cards
+   ≤1000 filter pills → icon + count; 3 cards
+   ≤760  compact header: rating label and "Based on" hidden; 2 cards
+   ≤480  filters hidden, short button label, no arrows; 1 card */
+@container rw (max-width:1000px){.rw-tab:not([data-p=all]) .rw-tab-name,.rw-tab-long{display:none}.rw-tab,.rw-tabs-more{padding:6px 10px;gap:5px}.rw-tabs{gap:5px}}
+@container rw (max-width:760px){.rw-header{gap:8px 10px;padding:9px 12px}.rw-summary{gap:9px}.rw-score{font-size:30px}.rw-label,.rw-based-pre{display:none}.rw-stars-lg i{width:15px;height:15px}
+  .rw-write{padding:8px 13px;font-size:12.5px}.rw-tabs{gap:4px}.rw-tab,.rw-tabs-more{padding:4px 7px;gap:4px;font-size:12.5px}.rw-tab img,.rw-tab-icon{width:14px;height:14px}.rw-tab em{padding:0 5px;font-size:11px}}
+.rw-write-short{display:none}
+@container rw (max-width:480px){.rw-header{justify-content:space-between}.rw-tabs{display:none}.rw-summary{flex:0 1 auto;min-width:0}.rw-write{margin-left:auto;padding:8px 14px}
+  .rw-write-long{display:none}.rw-write-short{display:inline}}
+
+/* ---- Fitting options (all opt-in; see the README "Options" table). Nothing below applies by default. ---- */
+/* data-arrows="inside": arrows sit within the widget's edges instead of overhanging them */
+.rw-arrows-inside .rw-prev{left:6px}.rw-arrows-inside .rw-next{right:6px}
+/* data-hover-lift="false": no 2px rise on hover/focus (nothing moves toward the edges) */
+.rw-nolift a.rw-card:hover,.rw-nolift a.rw-card:focus-visible,.rw-nolift a.rw-card:active{transform:none}
+/* data-focus-ring="inside": focus outlines drawn inside tabs, button and arrows (never cut off at the edges) */
+.rw-focus-inside .rw-tab:focus-visible,.rw-focus-inside .rw-write:focus-visible,.rw-focus-inside .rw-nav:focus-visible,.rw-focus-inside .rw-tabs-more:focus-visible{outline-offset:-4px}
+/* data-cards="N": at most N cards side by side */
+@container rw (min-width:1001px){.rw-cards-3.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 32px)/3)}}
+@container rw (min-width:761px){.rw-cards-2.rw-layout-carousel .rw-track{grid-auto-columns:calc((100% - 16px)/2)}}
+@container rw (min-width:481px){.rw-cards-1.rw-layout-carousel .rw-track{grid-auto-columns:100%}}
+.rw-cards-1.rw-layout-grid .rw-track{grid-template-columns:minmax(0,1fr)}
+.rw-cards-2.rw-layout-grid .rw-track{grid-template-columns:repeat(auto-fill,minmax(max(270px,calc((100% - 16px)/2)),1fr))}
+.rw-cards-3.rw-layout-grid .rw-track{grid-template-columns:repeat(auto-fill,minmax(max(270px,calc((100% - 32px)/3)),1fr))}
+.rw-cards-4.rw-layout-grid .rw-track{grid-template-columns:repeat(auto-fill,minmax(max(270px,calc((100% - 48px)/4)),1fr))}
+/* data-fixed-height="true": the host gets a height (its parent's, or the viewport's below it) and everything fits
+   inside: header on top, the card track takes the remaining height, long text scrolls inside its card. The root
+   becomes a size container so the header can also compact by available height. */
+.rw-host.rw-fixed-host{box-sizing:border-box}
+.rw-root.rw-fixed{height:100%;display:flex;flex-direction:column;container-type:size;overflow:hidden}
+.rw-fixed .rw-header{flex:none}
+.rw-fixed .rw-loading{margin:auto}
+.rw-fixed .rw-viewport{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.rw-fixed .rw-track{flex:1 1 auto;min-height:0}
+.rw-fixed.rw-layout-carousel .rw-track{grid-template-rows:minmax(0,1fr);overflow-y:hidden}
+.rw-fixed.rw-layout-carousel .rw-card{min-height:0;overflow:hidden}
+.rw-fixed.rw-layout-carousel .rw-text{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;scrollbar-width:thin}
+.rw-fixed.rw-layout-grid .rw-track{overflow-y:auto;align-content:start;scrollbar-width:thin}
+.rw-fixed .rw-card-top,.rw-fixed .rw-stars,.rw-fixed .rw-rec,.rw-fixed .rw-link,.rw-fixed .rw-ai-top{flex:none}
+.rw-root.rw-fixed img.rw-accolade-badge{padding:6px 8px}
+.rw-fixed .rw-avatar-secondary{width:18px;height:18px}
+/* Two height steps in fixed mode; between them the card text scrolls inside its card.
+   ≤360  compact header and cards
+   ≤200  slim: no review count line, cards drop the date and the "View on" cue, snippets clamp to the lines that fit */
+@container rw (max-height:360px){
+  .rw-fixed .rw-header{padding:7px 10px;margin-bottom:8px;gap:8px 12px}.rw-fixed .rw-score{font-size:26px}.rw-fixed .rw-label,.rw-fixed .rw-based-pre{display:none}.rw-fixed .rw-based{margin-top:0}
+  .rw-fixed .rw-stars i{width:15px;height:15px}.rw-fixed .rw-stars-lg i{width:14px;height:14px}
+  .rw-fixed .rw-write{padding:7px 12px;font-size:12.5px}.rw-fixed .rw-tab,.rw-fixed .rw-tabs-more{padding:4px 7px;font-size:12.5px}
+  .rw-fixed .rw-card{padding:12px;gap:6px}.rw-fixed .rw-avatar{width:34px;height:34px}.rw-fixed .rw-name{font-size:14px}
+  .rw-fixed .rw-text{font-size:14px;line-height:1.5}.rw-fixed .rw-ai-text{font-size:13px;line-height:1.45}.rw-fixed .rw-link{font-size:12.5px}
+  .rw-fixed .rw-media-hero{min-height:0}.rw-fixed .rw-media-chip{width:40px;height:40px}}
+@container rw (max-height:200px){
+  .rw-fixed .rw-header{padding:3px 8px;margin-bottom:4px;gap:8px}.rw-fixed .rw-summary{gap:7px}
+  .rw-fixed .rw-score{font-size:20px}.rw-fixed .rw-based{display:none}.rw-fixed .rw-stars-lg i{width:13px;height:13px}
+  .rw-fixed .rw-write{padding:4px 10px;font-size:12px}.rw-fixed .rw-tab,.rw-fixed .rw-tabs-more{padding:2px 7px;font-size:12px}
+  .rw-fixed.rw-layout-carousel .rw-track{padding:2px 2px 4px}
+  .rw-fixed .rw-nav{width:24px;height:24px;font-size:18px;padding:0 0 2px}
+  .rw-fixed .rw-card{padding:6px 9px;gap:3px}
+  .rw-fixed .rw-card-top{gap:8px}.rw-fixed .rw-avatar{width:22px;height:22px}.rw-fixed .rw-name{font-size:13px}
+  .rw-fixed .rw-who time,.rw-fixed .rw-link,.rw-fixed .rw-subtitle,.rw-fixed .rw-also{display:none}
+  .rw-fixed .rw-stars i{width:12px;height:12px}.rw-fixed .rw-stars svg{display:block}
+  .rw-fixed.rw-layout-carousel .rw-text{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.35}
+  .rw-fixed .rw-ai{gap:3px}.rw-fixed .rw-ai-top{gap:5px}.rw-fixed .rw-ai-label{font-size:13px}
+  .rw-fixed .rw-ai-icon{width:16px;height:16px}.rw-fixed .rw-ai-icon svg{width:10px;height:10px}
+  .rw-fixed .rw-ai-text{font-size:12.5px;line-height:1.35}.rw-fixed .rw-media-chip{width:28px;height:28px}.rw-fixed .rw-media-icon{width:24px;height:24px}}
+.rw-credit{flex:none;text-align:end;margin-top:6px;font-size:11px;line-height:1.4}
+.rw-credit a{color:var(--rw-muted,#888);text-decoration:none;opacity:.8}
+.rw-credit a:hover,.rw-credit a:focus-visible{text-decoration:underline;opacity:1}
