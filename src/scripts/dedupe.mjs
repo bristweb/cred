@@ -1,11 +1,11 @@
-// The widget's duplicate rule (assets/js/cred.js; keep the two in step), shared by validate.mjs and badge.mjs.
+// The widget's duplicate rule (src/assets/js/cred.js; keep the two in step), shared by validate.mjs and badge.mjs.
 // One review posted on several platforms counts once: records with the same text (lowercased, punctuation and extra
 // spaces dropped, 40+ characters; display.dedupe: false turns this off) or one naming the other in duplicate_of
 // ("<platform>-<platform_review_id>"). dedupe(list) keeps one copy per review: one without duplicate_of, then one
 // with a star rating, then the platform listed first in config.platforms, then the oldest.
 export const keyOf = r => `${r.platform}-${r.platform_review_id}`;
 export const hid = (r, part) => r.hidden === true || Boolean(r.hidden && typeof r.hidden === 'object' && r.hidden[part] === true);
-// include_examples: false leaves out every record marked example: true (assets/js/cred.js does the same).
+// include_examples: false leaves out every record marked example: true (src/assets/js/cred.js does the same).
 export const exampleOut = (config, x) => x?.example === true && config?.include_examples === false;
 const normText = t => String(t ?? '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
 

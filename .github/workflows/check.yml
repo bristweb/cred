@@ -1,4 +1,4 @@
-# Syntax check + validate the bundled fictional example/.
+# Syntax check, build the site, and validate the bundled example content (content/example/).
 name: Check
 on:
   push:
@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: node --check assets/js/cred.js && node --check scripts/validate.mjs && node --check scripts/badge.mjs && node --check scripts/build-versions.mjs && node --check scripts/dedupe.mjs
+      - run: for f in src/assets/js/cred.js src/scripts/*.mjs; do node --check "$f"; done
       - name: VERSION matches package.json
-        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" assets/js/cred.js
-      - run: node scripts/validate.mjs example && node scripts/badge.mjs example && git diff --exit-code example/badge.json
+        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" src/assets/js/cred.js
+      - name: Build publishes the widget, pages and example at their public URLs
+        run: node src/scripts/build.mjs dist && test -f dist/assets/js/cred.js && test -f dist/lang/en.json && test -f dist/index.html && test -f dist/example/config.js
+      - run: node src/scripts/validate.mjs content/example && node src/scripts/badge.mjs content/example && git diff --exit-code content/example/badge.json

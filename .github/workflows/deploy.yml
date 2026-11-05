@@ -18,8 +18,8 @@ jobs:
           node-version: 22
       - name: Build
         run: |
-          rsync -a --exclude .git --exclude .github --exclude node_modules --exclude dist ./ dist/
-          node scripts/build-versions.mjs dist
+          node src/scripts/build.mjs dist
+          node src/scripts/build-versions.mjs dist
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

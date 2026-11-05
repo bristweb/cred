@@ -6,13 +6,13 @@ Everything here is tagged `example: true` (each review record, and the summary, 
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional; the platform names identify where each sample would appear.
 
-Copy this whole folder to start your own data folder, or a separate data repo (includes `.github/workflows/validate.yml` and `deploy.yml`, `.nojekyll`, `_headers` and `.gitignore`).
+In a fork, copy this whole folder to `content/data/` and replace the content (the widget reads `/data/` by default). Or copy it to start a separate data repo (includes `.github/workflows/validate.yml` and `deploy.yml`, `.nojekyll`, `_headers` and `.gitignore`).
 
 ## Publish
 
-**Hosting.** Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
+**Hosting a separate data repo.** (A fork publishes through its own workflows instead, see the main README.) Recommended: Cloudflare Pages. The included `.github/workflows/deploy.yml` publishes the repo root on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages needs no extra files; in Settings → Pages choose *Deploy from a branch*, `main`, `/ (root)` (`.nojekyll` is included).
 
-Then point the widget at the published URL (`data-source` is only needed when this folder is served from a different site than the script; in a fork that holds both, omit it and the widget reads `data/`, or `example/` if there is no `data/`):
+Then point the widget at the published URL (`data-source` is only needed when this folder is served from a different site than the script; in a fork that holds both, omit it and the widget reads `/data/`, or `/example/` if there is no `content/data/`):
 
 ```html
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js"

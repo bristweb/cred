@@ -1,7 +1,8 @@
 /* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
- * The code lives in this repo; everything about a site lives in a data folder (data/ in a fork, example/ upstream) or a
+ * The code lives in src/ of this repo (published at /assets/ and /lang/); everything about a site lives in a content folder
+ * (content/data/ in a fork, content/example/ upstream; published at /data/ and /example/) or a
  * separate data repo. data-source names it and is optional: omitted, it defaults to <site root>/data/ if that has a
- * config.js, else <site root>/example/ (site root = where this script's assets/ folder is served from):
+ * config.js, else <site root>/example/ (site root = where this script's published assets/ folder is served from):
  *   <source>config.js            business, platforms, display defaults, languages/defaultLanguage/strings, schema,
  *                                summary card, optional accolades/testimonials, and reviews.years
  *   <source>lang/<code>.json     optional UI wording files listed in config.languages[{lang,url}]. Partial OK.

@@ -25,7 +25,7 @@
 #intro{background:none}</style>
 </head>
 <body>
-<!-- Demo host page. No data-source: the widget uses ./data/ if it has a config.js, else the bundled example/.
+<!-- Demo host page. No data-source: the widget uses ./data/ if it has a config.js, else the bundled /example/ (content/example/ in the repo).
      Override with ?source=<data-folder-url>. Options: &layout=&platform=&limit=&summary=off&theme=light|dark|auto
      Constrained: &constrained=true
      Demo chrome only: ?theme=dark → #0d1117 page background; ?theme=light → #fff. Omitted/auto stays transparent.
@@ -60,7 +60,7 @@
 <li>Any other site: paste into the page HTML.</li>
 </ul></li>
 <li><strong>That's it.</strong> The widget adapts to the width it's given. Optional <code>data-*</code> attributes (layout, theme, limit, <code>data-constrained</code> for fixed-height boxes) are listed in the <a href="https://github.com/bristweb/cred#options">options</a>.</li>
-<li><strong>Make your own.</strong> Fork <a href="https://github.com/bristweb/cred">bristweb/cred</a>, copy <code>example/</code> to <code>data/</code> and replace it with your content, then publish the fork and use the snippet with your own address as <code>src</code>. <code>data-source</code> is optional: without it the widget reads <code>data/</code> (or <code>example/</code>) from the same site. Setup guide: <a href="https://github.com/bristweb/cred#fork-and-replace">github.com/bristweb/cred</a>.</li>
+<li><strong>Make your own.</strong> Fork <a href="https://github.com/bristweb/cred">bristweb/cred</a>, copy <code>content/example/</code> to <code>content/data/</code> and replace it with your content, then publish the fork and use the snippet with your own address as <code>src</code>. <code>data-source</code> is optional: without it the widget reads <code>/data/</code> (or <code>/example/</code>) from the same site. Setup guide: <a href="https://github.com/bristweb/cred#fork-and-replace">github.com/bristweb/cred</a>.</li>
 </ol>
 <p class="note">Please don't embed or link to this page itself; paste the snippet on your own site.</p>
 <h2>Preview</h2>

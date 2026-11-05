@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Validate a reviews data repo against the JSON Schemas in schemas/, plus filesystem checks
+ * Validate a reviews data repo against the JSON Schemas in src/schemas/, plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
- *   node cred/scripts/validate.mjs <data-repo-dir>   # default: .
+ *   node src/scripts/validate.mjs <data-dir>   # e.g. content/example   # default: .
  *
  * Requires the `ajv` dependency from this repo (`npm ci` in cred). The reusable workflow
- * installs it before running. Schemas: schemas/config.schema.json, schemas/reviews.schema.json.
+ * installs it before running. Schemas: src/schemas/config.schema.json, src/schemas/reviews.schema.json.
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -49,7 +49,7 @@ const isIso = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{
 let config = null;
 try { config = (await import('data:text/javascript,' + encodeURIComponent(readFileSync(path.join(root, 'config.js'), 'utf8')))).default; }
 catch (e) { err(`config.js: ${e.code === 'ENOENT' ? 'missing' : 'cannot load (' + e.message + ')'}`); }
-if (existsSync(path.join(root, 'config.json'))) warn('config.json is no longer read; config.js is the config (node cred/scripts/config-to-js.mjs converts it)');
+if (existsSync(path.join(root, 'config.json'))) warn('config.json is no longer read; config.js is the config (node src/scripts/config-to-js.mjs converts it)');
 if (config) {
   if (!validateConfig(config)) for (const e of validateConfig.errors) err(fmt('config.js', e));
 }

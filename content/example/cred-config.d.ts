@@ -1,4 +1,4 @@
-// Generated from schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.
+// Generated from src/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.
 
 /**
  * CRED data repo config (config.js default export).
@@ -245,7 +245,7 @@ export interface CredConfig {
     [k: string]: unknown;
   }[];
   /**
-   * Optional settings for the rating badge files written by scripts/badge.mjs (badge.json for shields.io, badge.svg).
+   * Optional settings for the rating badge files written by src/scripts/badge.mjs (badge.json for shields.io, badge.svg).
    */
   badge?: {
     /**

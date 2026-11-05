@@ -2,9 +2,9 @@
 /**
  * Write rating badge files into a reviews data repo, from the same reviews the widget shows
  * (skips example records when include_examples is false, "hidden": true and hidden.rating records, display.hide keys and rated reviews below display.min_rating, and
- * counts a review posted on several platforms once, as the widget does: scripts/dedupe.mjs).
+ * counts a review posted on several platforms once, as the widget does: src/scripts/dedupe.mjs).
  *
- *   node cred/scripts/badge.mjs <data-repo-dir>   # default: .
+ *   node src/scripts/badge.mjs <data-dir>   # default: .
  *
  * badge.json  shields.io endpoint: https://img.shields.io/endpoint?url=<data-source>badge.json
  * badge.svg   the same badge as a static image
