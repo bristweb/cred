@@ -3,7 +3,7 @@
  * Validate a reviews data repo against the JSON Schemas in src/schemas/, plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
- *   node src/scripts/validate.mjs <data-dir>   # e.g. src/example   # default: .
+ *   node src/scripts/validate.mjs <data-dir>   # e.g. src/example-content   # default: .
  *
  * Requires the `ajv` dependency from this repo (`npm ci` in cred). The reusable workflow
  * installs it before running. Schemas: src/schemas/config.schema.json, src/schemas/reviews.schema.json.
@@ -12,7 +12,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { deduper, exampleOut, hid, keyOf } from './dedupe.mjs';
+import { deduper, exampleOut, hid, isExamplesDir, keyOf } from './dedupe.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WIDGET = path.resolve(HERE, '..');
@@ -183,10 +183,10 @@ for (const { r, at } of records) {
   for (let t = byKey.get(k), n = 0; t && t.duplicate_of != null; t = byKey.get(String(t.duplicate_of)))
     if (t === r || ++n > records.length) { err(`${at}: duplicate_of loops back to this review`); break; }
 }
-const live = records.map(x => x.r).filter(r => !exampleOut(config, r));
+const live = records.map(x => x.r).filter(r => !exampleOut(config, r, isExamplesDir(root)));
 const kept = live.filter(r => !hid(r, 'rating') && !hideList.includes(keyOf(r)));
 const merged = kept.length - deduper(config, live)(kept).length;
-const exampleItems = [...records.map(x => x.r), config?.summary, ...['accolades', 'credentials', 'testimonials'].flatMap(k => (Array.isArray(config?.[k]) ? config[k] : []))].filter(x => x?.example === true).length;
+const exampleItems = [...records.map(x => x.r), config?.summary, ...['accolades', 'credentials', 'testimonials'].flatMap(k => (Array.isArray(config?.[k]) ? config[k] : []))].filter(x => x && (isExamplesDir(root) || x.example === true)).length;
 const imgDir = path.join(root, 'images', 'reviewers');
 if (existsSync(imgDir)) for (const f of readdirSync(imgDir)) if (!used.has(`images/reviewers/${f}`)) warn(`images/reviewers/${f}: not referenced by any review or testimonial (ok if unused)`);
 

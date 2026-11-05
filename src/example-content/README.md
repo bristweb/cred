@@ -2,7 +2,7 @@
 
 The **examples** that ship with [bristweb/cred](https://github.com/bristweb/cred): sample content for an invented bike shop, not a real business. Do not present it as real reviews or testimonials.
 
-Everything here is tagged `example: true` (each review record, and the summary, accolades, credentials and testimonials in `config.js`). `include_examples` in `config.js` (default `true`) shows it; set it to `false` to leave all tagged content out of the published widget without deleting any file. Keep this folder untouched in a fork so upstream updates merge cleanly, and put your own content in a copy of it (for example `data/`). See [Fork and replace](https://github.com/bristweb/cred#fork-and-replace).
+Everything here is example content by location, so nothing is tagged `example: true`. `include_examples` in `config.js` (default `true`) shows it; set it to `false` to leave all of it out of the published widget without deleting any file. Once you copy files into your own `content/`, they are your content. Keep this folder untouched in a fork so upstream updates merge cleanly, and put your own content in a copy of it (for example `data/`). See [Fork and replace](https://github.com/bristweb/cred#fork-and-replace).
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional; the platform names identify where each sample would appear.
 
@@ -25,7 +25,7 @@ Google Sites / fixed-height box: add `data-constrained="true"`.
 
 - `config.js` (with `cred-config.d.ts` for editor type hints) — `include_examples`, business, platforms, display, summary, optional `accolades` / `testimonials`, `reviews.years` (optional `languages` / `defaultLanguage`)
 - `lang/` — optional UI wording listed in `languages` (partial OK; widget ships English)
-- `reviews/<year>.json` — review records (tagged `example: true`)
+- `reviews/<year>.json` — review records
 - `theme/theme.css` — `--rw-*` colors (light + dark)
 - `icons/`, `images/` — optional local assets
 - `.github/workflows/validate.yml` — validates against cred on push

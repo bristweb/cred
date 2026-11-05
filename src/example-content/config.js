@@ -8,11 +8,11 @@ export default {
   // so breaking changes (a new major version) never reach your site.
   version: "latest",
 
-  // The records, testimonials, awards, credentials and summary below are marked `example: true`: invented sample
-  // content. true (the default) shows them, as the upstream demo does. In a fork that keeps these files, set it to
-  // false: everything marked `example: true` is left out of the cards, counts, averages, JSON-LD and badge, and
-  // nothing is deleted, so pulling updated examples from upstream never changes what your site publishes.
-  // Needs widget 1.2.0 or later (pin version: "^1.2.0").
+  // Everything in this folder is invented sample content, and the widget knows that from where it is loaded (this
+  // examples folder), so nothing below needs an `example: true` tag. true (the default) shows it, as the upstream demo
+  // does. false leaves all of it out of the cards, counts, averages, JSON-LD and badge without deleting anything.
+  // Once you copy these files into your own content/ folder they are your content: `include_examples` then only
+  // affects items you tag `example: true` yourself. Needs widget 1.2.0 or later (pin version: "^1.2.0").
   include_examples: true,
 
   // The business shown in the header and in the schema.org JSON-LD.
@@ -112,7 +112,6 @@ export default {
     title: "Highlights",
     text: "Riders praise quick repairs, careful bike fits, and a calm shop floor with no hard sell. Regulars mention returning for seasonal gear, tubeless setups, and kid-bike fittings after a first tune-up.",
     generated_at: "2026-10-06T18:00:00Z",
-    example: true
   },
 
   // Yearly review files reviews/<year>.json, newest first. `years` is kept up to date by the import script.
@@ -125,14 +124,12 @@ export default {
       year: 2025,
       icon: "icons/award-choice.svg",
       url: "https://example.com/awards/local-shop-editors-pick-2025",
-      example: true
     },
     {
       label: "Trail Town Best Bike Shop",
       year: 2024,
       icon: "icons/award-bestof.svg",
       url: "https://example.com/awards/trail-town-best-bike-shop-2024",
-      example: true
     }
   ],
 
@@ -144,7 +141,6 @@ export default {
       icon: "icons/credential-mechanic.svg",
       start: "2023-05",
       url: "https://example.com/credentials/example-bike-shop-mechanic",
-      example: true
     },
     {
       label: "E-bike Service Certification",
@@ -152,7 +148,6 @@ export default {
       icon: "icons/credential-ebike.svg",
       start: "2023-09",
       end: "2025-09",
-      example: true
     }
   ],
 
@@ -160,7 +155,6 @@ export default {
   testimonials: [
     {
       title: "June Park",
-      example: true,
       subtitle: "Handwritten thank-you note",
       text: "Thank you for fixing up my granddaughter's first bike before her birthday. She rode it around the whole block twice!",
       date: "2026-09-20T12:00:00Z",
@@ -176,7 +170,6 @@ export default {
     },
     {
       title: "Dana Ortiz",
-      example: true,
       subtitle: "Daily commuter",
       text: "Left a voicemail after my brake fix because a review didn't feel like enough. Same-morning turnaround and the bike stops like new.",
       date: "2026-09-02T15:10:00Z",
@@ -192,7 +185,6 @@ export default {
     },
     {
       title: "Riley Chen",
-      example: true,
       subtitle: "Fleet Manager, Contoso Logistics",
       reviewer_image: "images/reviewers/testimonial-riley-chen.svg",
       text: "Example Bike Shop keeps our warehouse e-bike fleet rolling. Tune-ups are booked same week, parts are stocked, and the techs explain wear without the hard sell. Our facilities team trusts them with every unit.",
@@ -206,7 +198,6 @@ export default {
     },
     {
       title: "Summit Athletics",
-      example: true,
       subtitle: "Team sponsor since 2023",
       text: "We outfit our coaching staff and youth ride leaders through Example Bike Shop. Fits are careful, demos are honest, and group orders land on time. They feel like an extension of our athletics program.",
       date: "2024-05-22T16:00:00Z",

@@ -2,7 +2,6 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-003",
-    "example": true,
     "reviewer_name": "Peyton Murphy",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -20,7 +19,6 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-012",
-    "example": true,
     "reviewer_name": "Kai Okada",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -38,7 +36,6 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-013",
-    "example": true,
     "reviewer_name": "Micah Berg",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -56,7 +53,6 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-001",
-    "example": true,
     "reviewer_name": "Skyler Okada",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -71,7 +67,6 @@
   {
     "platform": "facebook",
     "platform_review_id": "ex-facebook-010",
-    "example": true,
     "reviewer_name": "Shawn Kowalski",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -89,7 +84,6 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-014",
-    "example": true,
     "reviewer_name": "Avery Okada",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -107,7 +101,6 @@
   {
     "platform": "yelp",
     "platform_review_id": "ex-yelp-005",
-    "example": true,
     "reviewer_name": "Zoe Hughes",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -125,7 +118,6 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-010",
-    "example": true,
     "reviewer_name": "Harper Kowalski",
     "reviewer_profile_url": null,
     "rating": 5,
@@ -143,7 +135,6 @@
   {
     "platform": "google",
     "platform_review_id": "ex-google-002",
-    "example": true,
     "reviewer_name": "Quinn Walsh",
     "reviewer_profile_url": null,
     "rating": 5,

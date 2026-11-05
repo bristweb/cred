@@ -3,10 +3,16 @@
 // spaces dropped, 40+ characters; display.dedupe: false turns this off) or one naming the other in duplicate_of
 // ("<platform>-<platform_review_id>"). dedupe(list) keeps one copy per review: one without duplicate_of, then one
 // with a star rating, then the platform listed first in config.platforms, then the oldest.
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 export const keyOf = r => `${r.platform}-${r.platform_review_id}`;
 export const hid = (r, part) => r.hidden === true || Boolean(r.hidden && typeof r.hidden === 'object' && r.hidden[part] === true);
-// include_examples: false leaves out every record marked example: true (src/assets/js/cred.js does the same).
-export const exampleOut = (config, x) => x?.example === true && config?.include_examples === false;
+// The bundled examples folder (src/example-content/). Everything loaded from it is example content.
+export const examplesDir = fileURLToPath(new URL('../example-content', import.meta.url));
+export const isExamplesDir = dir => path.resolve(dir) === examplesDir;
+// include_examples: false leaves out example content: everything when the data folder is the bundled examples
+// (inExamples), else only records marked example: true (src/assets/js/cred.js does the same).
+export const exampleOut = (config, x, inExamples = false) => Boolean(x) && config?.include_examples === false && (inExamples || x.example === true);
 const normText = t => String(t ?? '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
 
 export function deduper(config, reviews) {

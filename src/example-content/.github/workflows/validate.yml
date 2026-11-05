@@ -1,6 +1,6 @@
 # Checks config.json, reviews/<year>.json and images/reviewers/ with the shared validator
 # (https://github.com/bristweb/cred, scripts/validate.mjs).
-# Copied with src/example/ into a new data repo — lands at .github/workflows/validate.yml at the repo root.
+# Copied with src/example-content/ into a new data repo — lands at .github/workflows/validate.yml at the repo root.
 name: Validate reviews data
 on:
   push:

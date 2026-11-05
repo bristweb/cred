@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Write rating badge files into a reviews data repo, from the same reviews the widget shows
- * (skips example records when include_examples is false, "hidden": true and hidden.rating records, display.hide keys and rated reviews below display.min_rating, and
+ * (skips example records when include_examples is false (all of them in src/example-content/, else those marked example: true), "hidden": true and hidden.rating records, display.hide keys and rated reviews below display.min_rating, and
  * counts a review posted on several platforms once, as the widget does: src/scripts/dedupe.mjs).
  *
  *   node src/scripts/badge.mjs <data-dir>   # default: .
@@ -12,7 +12,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { deduper, exampleOut, hid, keyOf } from './dedupe.mjs';
+import { deduper, exampleOut, hid, isExamplesDir, keyOf } from './dedupe.mjs';
 
 const root = path.resolve(process.argv[2] || '.');
 const read = f => JSON.parse(readFileSync(path.join(root, f), 'utf8'));
@@ -21,7 +21,7 @@ const D = config.display || {};
 const hide = new Set((Array.isArray(D.hide) ? D.hide : []).map(String));
 const min = Number(D.min_rating) || 0;
 const records = (config.reviews?.years || []).flatMap(y => read(`reviews/${y}.json`));
-const live = records.filter(r => !exampleOut(config, r));
+const live = records.filter(r => !exampleOut(config, r, isExamplesDir(root)));
 const reviews = deduper(config, live)(live.filter(r => !hid(r, 'rating') && !hide.has(keyOf(r)) && !(min > 0 && typeof r.rating === 'number' && r.rating < min)));
 const rated = reviews.filter(r => typeof r.rating === 'number');
 const avg = rated.length ? rated.reduce((s, r) => s + r.rating, 0) / rated.length : 0;
