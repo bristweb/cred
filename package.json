@@ -9,7 +9,7 @@
   "scripts": {
     "validate": "node package/tools/validate.mjs package/example-data",
     "types": "npx --yes json-schema-to-typescript@15 -i package/schemas/config.schema.json -o package/types/config.d.ts --bannerComment \"// Generated from package/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.\" && cp package/types/config.d.ts package/example-data/cred-config.d.ts",
-    "test": "node package/tools/smoke-test.mjs"
+    "test": "node --test \"package/tools/test/*.test.mjs\" && node package/tools/smoke-test.mjs"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,7 @@
   "homepage": "https://github.com/bristweb/cred#readme",
   "type": "module",
   "private": "true",
-  "dependencies": {
-    "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1"
+  "devDependencies": {
+    "zod": "^4.6.7"
   }
 }
