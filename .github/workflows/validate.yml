@@ -24,8 +24,8 @@ jobs:
           path: widget
       - run: npm ci
         working-directory: widget
-      - run: node widget/scripts/validate.mjs data
-      - run: node widget/scripts/badge.mjs data
+      - run: node widget/package/tools/validate.mjs data
+      - run: node widget/package/tools/badge.mjs data
       - name: Commit badge files
         if: github.ref_name == github.event.repository.default_branch
         working-directory: data

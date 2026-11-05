@@ -1,0 +1,152 @@
+[
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-003",
+    "reviewer_name": "Peyton Murphy",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Winterized my road bike: grease, new bar tape, true wheels. Ready for wet season commuting.",
+    "date": "2025-11-23T16:42:57Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-003",
+    "owner_reply": {
+      "text": "Appreciate the kind words. Stop by anytime.",
+      "date": "2025-11-24T10:42:57Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-003.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-012",
+    "reviewer_name": "Kai Okada",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Frame bag special-ordered and mounted cleanly. No rattle even on brick streets.",
+    "date": "2025-09-13T17:06:40Z",
+    "review_url": "https://example.com/google/reviews/ex-google-012",
+    "owner_reply": {
+      "text": "Thanks for riding with us!",
+      "date": "2025-09-14T02:06:40Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-012.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "facebook",
+    "platform_review_id": "ex-facebook-013",
+    "reviewer_name": "Micah Berg",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Brought in a garage-find road bike from the 80s. They kept the original parts where they could and it rides beautifully.",
+    "date": "2025-08-30T00:49:25Z",
+    "review_url": "https://example.com/facebook/reviews/ex-facebook-013",
+    "owner_reply": {
+      "text": "Thanks for riding with us. Safe miles!",
+      "date": "2025-08-31T02:49:25Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-013.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-001",
+    "reviewer_name": "Skyler Okada",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Great selection of city bikes. Staff took time to set saddle height and explained gear range without pushing an upgrade I did not need.",
+    "date": "2025-07-29T23:58:08Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-001",
+    "owner_reply": null,
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-001.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "facebook",
+    "platform_review_id": "ex-facebook-010",
+    "reviewer_name": "Shawn Kowalski",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Wheel build for my touring bike. Hand-built, still true after a month of loaded riding, and they explained every spoke choice.",
+    "date": "2025-07-07T08:10:17Z",
+    "review_url": "https://example.com/facebook/reviews/ex-facebook-010",
+    "owner_reply": {
+      "text": "Happy to help \u2014 rolling stock ready whenever you are.",
+      "date": "2025-07-08T12:10:17Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/facebook-ex-facebook-010.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-014",
+    "reviewer_name": "Avery Okada",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Rented a gravel bike for the weekend. Clean, well tuned, and they added a frame bag at no charge. Will rent again.",
+    "date": "2025-06-02T14:05:01Z",
+    "review_url": "https://example.com/google/reviews/ex-google-014",
+    "owner_reply": {
+      "text": "Appreciate the kind words. Stop by anytime.",
+      "date": "2025-06-03T18:05:01Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-014.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "yelp",
+    "platform_review_id": "ex-yelp-005",
+    "reviewer_name": "Zoe Hughes",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Loaner bike while mine was in for a warped rotor. Made the week workable.",
+    "date": "2025-05-04T17:34:27Z",
+    "review_url": "https://example.com/yelp/reviews/ex-yelp-005",
+    "owner_reply": {
+      "text": "Appreciate the kind words. Stop by anytime.",
+      "date": "2025-05-05T09:34:27Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/yelp-ex-yelp-005.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-010",
+    "reviewer_name": "Harper Kowalski",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Bought lights and a rack here. They installed both while I grabbed coffee next door. Solid neighborhood shop.",
+    "date": "2025-04-25T23:36:59Z",
+    "review_url": "https://example.com/google/reviews/ex-google-010",
+    "owner_reply": {
+      "text": "Thanks for riding with us!",
+      "date": "2025-04-27T06:36:59Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-010.svg",
+    "reviewer_image_source_url": null
+  },
+  {
+    "platform": "google",
+    "platform_review_id": "ex-google-002",
+    "reviewer_name": "Quinn Walsh",
+    "reviewer_profile_url": null,
+    "rating": 5,
+    "text": "Brake bleed and new pads before a mountain trip. Levers feel firm and they showed me how to check pad wear myself.",
+    "date": "2025-02-19T10:22:55Z",
+    "review_url": "https://example.com/google/reviews/ex-google-002",
+    "owner_reply": {
+      "text": "Happy to help \u2014 rolling stock ready whenever you are.",
+      "date": "2025-02-20T12:22:55Z"
+    },
+    "collected_at": "2026-10-06T18:00:00Z",
+    "reviewer_image": "assets/images/reviewers/google-ex-google-002.svg",
+    "reviewer_image_source_url": null
+  }
+]

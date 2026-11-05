@@ -2,6 +2,18 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.2.0 (2026-11-05)
+
+- `include_examples` (top-level in `config.js`, default `true`): `false` leaves example content out of the cards, counts, averages, summary card, JSON-LD and rating badge, without deleting any file. Everything loaded from the bundled examples folder (`package/example-data/`) is example content by location, so the example data carries no per-item tags; the widget, validator and badge script infer it from the source. In your own content, items marked `example: true` (reviews, summary, accolades, credentials, testimonials) are examples too; the tag is optional and rarely needed.
+- The bundled sample content is now called **examples** (business name "Example Bike Shop") instead of a branded name; the demo still shows it.
+- `data-source` is optional. The widget picks its data in this order: `data-source` (or `?source=`) when the embed has one; otherwise `<site root>/data/` when it has a `config.js` (a fork's own data); otherwise the bundled examples at `<site root>/package/example-data/`. The site root is worked out from the script URL (`…/package/assets/js/cred.js`, `…/v/<x.y.z>/assets/js/cred.js` or the short `…/assets/js/cred.js`), so it also works under a GitHub Pages project path.
+- With no reviews to count, the header omits the rating block (it shows the "Write a review" button only).
+- Repository reorganised; nothing is compiled and there is no build step or `dist/` any more: the repo is served as it is. `package/` is the product a fork leaves alone (`assets/` widget, CSS and default icons; `lang/` built-in English wording; `schemas/`, `types/`; `tools/`, formerly `scripts/`; `example-data/`, the bundled examples). The top-level `data/` folder is the client's data (`config.js`, `reviews/`, `theme/`, `lang/`, `assets/`), empty upstream. Cred's own pages are in the top-level `site/` (`index.html`, `embed.html`, `example.html`, `robots.txt`, `sitemap.xml`). Root host files: `_headers`, `_redirects`, `.nojekyll`, `404.html`.
+- Public URLs: files are served at their real paths on every host (`/package/assets/js/cred.js`, `/site/`, `/data/`, `/package/example-data/`). On Cloudflare Pages, `_redirects` keeps the existing short URLs as rewrites: `/assets/js/cred.js`, `/lang/`, `/schemas/`, `/types/`, `/`, `/embed.html`, `/example/` (page) and `/example/<file>` (example data); `/content/…` redirects to `/data/…`. GitHub Pages has no rewrites and uses the real paths.
+- `npm run build` and `build.mjs` are gone. Deploys run `package/tools/export-site.sh`: a `git archive` of the served paths (no `.git`, `node_modules` or untracked files) plus the generated `/v/<x.y.z>/` release copies and `versions.json` from `build-versions.mjs`, which reads each tag's widget from `package/`, `src/` or the root. `npm test` runs a static HTTP smoke test (`package/tools/smoke-test.mjs`).
+- One asset layout everywhere: a single `assets/` folder in the data folder (`data/` and `package/example-data/`), sorted by kind: `assets/icons/`, `assets/images/` (with `assets/images/reviewers/` for avatars), `assets/video/`, `assets/audio/`. `package/example-data/` is an exact mirror of `data/` (no `site/` folder, no per-record `example: true`).
+- README: new Fork and replace guide (fork, own data folder, hide examples, what is code and what is content, pull from upstream); a separate data repo is now the alternative.
+
 ## 1.1.0 (2026-10-19)
 
 - `hidden` on a review can be an object that hides only some parts: `{ "display": true }` (no card), `{ "rating": true }` (left out of the average and counts), `{ "schema": true }` (left out of the JSON-LD). `true` still hides everything.
