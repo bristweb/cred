@@ -7,7 +7,7 @@ The demo below runs on **examples**: invented sample content (a fictional bike s
 ## <a href="https://cred.bristleconeweb.com/?theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v6.png" />
+  <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v7.png" />
   <source media="(prefers-color-scheme: light)" srcset="docs/example-widget-light-v6.png" />
   <img src="docs/example-widget-light-v6.png" alt="Live demo showing the bundled example data (a fictional bike shop)" />
 </picture>
