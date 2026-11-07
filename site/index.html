@@ -24,25 +24,18 @@
 .ci .copy{position:absolute;top:8px;right:8px;font:inherit;font-size:12.5px;border:1px solid #d6d6d6;background:#f6f6f6;border-radius:6px;padding:4px 10px;cursor:pointer;color:#333}
 .ci .copy:hover{background:#eee}.ci code{font-size:13px}.ci .note{font-size:13.5px;color:#777}
 #intro{background:none}</style>
+<script src="../site/page-theme.js"></script>
+<link rel="stylesheet" href="../site/page-theme.css">
 </head>
 <body>
 <!-- Demo host page. No data-source: the widget uses <site root>/data/ if it has a config.js, else the bundled package/example-data/.
      Override with ?source=<data-folder-url>. Options: &layout=&platform=&limit=&summary=off&theme=light|dark|auto
      Constrained: &constrained=true
-     Demo chrome only: ?theme=dark → #0d1117 page background; ?theme=light → #fff. Omitted/auto stays transparent.
+     Standalone chrome follows system appearance; ?theme=light|dark overrides it.
      (embed.html stays transparent always — do not copy this chrome there.) -->
 <script>
   (function () {
-    var q = new URLSearchParams(location.search);
     if (!location.search) document.addEventListener('DOMContentLoaded', function () { document.getElementById('intro').hidden = false; });
-    var theme = (q.get('theme') || '').toLowerCase();
-    if (theme !== 'light' && theme !== 'dark') return;
-    var dark = theme === 'dark';
-    var bg = dark ? '#0d1117' : '#ffffff';
-    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-    document.documentElement.style.background = bg;
-    document.body.style.background = bg;
-    document.documentElement.setAttribute('data-theme', theme);
   })();
 </script>
 <div id="intro" hidden><div class="ci">
