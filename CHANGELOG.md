@@ -2,14 +2,16 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
-## Unreleased
+## 1.2.0 (2026-11-06)
+
+- Browser-only template setup and validated package-only update pull requests through GitHub Actions. Setup preserves client content and the full README.
+- Standalone demo pages opt into automatic light/dark themes, while explicit theme overrides and light-only embeds retain their behavior.
 
 - Indexing: exports with local `data/config.js` mark the bundled setup/demo pages noindex and remove their sitemap entries. Example-only repos keep them indexable. Client content, embedded websites and explicit indexing preferences are untouched.
 
 - Tools: `validate.mjs` checks the JSON Schemas with Zod (`z.fromJSONSchema` + `safeParse`) instead of Ajv; Zod is a development dependency only. Schemas, typings, the widget and the data format are unchanged.
 - Tests: `npm test` runs validator regression tests (`node --test`) before the smoke test; the smoke test accepts a fork's own `data/config.js`.
 
-## 1.2.0 (2026-11-05)
 
 - `include_examples` (top-level in `config.js`, default `true`): `false` leaves example content out of the cards, counts, averages, summary card, JSON-LD and rating badge, without deleting any file. Everything loaded from the bundled examples folder (`package/example-data/`) is example content by location, so the example data carries no per-item tags; the widget, validator and badge script infer it from the source. In your own content, items marked `example: true` (reviews, summary, accolades, credentials, testimonials) are examples too; the tag is optional and rarely needed.
 - The bundled sample content is now called **examples** (business name "Example Bike Shop") instead of a branded name; the demo still shows it.
