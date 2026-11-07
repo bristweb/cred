@@ -10,6 +10,7 @@ import { readFileSync, existsSync, statSync, mkdtempSync, readdirSync } from 'no
 import { execSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { widgetVersion } from './widget-version.mjs';
 
 let failed = 0;
 const ok = (cond, msg) => { console.log(`${cond ? 'ok  ' : 'FAIL'} ${msg}`); if (!cond) failed++; };
@@ -86,7 +87,7 @@ execSync(`sh package/tools/export-site.sh ${out} ${ref}`, { stdio: 'inherit' });
 const top = readdirSync(out).sort();
 ok(!top.some(f => ['.git', 'node_modules', '.github', 'docs'].includes(f)), `export: top level is ${top.join(' ')}`);
 const versions = JSON.parse(readFileSync(path.join(out, 'versions.json'), 'utf8'));
-ok(versions.latest === JSON.parse(readFileSync('package.json', 'utf8')).version, `export: versions.json latest ${versions.latest}`);
+ok(versions.latest === widgetVersion(), `export: versions.json latest ${versions.latest}`);
 for (const v of versions.versions) ok(existsSync(path.join(out, 'v', v, 'assets/js/cred.js')) && existsSync(path.join(out, 'v', v, 'lang/en.json')), `export: v/${v}/assets/js/cred.js and lang/en.json`);
 await checkSite(out, '/cred/', 'export under /cred/');
 const server = await serve(out, '/');

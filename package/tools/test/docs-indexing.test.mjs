@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -11,12 +11,21 @@ const put = (dir, file, text) => {
   mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
   writeFileSync(path.join(dir, file), text);
 };
+// Fixed template fixtures: tests must also run in a populated instance with its own sitemap/routing.
+const stock = {
+  'site/index.html': '<!-- cred:setup-page -->\n<head><link rel="canonical" href="https://cred.bristleconeweb.com/"></head>',
+  'site/example.html': '<!-- cred:setup-page -->\n<head><link rel="canonical" href="https://cred.bristleconeweb.com/example/"></head><script data-source="../package/example-data/"></script>',
+  'site/embed.html': '<head><meta name="robots" content="noindex, nofollow, noarchive"></head>',
+  'site/robots.txt': 'User-agent: *\nAllow: /\nSitemap: https://cred.bristleconeweb.com/sitemap.xml\n',
+  'site/sitemap.xml': '<urlset><url><loc>https://cred.bristleconeweb.com/</loc></url><url><loc>https://cred.bristleconeweb.com/example/</loc></url></urlset>',
+  '_redirects': '/ /site/ 200\n/example/ /site/example 200\n',
+};
 const noindex = html => /<meta name="robots" content="noindex">/.test(html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ''));
 function fixture(t, config) {
   const dir = mkdtempSync(path.join(tmpdir(), 'cred-indexing-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
-  cpSync(path.join(root, 'site'), path.join(dir, 'site'), { recursive: true });
-  for (const f of ['_headers', '_redirects', 'package/assets/js/cred.js']) put(dir, f, read(root, f));
+  for (const [file, text] of Object.entries(stock)) put(dir, file, text);
+  for (const f of ['_headers', 'package/assets/js/cred.js']) put(dir, f, read(root, f));
   put(dir, 'site/reviews.html', '<head><title>Client reviews</title></head><body><script src="../package/assets/js/cred.js"></script></body>');
   if (config !== undefined) put(dir, 'data/config.js', config);
   return dir;
@@ -31,7 +40,7 @@ test('example-only export retains indexable setup pages, sitemap and robots', t 
   const dir = fixture(t);
   apply(dir);
   for (const f of ['site/index.html', 'site/example.html', 'site/embed.html', 'site/robots.txt', 'site/sitemap.xml', '_headers']) {
-    assert.equal(read(dir, f), read(root, f), f);
+    assert.equal(read(dir, f), stock[f] ?? read(root, f), f);
   }
   assert.equal(noindex(read(dir, 'site/index.html')), false);
   assert.equal(noindex(read(dir, 'site/example.html')), false);
@@ -48,7 +57,7 @@ test('local data: only the marked docs get literal noindex; embed, client pages,
   apply(dir);
   for (const f of ['index.html', 'example.html']) assert.equal(noindex(read(dir, `site/${f}`)), true, f);
   assert.equal(read(dir, 'site/reviews.html'), content);
-  assert.equal(read(dir, 'site/embed.html'), read(root, 'site/embed.html'), 'existing iframe noindex stays (explicit preference)');
+  assert.equal(read(dir, 'site/embed.html'), stock['site/embed.html'], 'existing iframe noindex stays (explicit preference)');
   assert.equal(read(dir, 'data/config.js'), config);
   assert.equal(read(dir, 'package/assets/js/cred.js'), read(root, 'package/assets/js/cred.js'));
   assert.equal(read(dir, '_headers'), headers, 'no blanket header added');
@@ -73,8 +82,8 @@ test('aliases and source overrides cannot bypass the docs policy', t => {
 test('broken local config follows the widget example fallback', t => {
   const dir = fixture(t, 'throw new Error("broken config");');
   assert.match(apply(dir).stderr, /keeping the example fallback policy/);
-  assert.equal(read(dir, 'site/index.html'), read(root, 'site/index.html'));
-  assert.equal(read(dir, 'site/sitemap.xml'), read(root, 'site/sitemap.xml'));
+  assert.equal(read(dir, 'site/index.html'), stock['site/index.html']);
+  assert.equal(read(dir, 'site/sitemap.xml'), stock['site/sitemap.xml']);
 });
 
 test('client replacement and explicit noindex preferences are preserved', t => {
@@ -97,7 +106,7 @@ test('mixed sitemap keeps client URLs and advertisement, removes only noindex se
   const sitemap = read(dir, 'site/sitemap.xml');
   assert.match(sitemap, /https:\/\/client.example\/reviews/);
   assert.equal(sitemap.includes('bristleconeweb.com'), false);
-  assert.equal(read(dir, 'site/robots.txt'), read(root, 'site/robots.txt'));
+  assert.equal(read(dir, 'site/robots.txt'), stock['site/robots.txt']);
 });
 
 test('empty setup sitemap: preserve explicit allow/disallow rules and unrelated sitemap advertisement exactly', t => {
