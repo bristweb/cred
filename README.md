@@ -124,6 +124,12 @@ How `package/` stays untouched but still customizable: your `config.js` lists it
 | `package/example-data/`: a sample of `data/` (all of it is example content) | Your own import scripts, sync jobs and secrets |
 | `site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` | Your choice of hosting workflow (`deploy.yml` or `pages.yml`) |
 
+#### Indexing the setup/demo pages
+
+Cred and example-only forks keep the docs/demo pages indexable. When a published fork has a loadable `data/config.js` (the same condition that selects local data instead of bundled examples), the export adds a literal `noindex` meta tag to the two marked setup pages: `site/index.html` and `site/example.html`. That covers their short Cloudflare URLs (`/`, `/example/`) and real paths (`/site/`, `/site/example.html`, etc.), even with `?source=` or the example page's explicit example source. Their entries are removed from the sitemap; if nothing remains, the empty sitemap and its robots.txt advertisement are removed. Crawling stays allowed so crawlers can see the tags.
+
+This is a publish-time policy in `export-site.sh`, used by both deploy workflows, not widget JavaScript: embedding Cred never changes the indexing of a customer's website. Client content pages, data, assets, headers and explicit robots rules are untouched. `site/embed.html` retains its existing explicit `noindex, nofollow, noarchive`; a client can intentionally change that on its own content-only iframe page. To replace a setup page with an indexable client page, remove its `<!-- cred:setup-page … -->` comment along with the setup instructions and set your own canonical/sitemap. Other client pages need no marker or special setting. A raw checkout served without the export does not apply this publish-time policy.
+
 #### Public URLs
 
 The files are served at their real paths on every static host. Cloudflare Pages also reads `_redirects`, which adds short URLs (rewrites: same file, address bar unchanged) so existing embeds keep working:
@@ -140,7 +146,7 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 
 GitHub Pages ignores `_redirects`: use the real paths there (for example `https://<user>.github.io/<repo>/package/assets/js/cred.js` and `…/<repo>/site/`; the bare `/<repo>/` has no page there and shows `404.html`, which links to `site/`). The widget works out its site root from its own URL either way (`…/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
 
-**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files, `site/`, `data/`, `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. Both deploy workflows run it.
+**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files, `site/`, `data/`, `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. It also applies the setup-page indexing policy above to the published HTML. Both deploy workflows run it.
 
 Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
 
@@ -219,7 +225,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-`index.html` and `embed.html` are bare, transparent, `noindex` pages. They live in `site/` (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` everywhere). With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `package/example-data/`).
+`site/embed.html` is the bare, transparent, explicitly `noindex` iframe page; `site/index.html` is the setup/demo page. They live in `site/` (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` everywhere). With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `package/example-data/`).
 
 ---
 
