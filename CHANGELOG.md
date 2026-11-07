@@ -4,6 +4,8 @@ All notable changes to CRED. Versions follow [semantic versioning](https://semve
 
 ## Unreleased
 
+- Indexing: exports with local `data/config.js` mark the bundled setup/demo pages noindex and remove their sitemap entries. Example-only repos keep them indexable. Client content, embedded websites and explicit indexing preferences are untouched.
+
 - Tools: `validate.mjs` checks the JSON Schemas with Zod (`z.fromJSONSchema` + `safeParse`) instead of Ajv; Zod is a development dependency only. Schemas, typings, the widget and the data format are unchanged.
 - Tests: `npm test` runs validator regression tests (`node --test`) before the smoke test; the smoke test accepts a fork's own `data/config.js`.
 
