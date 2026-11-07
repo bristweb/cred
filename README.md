@@ -25,9 +25,13 @@ A static, dependency-free reviews widget. Hand-edited files, no build step: publ
 
 Product comparison: [docs/COMPARISON.md](docs/COMPARISON.md).
 
+<!-- cred:instance:start -->
+<!-- Filled once by the browser-only setup action; the rest of this README is preserved. -->
+<!-- cred:instance:end -->
+
 ## Contents
 
-1. [Fork and replace](#fork-and-replace) (recommended setup)
+1. [Browser-only setup](#browser-only-setup) (recommended), or [fork and replace](#fork-and-replace)
 2. [Embed](#embed)
 3. [Options](#options)
 4. [Data format](#data-format)
@@ -42,9 +46,28 @@ Product comparison: [docs/COMPARISON.md](docs/COMPARISON.md).
 
 ---
 
+## Browser-only setup
+
+Create an independent public or private repository from Cred without installing anything locally. GitHub Actions runs the setup and validation tools for you.
+
+1. Click **Use this template → Create a new repository** on [bristweb/cred](https://github.com/bristweb/cred). Choose your account, repository name and visibility. You do not need a fork or an upstream sync job.
+2. In Cloudflare, open **Workers & Pages → Create → Pages → Connect to Git**. Authorize GitHub access to your new repository, including it explicitly if private. Select `main`, no framework, build command `sh package/tools/export-site.sh _publish`, and output directory `_publish`. Set the build environment variable `NODE_VERSION` to `22`. Save the free Pages project and note its `https://your-project.pages.dev/` address. No Cloudflare token or repository secret is needed for this Git integration. Future pushes publish automatically. A private repository does **not** make its published website private.
+3. In your repository, open **Actions → Set up Cred → Run workflow** on the default branch. Enable Actions first if GitHub prompts. Enter your business name and **this Cred site's deployed URL**. The optional business website is separate: for example, `https://reviews.example/` hosts Cred while `https://business.example/` is your business website. A project URL such as `https://owner.github.io/reviews/` also works.
+4. Setup commits an empty client configuration, a reviews homepage, your embed URLs and a small links block in the existing README. It preserves the rest of this document and the bundled examples. The widget does not display the examples once configured. Add your actual platforms and reviews through GitHub's file editor or **Add file → Upload files** in `data/`; see [Data format](#data-format). Your Pages connection publishes the commit. Setup is one-time: it refuses populated data or customized host settings rather than overwrite them.
+
+Cloudflare's browser authorization is a required connection step, not something the Actions token can grant. If the repository is missing from Cloudflare's list, adjust the GitHub app's repository access in your browser. The secret-based deploy workflow below is an alternative, not required alongside Git integration. GitHub Pages is another option using the included Pages workflow and real project-subpath URLs. Run its Publish workflow manually after setup, since setup commits made with the Actions token do not trigger other Actions workflows.
+
+### Update through GitHub
+
+Open **Actions → Update Cred package → Run workflow** and enter a published, compatible `vX.Y.Z` tag from [Cred's tags](https://github.com/bristweb/cred/tags). The action checks the release, validates the content, runs tests and opens a pull request changing **only `package/`**. Review and merge that PR when ready. It never replaces your README, `data/`, `site/`, workflows or root host settings.
+
+The existing v1.0.x and v1.1.0 tags predate this layout and are rejected. The first browser-template-compatible release must be tagged after this feature is merged; until then there is no compatible published update. A release requiring changed root scripts or development dependencies also stops with a migration message. Package-only updates are not a promise of automatic future major migrations. Template copies do not inherit the upstream release-tag history; their installed `package/` is the current build.
+
+GitHub may block Actions from opening pull requests. In **Settings → Actions → General → Workflow permissions**, allow GitHub Actions to create pull requests, if your organization permits it. Otherwise use the pushed update branch's **Compare & pull request** button. No personal access token is required. These token-created pull requests do not trigger other Actions workflows; tests already run in the update action. If branch protection requires a fresh Check run, close and reopen the PR yourself to trigger it.
+
 ## Fork and replace
 
-The recommended setup: **fork this repo, leave `package/` alone, put everything that is yours in the (empty) `data/` folder, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
+The manual fork option: **fork this repo, leave `package/` alone, put everything that is yours in the (empty) `data/` folder, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
 
 1. **Fork** [bristweb/cred](https://github.com/bristweb/cred) and publish the fork: Cloudflare Pages with the included `.github/workflows/deploy.yml` (repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or GitHub Pages (Settings → Pages → Source: *GitHub Actions*, then run the included `.github/workflows/pages.yml`). Both publish the committed files as they are, plus the generated `/v/` release copies (see [Repository layout](#repository-layout)). `_headers` opens CORS.
 2. **Leave `package/` alone and copy `package/example-data/` into `data/`**, then replace the example content with yours: `config.js`, `reviews/`, `theme/`, and your files under `assets/` (`icons/`, `images/`, `video/`, `audio/`). Leave `package/example-data/` itself untouched so upstream updates merge without conflicts. `data/` is served at `/data/`. With no `data-source`, the widget uses `data/` as soon as it has a `config.js`, and the bundled examples until then.
@@ -144,9 +167,9 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 | `/data/` | `/data/` (old `/content/…` redirects here) |
 | `/v/<x.y.z>/assets/js/cred.js`, `/versions.json` (generated at deploy) | same |
 
-GitHub Pages ignores `_redirects`: use the real paths there (for example `https://<user>.github.io/<repo>/package/assets/js/cred.js` and `…/<repo>/site/`; the bare `/<repo>/` has no page there and shows `404.html`, which links to `site/`). The widget works out its site root from its own URL either way (`…/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
+GitHub Pages ignores `_redirects`: use the real paths there (for example `https://<user>.github.io/<repo>/package/assets/js/cred.js` and `…/<repo>/site/`; browser setup adds a root page forwarding to `site/reviews.html`; without setup, the bare `/<repo>/` shows `404.html`, which links to `site/`). The widget works out its site root from its own URL either way (`…/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
 
-**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files, `site/`, `data/`, `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. It also applies the setup-page indexing policy above to the published HTML. Both deploy workflows run it.
+**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files (including a client `index.html` when present), `site/`, `data/`, `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. It also applies the setup-page indexing policy above to the published HTML. Both deploy workflows run it.
 
 Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
 
@@ -444,7 +467,7 @@ Above those heights, long card text scrolls inside its card.
 
 ## Versions
 
-The embed code never changes: `…/assets/js/cred.js` is always the latest release. A data repo can pin the widget version with `version` in `config.js`, written as a full semantic version:
+The embed code never changes: `…/assets/js/cred.js` serves the installed build. A data repo can pin the widget version with `version` in `config.js`, written as a full semantic version:
 
 | `version` | Loads |
 |---|---|
@@ -454,6 +477,8 @@ The embed code never changes: `…/assets/js/cred.js` is always the latest relea
 | `"1.0.2"` | exactly 1.0.2 |
 
 When the latest build already satisfies the range (e.g. `"^1.0.0"` while latest is 1.x.x), nothing extra loads. Otherwise it reads `/versions.json` (the list of releases), picks the newest match and loads that release's immutable copy from `/v/<x.y.z>/` once, reusing the data it already fetched. Recommended for production: `"^1.0.0"`, which takes fixes and features but never a breaking change. The `/v/` copies and `versions.json` are the one generated part of a deploy: `package/tools/build-versions.mjs` (run by `export-site.sh` in `deploy.yml` and `pages.yml`) extracts each `vX.Y.Z` tag's widget into `/v/<x.y.z>/assets/` and `/lang/`, whichever layout the tag used (root, `src/` or `package/`).
+
+The installed widget version comes from `VERSION` in `package/assets/js/cred.js`, including after a package-only update. Root `package.json` describes the development tooling; its version is not the installed widget version.
 
 Releases follow [semantic versioning](https://semver.org/): breaking changes to the embed, options or data format bump the major version; new features the minor; fixes the patch. Each release is a `vX.Y.Z` git tag; see [CHANGELOG.md](CHANGELOG.md).
 

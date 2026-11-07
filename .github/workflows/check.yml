@@ -19,8 +19,8 @@ jobs:
       - run: npm ci
       - run: for f in package/assets/js/cred.js package/tools/*.mjs package/tools/test/*.mjs; do node --check "$f"; done
       - run: sh -n package/tools/export-site.sh
-      - name: VERSION matches package.json
-        run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" package/assets/js/cred.js
+      - name: Widget declares a release version
+        run: node package/tools/widget-version.mjs
       - name: No build output or old layout
         run: '! test -e dist && ! test -e src && ! test -e content && ! test -e package/example-data/site && ! test -e data/site'
       - run: node package/tools/validate.mjs package/example-data && node package/tools/badge.mjs package/example-data && git diff --exit-code package/example-data/badge.json

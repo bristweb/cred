@@ -7,7 +7,7 @@ set -eu
 out="$1"
 ref="${2:-HEAD}"
 paths=""
-for p in _headers _redirects .nojekyll 404.html site data package; do
+for p in _headers _redirects .nojekyll index.html 404.html site data package; do
   if git cat-file -e "$ref:$p" 2>/dev/null; then paths="$paths $p"; fi
 done
 for p in site package; do
