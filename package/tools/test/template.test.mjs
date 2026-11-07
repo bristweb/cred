@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
+import { runInNewContext } from 'node:vm';
 import { execFileSync } from 'node:child_process';
 import { setup, siteUrl } from '../setup.mjs';
 import { replacePackage, releaseTag, packagePath, compatibleManifest, update } from '../update-package.mjs';
@@ -37,6 +38,10 @@ const config = async dir => (await import('data:text/javascript,'+encodeURICompo
 test('one-time setup: empty real data, exact site/subpath URLs, bounded README and legitimate upstream links', async t => {
   const dir=fixture(t), before=read(dir,'README.md');
   const result=setup(dir,opts), c=await config(dir);
+  let redirected;
+  const redirect = read(dir,'index.html').match(/<script>([\s\S]*?)<\/script>/)[1];
+  runInNewContext(redirect,{URL,location:{href:'https://reviews.example/project/?theme=dark',search:'?theme=dark',hash:'#reviews',replace:x=>{redirected=String(x)}}});
+  assert.equal(redirected,'https://reviews.example/project/site/reviews.html?theme=dark#reviews');
   assert.equal(c.business.name,opts.businessName);assert.equal(c.business.website,opts.businessWebsite);
   assert.deepEqual(c.reviews.years,[]);assert.equal(c.include_examples,false);
   assert.deepEqual(Object.keys(c.platforms),['direct']);
