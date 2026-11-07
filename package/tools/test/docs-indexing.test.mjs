@@ -42,6 +42,9 @@ test('local data: only the marked docs get literal noindex; embed, client pages,
   const dir = fixture(t, config);
   const content = read(dir, 'site/reviews.html');
   const headers = read(dir, '_headers');
+  const originalRobots = read(dir, 'site/robots.txt');
+  const sitemapAdvertisement = originalRobots.match(/^Sitemap:.*\/sitemap\.xml\r?\n/m)?.[0] || '';
+  const expectedRobots = originalRobots.replace(sitemapAdvertisement, '');
   apply(dir);
   for (const f of ['index.html', 'example.html']) assert.equal(noindex(read(dir, `site/${f}`)), true, f);
   assert.equal(read(dir, 'site/reviews.html'), content);
@@ -51,7 +54,7 @@ test('local data: only the marked docs get literal noindex; embed, client pages,
   assert.equal(read(dir, '_headers'), headers, 'no blanket header added');
   assert.equal(/noindex|robots/i.test(read(dir, 'package/assets/js/cred.js')), false, 'embed never controls the customer page robots');
   assert.equal(existsSync(path.join(dir, 'site/sitemap.xml')), false, 'no generic docs sitemap left');
-  assert.equal(read(dir, 'site/robots.txt'), 'User-agent: *\nAllow: /\n', 'keep crawlable so crawlers see noindex');
+  assert.equal(read(dir, 'site/robots.txt'), expectedRobots, 'only the empty sitemap advertisement is removed; explicit robots rules are preserved');
 });
 
 test('aliases and source overrides cannot bypass the docs policy', t => {
@@ -95,4 +98,11 @@ test('mixed sitemap keeps client URLs and advertisement, removes only noindex se
   assert.match(sitemap, /https:\/\/client.example\/reviews/);
   assert.equal(sitemap.includes('bristleconeweb.com'), false);
   assert.equal(read(dir, 'site/robots.txt'), read(root, 'site/robots.txt'));
+});
+
+test('empty setup sitemap: preserve explicit allow/disallow rules and unrelated sitemap advertisement exactly', t => {
+  const dir = fixture(t, 'export default {};');
+  put(dir, 'site/robots.txt', 'User-agent: *\nAllow: /\nDisallow: /private/\nSitemap: https://client.example/sitemap.xml\nSitemap: https://client.example/client-map.xml\n');
+  apply(dir);
+  assert.equal(read(dir, 'site/robots.txt'), 'User-agent: *\nAllow: /\nDisallow: /private/\nSitemap: https://client.example/client-map.xml\n');
 });
