@@ -6,7 +6,8 @@
 // <out> is a clean export of the tracked files, as they are (see export-site.sh); nothing else is copied or moved.
 // Usage: node package/tools/build-versions.mjs <out>   (needs the tags: actions/checkout fetch-depth 0)
 import { execSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, appendFileSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, appendFileSync } from 'node:fs';
+import { widgetVersion } from './widget-version.mjs';
 const out = process.argv[2];
 if (!out) { console.error('usage: build-versions.mjs <out>'); process.exit(1); }
 const sh = c => execSync(c, { encoding: 'utf8' }).trim();
@@ -24,7 +25,7 @@ for (const v of versions) {
   execSync(`git archive v${v} ${paths} | tar -x -C ${dir}${prefix ? ' --strip-components=1' : ''}`);
   headers += `/v/${v}/*\n  Cache-Control: public, max-age=31536000, immutable\n`;
 }
-const latest = JSON.parse(readFileSync('package.json', 'utf8')).version;
+const latest = widgetVersion();
 writeFileSync(`${out}/versions.json`, JSON.stringify({ latest, versions }, null, 2) + '\n');
 appendFileSync(`${out}/_headers`, headers + '/versions.json\n  Cache-Control: public, max-age=300\n');
 console.log(`versions: ${versions.join(', ') || '(none)'}`);

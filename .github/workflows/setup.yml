@@ -1,0 +1,57 @@
+name: Set up Cred
+on:
+  workflow_dispatch:
+    inputs:
+      business_name:
+        description: Business name (no reviews are invented or copied)
+        required: true
+        type: string
+      deployed_url:
+        description: URL where THIS Cred site will be hosted, including any project subpath (not your business website)
+        required: true
+        type: string
+      business_website:
+        description: Your business website URL, if different (optional)
+        required: false
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: cred-setup
+  cancel-in-progress: false
+jobs:
+  setup:
+    if: github.repository != 'bristweb/cred'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Prepare the empty client data and site (refuses existing data or custom pages)
+        env:
+          CRED_BUSINESS_NAME: ${{ inputs.business_name }}
+          CRED_DEPLOYED_URL: ${{ inputs.deployed_url }}
+          CRED_BUSINESS_WEBSITE: ${{ inputs.business_website }}
+        run: node package/tools/setup.mjs
+      - name: Validate your setup, including the staged export
+        run: |
+          git config user.name Cred
+          git config user.email cred@localhost
+          git add data site index.html README.md _redirects
+          node package/tools/validate.mjs data
+          npm test
+      - name: Save your setup
+        run: |
+          git config user.name Cred
+          git config user.email cred@localhost
+          git add data site index.html README.md _redirects
+          git commit -m "Set up the client reviews site"
+          if ! git push; then
+            echo "::error::Setup passed locally, but GitHub refused the commit. Check branch protection and Actions write permissions in repository Settings. No existing remote data was overwritten."
+            exit 1
+          fi
