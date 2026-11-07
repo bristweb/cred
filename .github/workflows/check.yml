@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
-      - run: for f in package/assets/js/cred.js package/tools/*.mjs package/tools/test/*.mjs; do node --check "$f"; done
+      - run: for f in package/assets/js/cred.js site/*.js package/tools/*.mjs package/tools/test/*.mjs; do node --check "$f"; done
       - run: sh -n package/tools/export-site.sh
       - name: VERSION matches package.json
         run: grep -q "const VERSION = '$(node -p "require('./package.json').version")'" package/assets/js/cred.js

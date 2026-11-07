@@ -1,0 +1,14 @@
+/* Page chrome only. Do not load this on the transparent iframe (embed.html) or third-party host pages. */
+:root { color-scheme: light; --cred-page-bg: #ffffff; --cred-page-ink: #222; --cred-page-muted: #555; --cred-page-note: #777; --cred-page-panel: #fff; --cred-page-button: #f6f6f6; --cred-page-hover: #eee; --cred-page-line: #d6d6d6; }
+:root[data-theme="auto"] { color-scheme: light dark; }
+:root[data-theme="dark"] { color-scheme: dark; --cred-page-bg: #0d1117; --cred-page-ink: #e6edf3; --cred-page-muted: #b1bac4; --cred-page-note: #8b949e; --cred-page-panel: #161b22; --cred-page-button: #21262d; --cred-page-hover: #30363d; --cred-page-line: #30363d; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] { --cred-page-bg: #0d1117; --cred-page-ink: #e6edf3; --cred-page-muted: #b1bac4; --cred-page-note: #8b949e; --cred-page-panel: #161b22; --cred-page-button: #21262d; --cred-page-hover: #30363d; --cred-page-line: #30363d; }
+}
+html, body { background: var(--cred-page-bg); color: var(--cred-page-ink); }
+#intro { background: transparent; color: var(--cred-page-ink); }
+.ci p, .ci li { color: var(--cred-page-muted); }
+.ci h2, .ci .note { color: var(--cred-page-note); }
+.ci pre { background: var(--cred-page-panel); border-color: var(--cred-page-line); }
+.ci .copy { background: var(--cred-page-button); border-color: var(--cred-page-line); color: var(--cred-page-ink); }
+.ci .copy:hover { background: var(--cred-page-hover); }
