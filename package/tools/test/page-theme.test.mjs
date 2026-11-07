@@ -57,9 +57,12 @@ test('standalone pages link theme resources at alias/subpath-safe URLs', () => {
 test('a fork root redirect preserves theme and other URL options', { skip: !existsSync(path.join(root, 'index.html')) }, () => {
   const js = read('index.html').match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(js, 'root redirect needs to preserve its query, not just a fixed meta refresh');
+  const destination = read('index.html').match(/<a\s+href="([^"]+)"/)?.[1];
+  assert.match(destination, /^site\/[A-Za-z0-9_-]+\.html$/);
+  assert.ok(existsSync(path.join(root, destination)), 'fallback points at an actual client page');
   for (const search of ['', '?theme=dark', '?theme=light&source=elsewhere']) {
     let target;
     runInNewContext(js, { URL, location: { href: 'https://host.example/heather-cred/' + search, search, hash: '#reviews', replace: x => { target = String(x); } } });
-    assert.equal(target, 'https://host.example/heather-cred/site/heather.html' + search + '#reviews');
+    assert.equal(target, 'https://host.example/heather-cred/' + destination + search + '#reviews');
   }
 });

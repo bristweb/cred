@@ -2,6 +2,11 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.2.1 (2026-11-06)
+
+- Template setup tests recognize the instance’s own homepage instead of assuming a Heather-specific route. Root forwarding still preserves theme, source and fragment options.
+- The optional Actions deployment explicitly skips without Cloudflare secrets; Git integration users do not need deployment secrets.
+
 ## 1.2.0 (2026-11-06)
 
 - Browser-only template setup and validated package-only update pull requests through GitHub Actions. Setup preserves client content and the full README.
