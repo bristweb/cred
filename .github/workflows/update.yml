@@ -1,0 +1,64 @@
+name: Update Cred package
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Published compatible bristweb/cred tag (vX.Y.Z; see the template README)
+        required: true
+        type: string
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: cred-package-update
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.repository != 'bristweb/cred'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Read the chosen release (only from bristweb/cred)
+        env:
+          CRED_RELEASE: ${{ inputs.release }}
+        run: node package/tools/update-package.mjs
+      - name: Check the new tools and your data
+        run: |
+          git config user.name Cred
+          git config user.email cred@localhost
+          git add -- package
+          for f in package/assets/js/cred.js package/tools/*.mjs; do node --check "$f"; done
+          node package/tools/validate.mjs package/example-data
+          if test -f data/config.js; then node package/tools/validate.mjs data; fi
+          npm test
+      - name: Open a package-only pull request
+        env:
+          CRED_RELEASE: ${{ inputs.release }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --cached --quiet -- package; then
+            echo "This package is already installed. No pull request needed."
+            exit 0
+          fi
+          git config user.name Cred
+          git config user.email cred@localhost
+          branch="cred-update-$CRED_RELEASE"
+          git switch -c "$branch"
+          git add package
+          git commit -m "Update CRED to $CRED_RELEASE"
+          if ! git push origin "$branch"; then
+            echo "::error::Could not push the update branch. Check repository write permissions or review an existing branch with the same release name. No force push was attempted."
+            exit 1
+          fi
+          if ! gh pr create --base "$DEFAULT_BRANCH" --head "$branch" --title "Update CRED to $CRED_RELEASE" --body "Updates only package/. Client data, pages, README, host settings and workflows are unchanged. Review and merge when ready."; then
+            echo "::error::The update branch was pushed but GitHub refused PR creation. In Settings > Actions > General, allow GitHub Actions to create pull requests (an organization policy may require an admin). Or use GitHub's Compare & pull request button for this branch. No personal access token is needed."
+            exit 1
+          fi
