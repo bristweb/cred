@@ -35,6 +35,7 @@ const rootRule = src.match(/const SITE_ROOT = DEFAULT_BASE\.replace\((\/.*\/), '
 ok(rootRule, 'cred.js: SITE_ROOT rule found');
 const siteRoot = scriptUrl => new URL('../../', scriptUrl).href.replace(eval(rootRule[1]), '/');
 ok(src.includes("'template/data/'") && src.includes("'data/config.js'"), 'cred.js: default data paths are data/ then template/data/');
+ok(src.includes('base = new URL(base, location.href).href;'), 'cred.js: a relative data-source is resolved against the page before import() (else it resolves against cred.js)');
 ok(src.includes("SITE_ROOT + 'versions.json'") && src.includes("SITE_ROOT + v + 'assets/js/cred.js'"), 'cred.js: versions.json and /v/ copies are read from the site root');
 ok(!/https?:\/\/[^'"\s]*bristleconeweb\.com[^'"\s]*\.(js|css|json)/.test(src), 'cred.js: no runtime dependency on bristleconeweb.com');
 

@@ -39,7 +39,7 @@
   // Build version (kept equal to package.json). config.js `version` may ask for another release: the newest
   // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
-  const VERSION = '1.3.0';
+  const VERSION = '1.3.1';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   // Site root (where data/, package/, versions.json and v/ live). The code root is one of:
   //   <root>/package/        the real files (/package/assets/js/cred.js; any static host, also a GitHub Pages /<repo>/ path)
@@ -396,6 +396,8 @@
     try {
       if (!base) base = await defaultSource(); // data-source is optional: same-repo content
       if (!base.endsWith('/')) base += '/';
+      // A relative data-source is relative to the page. Resolve it here: import() would resolve it against cred.js.
+      base = new URL(base, location.href).href;
       if (!VERSIONED && !opts.noVersion) {
         // Data first (shared and cached), so a version switch never refetches it or loads this build's CSS.
         ensureCss(code + 'assets/css/cred.css'); // in parallel; dropped again if another build takes over
