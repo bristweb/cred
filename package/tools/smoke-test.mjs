@@ -34,7 +34,7 @@ const src = readFileSync('package/assets/js/cred.js', 'utf8');
 const rootRule = src.match(/const SITE_ROOT = DEFAULT_BASE\.replace\((\/.*\/), '\/'\);/);
 ok(rootRule, 'cred.js: SITE_ROOT rule found');
 const siteRoot = scriptUrl => new URL('../../', scriptUrl).href.replace(eval(rootRule[1]), '/');
-ok(src.includes("'package/example-data/'") && src.includes("'data/config.js'"), 'cred.js: default data paths are data/ then package/example-data/');
+ok(src.includes("'template/data/'") && src.includes("'data/config.js'"), 'cred.js: default data paths are data/ then template/data/');
 ok(src.includes("SITE_ROOT + 'versions.json'") && src.includes("SITE_ROOT + v + 'assets/js/cred.js'"), 'cred.js: versions.json and /v/ copies are read from the site root');
 ok(!/https?:\/\/[^'"\s]*bristleconeweb\.com[^'"\s]*\.(js|css|json)/.test(src), 'cred.js: no runtime dependency on bristleconeweb.com');
 
@@ -61,13 +61,13 @@ async function checkSite(dir, prefix, label) {
     }
     const code = siteRoot(base + 'package/assets/js/cred.js');
     ok(code === base, `${label}: widget site root is ${prefix}`);
-    for (const p of ['package/assets/css/cred.css', 'package/lang/en.json', 'package/assets/icons/trophy.svg', 'data/README.md'])
+    for (const p of ['package/assets/css/cred.css', 'package/lang/en.json', 'package/assets/icons/trophy.svg'])
       ok((await get(code + p)).status === 200, `${label}: ${p}`);
     const own = existsSync(path.join(dir, 'data/config.js')); // a fork's own data, else (upstream) the examples are the default
     ok((await get(code + 'data/config.js')).status === (own ? 200 : 404), `${label}: data/config.js ${own ? 'served (own data is the default)' : 'absent → examples are the default'}`);
-    const ex = code + 'package/example-data/';
+    const ex = code + 'template/data/';
     const cfg = await get(ex + 'config.js');
-    ok(cfg.status === 200, `${label}: package/example-data/config.js`);
+    ok(cfg.status === 200, `${label}: template/data/config.js`);
     const conf = (await import('data:text/javascript;base64,' + Buffer.from(cfg.text).toString('base64'))).default;
     for (const y of conf.reviews?.years || []) ok((await get(ex + `reviews/${y}.json`)).status === 200, `${label}: example reviews/${y}.json`);
     ok((await get(ex + 'theme/theme.css')).status === 200, `${label}: example theme/theme.css`);

@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
-    if: github.repository != 'bristweb/cred'
+    if: github.repository != 'bristweb/cred' && github.repository != 'bristweb/cred-starter'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,9 +35,8 @@ jobs:
           git config user.email cred@localhost
           git add -- package
           for f in package/assets/js/cred.js package/tools/*.mjs; do node --check "$f"; done
-          node package/tools/validate.mjs package/example-data
-          if test -f data/config.js; then node package/tools/validate.mjs data; fi
-          npm test
+          sh -n package/tools/export-site.sh
+          node package/tools/validate.mjs data
       - name: Open a package-only pull request
         env:
           CRED_RELEASE: ${{ inputs.release }}

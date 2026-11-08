@@ -17,7 +17,7 @@ export function packagePath(value, mode = '100644') {
 }
 const sorted = x => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(k => [k, sorted(x[k])])) : x;
 export function compatibleManifest(current, incoming) {
-  for (const key of ['type', 'scripts', 'dependencies', 'devDependencies']) {
+  for (const key of ['type', 'dependencies', 'devDependencies']) {
     if (JSON.stringify(sorted(current[key] || null)) !== JSON.stringify(sorted(incoming[key] || null))) {
       throw new Error(`This release needs a root ${key} migration, not a package-only update. Keep this repo unchanged and use the release migration instructions.`);
     }
@@ -27,8 +27,8 @@ export function replacePackage(dir, entries, current, incoming, expectedVersion)
   compatibleManifest(current, incoming);
   const files = new Map(entries.map(e => [packagePath(e.file, e.mode), e]));
   if (files.size !== entries.length) throw new Error('Duplicate release paths.');
-  for (const file of ['package/assets/js/cred.js', 'package/tools/validate.mjs', 'package/tools/export-site.sh', 'package/tools/widget-version.mjs', 'package/tools/setup.mjs', 'package/tools/update-package.mjs']) {
-    if (!files.has(file)) throw new Error(`Unsupported old release layout: missing ${file}. Only published browser-template-compatible releases can be used.`);
+  for (const file of ['package/assets/js/cred.js', 'package/tools/validate.mjs', 'package/tools/export-site.sh', 'package/tools/widget-version.mjs', 'package/tools/update-package.mjs', 'package/tools/build-starter.sh']) {
+    if (!files.has(file)) throw new Error(`Unsupported old release layout: missing ${file}. Only releases with the starter layout (v1.3.0 or later) can be used.`);
   }
   const version = files.get('package/assets/js/cred.js').bytes.toString('utf8').match(/\bconst VERSION = '(\d+\.\d+\.\d+)';/)?.[1];
   if (!version) throw new Error('Release widget has no recognizable semantic version.');
@@ -54,6 +54,7 @@ export function update(dir, tag) {
   // Check layout before the root manifest to explain why legacy v1.0/v1.1 tags are unsupported.
   const records = git(['ls-tree', '-rz', '--full-tree', sha, '--', 'package/']).split('\0').filter(Boolean);
   if (!records.length) throw new Error('This tag predates package/. It is not a compatible template update. No files changed.');
+  if (!git(['ls-tree', '--name-only', sha, '--', 'template/data/config.js']).trim()) throw new Error('This tag predates the starter layout (v1.3.0). No files changed.');
   const entries = records.map(line => {
     const separator = line.indexOf('\t');
     const head = line.slice(0, separator), file = line.slice(separator + 1);

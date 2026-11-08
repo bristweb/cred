@@ -2,7 +2,7 @@
 
 The open-source (MIT) widget for reviews, testimonials, awards and credentials. Unlimited sources and reviews, no tracking or third-party scripts, schema.org JSON-LD built in, and your data stays in your own repo. Unencumbered: fork it, host it on your own origin, change anything.
 
-The demo below runs on **examples**: invented sample content (a fictional bike shop, not a real business) that ships with the repo (in `package/example-data/`) and can be switched off with one setting. See [Fork and replace](#fork-and-replace).
+The demo below runs on **examples**: invented sample content (a fictional bike shop, not a real business) that ships with the repo (in `template/data/`) and can be switched off with one setting. The same demo is the [starter template](#make-your-own) you copy to make your own.
 
 ## <a href="https://cred.bristleconeweb.com/?theme=light" target="_blank" rel="noopener">▶ Live demo (light mode)</a> · <a href="https://cred.bristleconeweb.com/?theme=dark" target="_blank" rel="noopener">▶ Live demo (dark mode)</a>
 
@@ -19,19 +19,15 @@ The demo below runs on **examples**: invented sample content (a fictional bike s
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js" defer></script>
 ```
 
-Paste to try it: with no `data-source` the widget shows the example data from the same site. For a real site, load the script from your own fork and let it read your `data/` folder, or set `data-source` if your content lives elsewhere ([Data source](#data-source)). More patterns: [Embed](#embed).
+Paste to try it: with no `data-source` the widget shows the example data from the same site. For a real site, load the script from your own copy ([Make your own](#make-your-own)) and let it read your `data/` folder, or set `data-source` if your content lives elsewhere ([Data source](#data-source)). More patterns: [Embed](#embed).
 
 A static, dependency-free reviews widget. Hand-edited files, no build step: publish the repo on any static host (Cloudflare Pages recommended; GitHub Pages works as a backup). You are not limited to a vendor's supported integrations. Gather reviews whenever, wherever, and however you like (automation or by hand). Counts, averages, card order and JSON-LD are computed in the browser.
 
 Product comparison: [docs/COMPARISON.md](docs/COMPARISON.md).
 
-<!-- cred:instance:start -->
-<!-- Filled once by the browser-only setup action; the rest of this README is preserved. -->
-<!-- cred:instance:end -->
-
 ## Contents
 
-1. [Browser-only setup](#browser-only-setup) (recommended), or [fork and replace](#fork-and-replace)
+1. [Make your own](#make-your-own) from the starter template, and [get Cred updates](#get-cred-updates)
 2. [Embed](#embed)
 3. [Options](#options)
 4. [Data format](#data-format)
@@ -46,43 +42,28 @@ Product comparison: [docs/COMPARISON.md](docs/COMPARISON.md).
 
 ---
 
-## Browser-only setup
+## Make your own
 
-Create an independent public or private repository from Cred without installing anything locally. GitHub Actions runs the setup and validation tools for you.
+The demo above **is** the starter template. Its source is the inner template [`template/`](template/) in this repo: `template/data/` is the demo content this site shows, and `template/` also holds the starter's own pages, README and workflows. On every push to `main`, the **Publish starter** action assembles `template/` plus the widget package (`package/`) into [**bristweb/cred-starter**](https://github.com/bristweb/cred-starter), a GitHub template repository. That repository is generated output, never edited by hand, so it always matches this demo. It contains no Cred project site, docs, changelog or history.
 
-1. Click **Use this template → Create a new repository** on [bristweb/cred](https://github.com/bristweb/cred). Choose your account, repository name and visibility. You do not need a fork or an upstream sync job.
-2. In Cloudflare, open **Workers & Pages → Create → Pages → Connect to Git**. Authorize GitHub access to your new repository, including it explicitly if private. Select `main`, no framework, build command `sh package/tools/export-site.sh _publish`, and output directory `_publish`. Set the build environment variable `NODE_VERSION` to `22`. Save the free Pages project and note its `https://your-project.pages.dev/` address. No Cloudflare token or repository secret is needed for this Git integration. Future pushes publish automatically. A private repository does **not** make its published website private.
-3. In your repository, open **Actions → Set up Cred → Run workflow** on the default branch. Enable Actions first if GitHub prompts. Enter your business name and **this Cred site's deployed URL**. The optional business website is separate: for example, `https://reviews.example/` hosts Cred while `https://business.example/` is your business website. A project URL such as `https://owner.github.io/reviews/` also works.
-4. Setup commits an empty client configuration, a reviews homepage, your embed URLs and a small links block in the existing README. It preserves the rest of this document and the bundled examples. The widget does not display the examples once configured. Add your actual platforms and reviews through GitHub's file editor or **Add file → Upload files** in `data/`; see [Data format](#data-format). Your Pages connection publishes the commit. Setup is one-time: it refuses populated data or customized host settings rather than overwrite them.
+Everything below happens in the browser; nothing needs installing.
 
-Cloudflare's browser authorization is a required connection step, not something the Actions token can grant. If the repository is missing from Cloudflare's list, adjust the GitHub app's repository access in your browser. The secret-based deploy workflow below is an alternative, not required alongside Git integration. GitHub Pages is another option using the included Pages workflow and real project-subpath URLs. Run **Deploy to GitHub Pages** manually after setup, since setup commits made with the Actions token do not trigger other Actions workflows.
+1. Open [bristweb/cred-starter](https://github.com/bristweb/cred-starter) and click **Use this template → Create a new repository**. Choose the owner, a name and public or private. The new repository is independent (not a fork) and starts as the same working demo.
+2. Publish it. Either Cloudflare **Workers & Pages → Create → Pages → Connect to Git** (branch `main`, no framework, build command `sh package/tools/export-site.sh _publish`, output `_publish`, variable `NODE_VERSION=22`), or its included **Deploy to Cloudflare Pages** action with three repository secrets (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or **Deploy to GitHub Pages**. A private repository still publishes a public site.
+3. Replace the demo with your content by editing `data/` in GitHub ([Data format](#data-format)). The starter's **Check** action validates each push. Your copy's `data/` is your content, so the widget treats it as real reviews: do not publish the fictional demo as yours.
+4. Embed it from your own address: `<script src="https://YOUR-SITE/package/assets/js/cred.js" defer></script>` ([Embed](#embed)).
 
-### Update through GitHub
+The starter's README walks through the same steps for the people who use it.
 
-Open **Actions → Update Cred package → Run workflow** and enter a published, compatible `vX.Y.Z` tag from [Cred's tags](https://github.com/bristweb/cred/tags). The action checks the release, validates the content, runs tests and opens a pull request changing **only `package/`**. Review and merge that PR when ready. It never replaces your README, `data/`, `site/`, workflows or root host settings.
+### Get Cred updates
 
-Use **v1.2.1** or later for browser-template setup; it fixes the initial v1.2.0 setup test assumption. The older v1.0.x and v1.1.0 tags predate this layout and are rejected. A release requiring changed root scripts or development dependencies also stops with a migration message. Package-only updates are not a promise of automatic future major migrations. Template copies do not inherit the upstream release-tag history; their installed `package/` is the current build.
+In your repository, open **Actions → Update Cred package → Run workflow** and enter a release tag from [Cred's releases](https://github.com/bristweb/cred/releases) (v1.3.0 or later). The action fetches that tag from `bristweb/cred`, replaces **only `package/`**, validates your `data/` and opens a pull request. Your `data/`, pages, README, host settings and workflows are never touched; review and merge the PR. A release that needs changed development dependencies stops with a migration message instead.
 
-GitHub may block Actions from opening pull requests. In **Settings → Actions → General → Workflow permissions**, allow GitHub Actions to create pull requests, if your organization permits it. Otherwise use the pushed update branch's **Compare & pull request** button. No personal access token is required. These token-created pull requests do not trigger other Actions workflows; tests already run in the update action. If branch protection requires a fresh Check run, close and reopen the PR yourself to trigger it.
-
-## Fork and replace
-
-The manual fork option: **fork this repo, leave `package/` alone, put everything that is yours in the (empty) `data/` folder, and deploy the fork from your own origin.** Nothing at runtime depends on bristleconeweb.com: your pages load `cred.js` from your own site and the widget reads your own data files. (The optional credit link under the widget is only a link.)
-
-1. **Fork** [bristweb/cred](https://github.com/bristweb/cred) and publish the fork: Cloudflare Pages with the included `.github/workflows/deploy.yml` (repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CF_PAGES_PROJECT`), or GitHub Pages (Settings → Pages → Source: *GitHub Actions*, then run the included `.github/workflows/pages.yml`). Both publish the committed files as they are, plus the generated `/v/` release copies (see [Repository layout](#repository-layout)). `_headers` opens CORS.
-2. **Leave `package/` alone and copy `package/example-data/` into `data/`**, then replace the example content with yours: `config.js`, `reviews/`, `theme/`, and your files under `assets/` (`icons/`, `images/`, `video/`, `audio/`). Leave `package/example-data/` itself untouched so upstream updates merge without conflicts. `data/` is served at `/data/`. With no `data-source`, the widget uses `data/` as soon as it has a `config.js`, and the bundled examples until then.
-3. **Embed from your own origin.** No `data-source` is needed: the widget reads the content from the same site as the script ([Data source](#data-source)).
-
-```html
-<!-- Cloudflare Pages (short URL from _redirects) -->
-<script src="https://YOUR-FORK-SITE/assets/js/cred.js" defer></script>
-<!-- Any static host, including GitHub Pages under /<repo>/ (the real path) -->
-<script src="https://YOUR-USER.github.io/YOUR-REPO/package/assets/js/cred.js" defer></script>
-```
+If GitHub blocks Actions from opening pull requests, allow it in **Settings → Actions → General → Workflow permissions** (if your organization permits), or use the pushed branch's **Compare & pull request** button. No personal access token is needed. Starter files outside `package/` (its workflows and pages) are not updated automatically; the [changelog](CHANGELOG.md) says when a release suggests changing one by hand.
 
 ### Examples and the `include_examples` switch
 
-Everything in `package/example-data/` is example content. You do not tag anything: the widget knows from where the data is loaded (the bundled examples folder, `package/example-data/`), and `validate.mjs` and `badge.mjs` know from the folder path. The files carry no `example: true` markers.
+Everything in `template/data/` is example content. You do not tag anything: the widget knows from where the data is loaded (the bundled examples folder, `template/data/`), and `validate.mjs` and `badge.mjs` know from the folder path. The files carry no `example: true` markers.
 
 `include_examples` is a top-level key in `config.js`. It defaults to `true`, so the upstream demo shows its examples:
 
@@ -95,11 +76,10 @@ export default {
 
 With `false`, example content is left out of the cards, counts, averages, summary card, JSON-LD and rating badge, the same way `hidden: true` works on a review. Nothing is deleted. In practice:
 
-- **Upstream and the bundled examples:** `include_examples` in `package/example-data/config.js` controls all of it at once.
-- **Your own content:** once you copy the sample into `data/`, those files are yours and count as real content. The widget no longer treats them as examples. To keep a few placeholder items you plan to replace, mark just those with `example: true` (accepted on reviews, `summary`, accolades, credentials and testimonials, but never required) and set `include_examples: false` in `data/config.js`.
-- **Keeping the examples around:** leave `package/example-data/` in your fork as a reference and let upstream refresh it. It never reaches your published widget once `data/` has a `config.js`, because the widget then reads `data/` instead.
+- **This repo's demo:** `include_examples` in `template/data/config.js` controls all of it at once, because everything loaded from `template/data/` is example content.
+- **Your starter copy:** its `data/` starts as a byte-for-byte copy of the demo but is your content: the widget no longer treats it as examples. Replace it. To keep a few placeholder items for now, mark just those with `example: true` (accepted on reviews, `summary`, accolades, credentials and testimonials) and set `include_examples: false` in `data/config.js`.
 
-To remove the examples for good, delete `package/example-data/` (the widget then has nothing to fall back on, so keep your `data/` populated). You do not have to. `include_examples` needs widget 1.2.0 or later (pin `version: "^1.2.0"` if you use it).
+`include_examples` needs widget 1.2.0 or later.
 
 ### Repository layout
 
@@ -107,25 +87,27 @@ Nothing in Cred is compiled. The files you edit are the files the browser loads,
 
 ```
 cred/
-├── package/                  the product: upstream's, a fork leaves it alone (merges stay clean)
+├── package/                  the product: the only folder a starter copy receives updates for
 │   ├── assets/               the widget: js/cred.js, css/cred.css, default icons/
 │   ├── lang/                 the widget's built-in English wording (en.json); used by every embed
 │   ├── schemas/  types/      JSON Schemas and editor typings for config.js
-│   ├── tools/                Node tools: validate, badge, dedupe, config-to-js, build-versions, export-site.sh, smoke-test
-│   └── example-data/         the bundled examples: a mirror of data/ (config.js, reviews/, theme/, lang/, assets/)
-├── data/                     yours: everything client-specific. Empty upstream (just a README)
+│   └── tools/                Node tools: validate, badge, dedupe, config-to-js, build-versions, export-site.sh, build-starter.sh, update-package, smoke-test
+├── template/                 the inner starter template (published as bristweb/cred-starter)
+│   ├── data/                 the demo: config.js, reviews/, theme/, lang/, assets/ (what this site shows)
+│   ├── site/index.html       the starter's reviews page;  README.md  the starter's own README
+│   └── .github/workflows/    the starter's Check and Update Cred package actions
 ├── site/                     Cred's own host pages: index.html (demo), embed.html (iframe), example.html, robots.txt, sitemap.xml
 ├── docs/                     screenshots, COMPARISON.md, data-repo-workflows/ (samples for a standalone data repo)
-├── .github/workflows/        check, deploy (Cloudflare Pages), pages (GitHub Pages), validate (reusable)
+├── .github/workflows/        check, deploy (Cloudflare Pages), pages (GitHub Pages), starter (publishes the starter), validate (reusable)
 ├── _headers  _redirects      host config for Cloudflare Pages (CORS, cache, short URLs)
 ├── 404.html                  the not-found page (hosts look for it at the root)
 ├── .nojekyll                 GitHub Pages: serve files as they are
 └── README.md, CHANGELOG.md, AGENTS.md, LICENSE, package.json
 ```
 
-`package/example-data/` is a **mirror of `data/`**: the same folder names and nesting a client puts in `data/`. It has no `site/` folder and its records carry no `example: true`; everything in it is example content because of where it is. `data/` holds data only; pages go in `site/`.
+`template/data/` is exactly the `data/` folder of a starter copy: the same folder names and nesting. Its records carry no `example: true`; here everything in it is example content because of where it is. `data/` holds data only; pages go in `site/`.
 
-**Where files go: one `assets/` folder, sorted by kind** (same in `data/` and `package/example-data/`):
+**Where files go: one `assets/` folder, sorted by kind** (same in a starter's `data/` and `template/data/`):
 
 ```
 assets/
@@ -138,18 +120,18 @@ assets/
 
 Paths in `config.js` and `reviews/*.json` are relative to the data folder, e.g. `assets/icons/google.svg`, `assets/images/reviewers/google-1.svg`, `assets/video/clip.mp4`. With no `icon` set, a platform looks for `assets/icons/<platform>.svg`.
 
-How `package/` stays untouched but still customizable: your `config.js` lists its own platform icons, `data/theme/theme.css` sets fonts and colours, `data/lang/<code>.json` overrides wording (partial files are fine; listed in `config.languages`), and everything you add lives under `data/assets/`. Your own landing page, `robots.txt`, `sitemap.xml` or `CNAME` go in `site/` (or the root host files), which a fork may edit.
+How `package/` stays untouched but still customizable: your `config.js` lists its own platform icons, `data/theme/theme.css` sets fonts and colours, `data/lang/<code>.json` overrides wording (partial files are fine; listed in `config.languages`), and everything you add lives under `data/assets/`. Your own landing page, `robots.txt`, `sitemap.xml` or `CNAME` go in `site/` (or the root host files) of your copy.
 
-| Upstream provides (`package/`, pull from upstream) | Yours |
+| Cred provides (`package/`, updated by pull request) | Yours (in your starter copy) |
 |---|---|
 | `package/assets/`, `package/lang/`: the widget, its default icons and English wording | `data/`: `config.js`, `reviews/`, `assets/`, `theme/`, `lang/` overrides |
 | `package/schemas/`, `package/types/`, `package/tools/`: validate, badge and release tooling | `site/` and the root host files, if you want your own pages |
-| `package/example-data/`: a sample of `data/` (all of it is example content) | Your own import scripts, sync jobs and secrets |
-| `site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` | Your choice of hosting workflow (`deploy.yml` or `pages.yml`) |
+| `template/`: the starter (demo `data/`, reviews page, README, workflows), copied once | Your own import scripts, sync jobs and secrets |
+| This repo's `site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` (not in the starter) | Your choice of hosting workflow (`deploy.yml` or `pages.yml`) |
 
 #### Indexing the setup/demo pages
 
-Cred and example-only forks keep the docs/demo pages indexable. When a published fork has a loadable `data/config.js` (the same condition that selects local data instead of bundled examples), the export adds a literal `noindex` meta tag to the two marked setup pages: `site/index.html` and `site/example.html`. That covers their short Cloudflare URLs (`/`, `/example/`) and real paths (`/site/`, `/site/example.html`, etc.), even with `?source=` or the example page's explicit example source. Their entries are removed from the sitemap; if nothing remains, the empty sitemap and its robots.txt advertisement are removed. Crawling stays allowed so crawlers can see the tags.
+The Cred site keeps its docs/demo pages indexable. When a published copy has a loadable `data/config.js` (the same condition that selects local data instead of bundled examples), the export adds a literal `noindex` meta tag to the two marked setup pages: `site/index.html` and `site/example.html`. That covers their short Cloudflare URLs (`/`, `/example/`) and real paths (`/site/`, `/site/example.html`, etc.), even with `?source=` or the example page's explicit example source. Their entries are removed from the sitemap; if nothing remains, the empty sitemap and its robots.txt advertisement are removed. Crawling stays allowed so crawlers can see the tags.
 
 This is a publish-time policy in `export-site.sh`, used by both deploy workflows, not widget JavaScript: embedding Cred never changes the indexing of a customer's website. Client content pages, data, assets, headers and explicit robots rules are untouched. `site/embed.html` retains its existing explicit `noindex, nofollow, noarchive`; a client can intentionally change that on its own content-only iframe page. To replace a setup page with an indexable client page, remove its `<!-- cred:setup-page … -->` comment along with the setup instructions and set your own canonical/sitemap. Other client pages need no marker or special setting. A raw checkout served without the export does not apply this publish-time policy.
 
@@ -163,15 +145,15 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 | `/package/assets/js/cred.js` (and `css/`, `icons/`) | `/assets/js/cred.js` |
 | `/package/lang/en.json` | `/lang/en.json` |
 | `/package/schemas/`, `/package/types/` | `/schemas/`, `/types/` |
-| `/package/example-data/` | `/example/` (data files, e.g. `/example/config.js`) |
+| `/template/data/` | `/example/` (data files, e.g. `/example/config.js`) |
 | `/data/` | `/data/` (old `/content/…` redirects here) |
 | `/v/<x.y.z>/assets/js/cred.js`, `/versions.json` (generated at deploy) | same |
 
-GitHub Pages ignores `_redirects`: use the real paths there (for example `https://<user>.github.io/<repo>/package/assets/js/cred.js` and `…/<repo>/site/`; browser setup adds a root page forwarding to `site/reviews.html`; without setup, the bare `/<repo>/` shows `404.html`, which links to `site/`). The widget works out its site root from its own URL either way (`…/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
+GitHub Pages ignores `_redirects`: use the real paths there (for example `https://<user>.github.io/<repo>/package/assets/js/cred.js` and `…/<repo>/site/`; a starter's root `index.html` forwards to `site/`; here the bare `/<repo>/` shows `404.html`, which links to `site/`). The widget works out its site root from its own URL either way (`…/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
 
-**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files (including a client `index.html` when present), `site/`, `data/`, `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. It also applies the setup-page indexing policy above to the published HTML. Both deploy workflows run it.
+**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files (including a starter's `index.html`), `site/`, `data/`, `template/data/` (the demo), `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. It also applies the setup-page indexing policy above to the published HTML. Both deploy workflows run it.
 
-Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a fork can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
+Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a copy can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
 
 ```sh
 npm ci                                       # once: development dependencies (zod) for the tools
@@ -180,21 +162,11 @@ node package/tools/badge.mjs data            # optional rating badge files
 npm test                                     # validator tests and static HTTP smoke test of the real paths
 ```
 
-### Pull the latest Cred from upstream
-
-```sh
-git remote add upstream https://github.com/bristweb/cred.git   # once
-git fetch upstream --tags
-git merge upstream/main
-```
-
-Rebase instead of merge if you prefer. Your content lives in `data/`, which upstream never touches, so merges stay clean and `package/example-data/` and the code simply update. Fetching tags matters if you serve `/v/<x.y.z>/` builds ([Versions](#versions)). Read [CHANGELOG.md](CHANGELOG.md) first when a major version is involved.
-
 ---
 
 ## Embed
 
-Same live demo as at the top of this README. For a real site, point the script `src` at your own fork's origin ([Fork and replace](#fork-and-replace)); `data-source` (or the iframe `?source=`) is optional and only needed when your content is somewhere else. The demo `src` also works while you try things out.
+Same live demo as at the top of this README. For a real site, point the script `src` at your own site ([Make your own](#make-your-own)); `data-source` (or the iframe `?source=`) is optional and only needed when your content is somewhere else. The demo `src` also works while you try things out.
 
 ### Data source
 
@@ -202,9 +174,9 @@ The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and the r
 
 1. **`data-source`** (or `?source=`), if the embed has one: that folder is used, and nothing else is tried. Set `data-source="https://…/"` (trailing `/` added if missing) to read content from a different folder, site or repo.
 2. **`data/`**, if it has content: the widget looks for `<site root>/data/config.js`. The site root is the folder that holds `package/` (worked out from the script URL: `…/package/assets/js/cred.js`, `…/v/<x.y.z>/assets/js/cred.js` or the Cloudflare short URL `…/assets/js/cred.js`). This is your fork's own content.
-3. **The bundled examples** (`<site root>/package/example-data/`) when `data/` is empty.
+3. **The bundled examples** (`<site root>/template/data/`) when `data/` is empty.
 
-So `data-source` is **optional**: a fork needs no attribute, and the upstream demo (whose `data/` is empty) works with the bare snippet. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
+So `data-source` is **optional**: a starter copy needs no attribute, and the upstream demo (whose `data/` is empty) works with the bare snippet. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
 
 ### JavaScript (recommended)
 
@@ -248,7 +220,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-`site/embed.html` is the bare, transparent, explicitly `noindex` iframe page; `site/index.html` is the setup/demo page. They live in `site/` (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` everywhere). With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `package/example-data/`).
+`site/embed.html` is the bare, transparent, explicitly `noindex` iframe page; `site/index.html` is the setup/demo page. They live in `site/` (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` everywhere). With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
 
 ---
 
@@ -258,7 +230,7 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 
 | Option | Values | Default |
 |---|---|---|
-| `source` | Data folder URL (trailing `/` added if missing). Optional: see [Data source](#data-source) | `<site root>/data/` if it has a `config.js`, else `<site root>/package/example-data/` |
+| `source` | Data folder URL (trailing `/` added if missing). Optional: see [Data source](#data-source) | `<site root>/data/` if it has a `config.js`, else `<site root>/template/data/` |
 | `layout` | `carousel` \| `grid` | `display.layout` or `carousel` |
 | `platform` | One key from `config.platforms`, or `accolades` / `credentials` / `testimonials` (filters to that tab). Omit for every platform. Clicking the active filter tab again clears it back to All | all platforms |
 | `limit` | Max review cards (`0` = no limit) | `0` |
@@ -291,7 +263,7 @@ theme/fonts/             optional self-hosted fonts
 
 ### `config.js`
 
-An ES module whose default export is the config object, so it can carry comments. `// @ts-check` plus the `/** @type {import('./cred-config').CredConfig} */` line above `export default` gives editor autocomplete and type checks from `cred-config.d.ts` (copy it from `package/example-data/`; it is generated from `package/schemas/config.schema.json`). Migrating from an older `config.json`: `node package/tools/config-to-js.mjs <data-dir>`, then delete `config.json`. `reviews.years` stays on one line (`years: [2026, 2025]`) so import scripts can update it.
+An ES module whose default export is the config object, so it can carry comments. `// @ts-check` plus the `/** @type {import('./cred-config').CredConfig} */` line above `export default` gives editor autocomplete and type checks from `cred-config.d.ts` (copy it from `template/data/`; it is generated from `package/schemas/config.schema.json`). Migrating from an older `config.json`: `node package/tools/config-to-js.mjs <data-dir>`, then delete `config.json`. `reviews.years` stays on one line (`years: [2026, 2025]`) so import scripts can update it.
 
 | Key | Role |
 |---|---|
@@ -352,7 +324,7 @@ Array of records for that calendar year, newest first. Store full names, full te
 
 `reviewer_image` may be any working URL or path (absolute, `data:`, or relative to the data root). A local convention like `assets/images/reviewers/<platform>-<id>.<ext>` is only a suggestion for sync scripts — not required.
 
-Optional `"example": true` marks a record as bundled sample content: it is left out when `config.js` sets `include_examples: false` ([Fork and replace](#fork-and-replace)). Your own records need no tag.
+Optional `"example": true` marks a record as bundled sample content: it is left out when `config.js` sets `include_examples: false` ([Make your own](#make-your-own)). Your own records need no tag.
 
 Optional `excerpt`: an exact passage of `text` to show on the card instead of the opening ~160 characters (ellipses mark where it starts or ends mid-text). The validator checks it is a real passage.
 
@@ -426,7 +398,7 @@ After validating, the same workflow writes `badge.json` and `badge.svg` at the d
 
 ## Updating data
 
-Edit the cloned data repo (same shape as `package/example-data/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / `assets/` / theme as needed, then publish. Optionally run `node package/tools/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
+Edit the cloned data repo (same shape as `template/data/`): add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / `assets/` / theme as needed, then publish. Optionally run `node package/tools/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
 
 ---
 
@@ -491,7 +463,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ## Alternative: a separate data repo
 
-[Fork and replace](#fork-and-replace) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `package/example-data/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `theme/`, `assets/`, and then add the host files and workflows a standalone repo needs: add a `_headers` with `/*` → `Access-Control-Allow-Origin: *` (and an empty `.nojekyll` for GitHub Pages) at the repo root, and copy `docs/data-repo-workflows/validate.yml` (and `deploy.yml`) to `.github/workflows/`. Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
+[The starter](#make-your-own) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `template/data/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `theme/`, `assets/`, and then add the host files and workflows a standalone repo needs: add a `_headers` with `/*` → `Access-Control-Allow-Origin: *` (and an empty `.nojekyll` for GitHub Pages) at the repo root, and copy `docs/data-repo-workflows/validate.yml` (and `deploy.yml`) to `.github/workflows/`. Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
 
 **Hosting.** Recommended: Cloudflare Pages. The sample `docs/data-repo-workflows/deploy.yml` publishes the committed files on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages through `.github/workflows/pages.yml` (Settings → Pages → Source: *GitHub Actions*, then run it).
 
@@ -501,14 +473,14 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 ## Technical details
 
 - Loads `config.js` (an ES module), then all year files in parallel; injects CSS if missing.
-- Without `data-source` / `?source=`, reads `<site root>/data/` (if it has a `config.js`) or `<site root>/package/example-data/` on the script's site; if neither loads, shows the unavailable message.
+- Without `data-source` / `?source=`, reads `<site root>/data/` (if it has a `config.js`) or `<site root>/template/data/` on the script's site; if neither loads, shows the unavailable message.
 - Fixed-height mode: host height 100% or viewport remainder; card text scrolls without blocking horizontal swipe.
 - Icons: data-repo SVG, then Simple Icons CDN fallback.
 - Local preview: serve the repo root with any static server (e.g. `npx serve .`) and open `/site/index.html`, or point `data-source` at a local URL. `npm test` runs the same check without a browser.
 
 Review text belongs to its authors; platform marks belong to their owners.
 
-If a feature is missing or you want to run it entirely independently, [fork the repo](https://github.com/bristweb/cred/fork). Pull requests are welcome.
+If a feature is missing, pull requests to bristweb/cred are welcome. To run your own reviews site, use [the starter](#make-your-own).
 
 ## License
 

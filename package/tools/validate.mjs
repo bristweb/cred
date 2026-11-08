@@ -3,7 +3,7 @@
  * Validate a reviews data repo against the JSON Schemas in package/schemas/ (checked with Zod), plus filesystem checks
  * the schemas cannot express (icons exist, relative avatars resolve, years list matches files, newest-first, etc.).
  *
- *   node package/tools/validate.mjs <data-dir>   # e.g. package/example-data   # default: .
+ *   node package/tools/validate.mjs <data-dir>   # e.g. template/data   # default: .
  *
  * Needs the development dependency zod (`npm ci` in the cred checkout; the reusable workflow does it).
  * The data is only checked, never changed.

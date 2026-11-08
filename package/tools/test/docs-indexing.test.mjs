@@ -14,7 +14,7 @@ const put = (dir, file, text) => {
 // Fixed template fixtures: tests must also run in a populated instance with its own sitemap/routing.
 const stock = {
   'site/index.html': '<!-- cred:setup-page -->\n<head><link rel="canonical" href="https://cred.bristleconeweb.com/"></head>',
-  'site/example.html': '<!-- cred:setup-page -->\n<head><link rel="canonical" href="https://cred.bristleconeweb.com/example/"></head><script data-source="../package/example-data/"></script>',
+  'site/example.html': '<!-- cred:setup-page -->\n<head><link rel="canonical" href="https://cred.bristleconeweb.com/example/"></head><script data-source="../template/data/"></script>',
   'site/embed.html': '<head><meta name="robots" content="noindex, nofollow, noarchive"></head>',
   'site/robots.txt': 'User-agent: *\nAllow: /\nSitemap: https://cred.bristleconeweb.com/sitemap.xml\n',
   'site/sitemap.xml': '<urlset><url><loc>https://cred.bristleconeweb.com/</loc></url><url><loc>https://cred.bristleconeweb.com/example/</loc></url></urlset>',
@@ -76,7 +76,7 @@ test('aliases and source overrides cannot bypass the docs policy', t => {
   // The same exported HTML is served at real paths (also under a GitHub project prefix) and Cloudflare aliases.
   assert.equal(noindex(read(dir, 'site/index.html')), true, '/, /site/, /site/index.html, ?source=…');
   assert.equal(noindex(read(dir, 'site/example.html')), true, '/example/, /site/example, /site/example.html');
-  assert.match(read(dir, 'site/example.html'), /data-source="\.\.\/package\/example-data\/"/, 'demo still explicitly uses examples, yet is noindex');
+  assert.match(read(dir, 'site/example.html'), /data-source="\.\.\/template\/data\/"/, 'demo still explicitly uses examples, yet is noindex');
 });
 
 test('broken local config follows the widget example fallback', t => {
