@@ -9,7 +9,7 @@ export interface CredConfig {
    */
   version?: string;
   /**
-   * Show example content. Everything loaded from the bundled examples folder (package/example-data/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files.
+   * Show example content. Everything loaded from the bundled examples folder (template/data/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files.
    */
   include_examples?: boolean;
   business: {
@@ -142,7 +142,7 @@ export interface CredConfig {
      */
     title?: string;
     /**
-     * Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this summary in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
+     * Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this summary in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
      */
     example?: boolean;
     [k: string]: unknown;
@@ -239,7 +239,7 @@ export interface CredConfig {
       [k: string]: unknown;
     }[];
     /**
-     * Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this testimonial in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
+     * Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this testimonial in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples.
      */
     example?: boolean;
     [k: string]: unknown;

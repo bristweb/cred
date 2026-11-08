@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Write rating badge files into a reviews data repo, from the same reviews the widget shows
- * (skips example records when include_examples is false (all of them in package/example-data/, else those marked example: true), "hidden": true and hidden.rating records, display.hide keys and rated reviews below display.min_rating, and
+ * (skips example records when include_examples is false (all of them in template/data/, else those marked example: true), "hidden": true and hidden.rating records, display.hide keys and rated reviews below display.min_rating, and
  * counts a review posted on several platforms once, as the widget does: package/tools/dedupe.mjs).
  *
  *   node package/tools/badge.mjs <data-dir>   # default: .

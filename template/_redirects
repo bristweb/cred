@@ -1,0 +1,5 @@
+# Cloudflare Pages short URLs (GitHub Pages ignores this file and uses the real paths).
+/                 /site/                       200
+/embed.html       /site/embed                  200
+/assets/*         /package/assets/:splat       200
+/lang/*           /package/lang/:splat         200

@@ -18,7 +18,7 @@
     "include_examples": {
       "type": "boolean",
       "default": true,
-      "description": "Show example content. Everything loaded from the bundled examples folder (package/example-data/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files."
+      "description": "Show example content. Everything loaded from the bundled examples folder (template/data/) is example content, with no tagging; in your own content only items marked example: true are. Default true, so the upstream demo shows them. Set false to leave example content out of the published widget (cards, counts, averages, JSON-LD, badge) without deleting any files."
     },
     "business": {
       "type": "object",
@@ -284,7 +284,7 @@
         },
         "example": {
           "type": "boolean",
-          "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this summary in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
+          "description": "Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this summary in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
         }
       },
       "description": "Summary card shown first on the All tab. text + generated_at required; optional title overrides the language headline."
@@ -376,7 +376,7 @@
           },
           "example": {
             "type": "boolean",
-            "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this award in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
+            "description": "Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this award in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
         }
       }
@@ -525,7 +525,7 @@
           },
           "example": {
             "type": "boolean",
-            "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this testimonial in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
+            "description": "Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this testimonial in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
         }
       }
@@ -615,7 +615,7 @@
           },
           "example": {
             "type": "boolean",
-            "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this credential in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
+            "description": "Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this credential in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
           }
         }
       }
