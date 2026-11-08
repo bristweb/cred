@@ -2,6 +2,10 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.3.1 (2026-11-07)
+
+- A relative `data-source` (such as the example page's `../template/data/`) is resolved against the page. `import()` resolved it against `cred.js`, so the example preview showed "Reviews are unavailable".
+
 ## 1.3.0 (2026-11-07)
 
 - **Starter template.** The demo now lives in the inner template `template/` (`template/data/` is the single demo source the Cred site shows). `package/tools/build-starter.sh` assembles `template/` + `package/` into [bristweb/cred-starter](https://github.com/bristweb/cred-starter), a GitHub template published automatically from `main`. **Use this template** there gives a working copy of the demo with its own short README, ready to replace with your data, without Cred's site, docs or history.
