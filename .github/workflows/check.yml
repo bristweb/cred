@@ -1,4 +1,4 @@
-# Syntax check, validate the bundled examples (package/example-data/), and a browserless static HTTP smoke test of the
+# Syntax check, validate the bundled examples (template/data/), and a browserless static HTTP smoke test of the
 # real paths, a GitHub Pages project subpath, the deploy export and the /v/ release copies (package/tools/smoke-test.mjs).
 name: Check
 on:
@@ -22,6 +22,6 @@ jobs:
       - name: Widget declares a release version
         run: node package/tools/widget-version.mjs
       - name: No build output or old layout
-        run: '! test -e dist && ! test -e src && ! test -e content && ! test -e package/example-data/site && ! test -e data/site'
-      - run: node package/tools/validate.mjs package/example-data && node package/tools/badge.mjs package/example-data && git diff --exit-code package/example-data/badge.json
+        run: '! test -e dist && ! test -e src && ! test -e content && ! test -e template/data/site && ! test -e data/site'
+      - run: node package/tools/validate.mjs template/data && node package/tools/badge.mjs template/data && git diff --exit-code template/data/badge.json
       - run: npm test

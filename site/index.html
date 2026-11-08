@@ -28,7 +28,7 @@
 <link rel="stylesheet" href="../site/page-theme.css">
 </head>
 <body>
-<!-- Demo host page. No data-source: the widget uses <site root>/data/ if it has a config.js, else the bundled package/example-data/.
+<!-- Demo host page. No data-source: the widget uses <site root>/data/ if it has a config.js, else the bundled template/data/.
      Override with ?source=<data-folder-url>. Options: &layout=&platform=&limit=&summary=off&theme=light|dark|auto
      Constrained: &constrained=true
      Standalone chrome follows system appearance; ?theme=light|dark overrides it.
@@ -54,7 +54,7 @@
 <li>Any other site: paste into the page HTML.</li>
 </ul></li>
 <li><strong>That's it.</strong> The widget adapts to the width it's given. Optional <code>data-*</code> attributes (layout, theme, limit, <code>data-constrained</code> for fixed-height boxes) are listed in the <a href="https://github.com/bristweb/cred#options">options</a>.</li>
-<li><strong>Make your own.</strong> Fork <a href="https://github.com/bristweb/cred">bristweb/cred</a>, leave <code>package/</code> alone, copy <code>package/example-data/</code> into <code>data/</code> and replace it with your content, then publish the fork and use the snippet with your own address as <code>src</code>. <code>data-source</code> is optional: without it the widget reads <code>data/</code> (or the bundled <code>package/example-data/</code>) from the same site. Setup guide: <a href="https://github.com/bristweb/cred#fork-and-replace">github.com/bristweb/cred</a>.</li>
+<li><strong>Make your own.</strong> Open the <a href="https://github.com/bristweb/cred-starter">Cred starter</a> and click <strong>Use this template</strong>. Your new repository is this same demo, ready to publish (Cloudflare Pages or GitHub Pages) and to fill with your own data in GitHub; nothing to install. Updates from Cred arrive as pull requests that change only <code>package/</code>.</li>
 </ol>
 <p class="note">Please don't embed or link to this page itself; paste the snippet on your own site.</p>
 <h2>Preview</h2>

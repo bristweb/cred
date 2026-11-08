@@ -2,6 +2,12 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## 1.3.0 (2026-11-07)
+
+- **Starter template.** The demo now lives in the inner template `template/` (`template/data/` is the single demo source the Cred site shows). `package/tools/build-starter.sh` assembles `template/` + `package/` into [bristweb/cred-starter](https://github.com/bristweb/cred-starter), a GitHub template published automatically from `main`. **Use this template** there gives a working copy of the demo with its own short README, ready to replace with your data, without Cred's site, docs or history.
+- The bundled examples moved from `package/example-data/` to `template/data/`; the widget's fallback, `/example/*` and the tools follow. Older `/v/` copies are unchanged.
+- **Update Cred package** (in starters) needs a v1.3.0+ release and still changes only `package/`; root scripts no longer have to match. The whole-repo template setup action is removed: `bristweb/cred` is no longer a GitHub template.
+
 ## 1.2.1 (2026-11-06)
 
 - Template setup tests recognize the instance’s own homepage instead of assuming a Heather-specific route. Root forwarding still preserves theme, source and fragment options.

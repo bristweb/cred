@@ -2,7 +2,7 @@
 # short public URLs. "200" = served from the real path without changing the address bar.
 # Real paths (work on every static host, also GitHub Pages under /<repo>/):
 #   /site/            Cred's own pages        /package/assets/js/cred.js   the widget
-#   /data/            the fork's data          /package/example-data/       the bundled examples
+#   /data/            the fork's data          /template/data/       the bundled examples
 /                 /site/                              200
 /embed.html       /site/embed                         200
 /example          /example/                           301
@@ -13,5 +13,5 @@
 /lang/*           /package/lang/:splat                200
 /schemas/*        /package/schemas/:splat             200
 /types/*          /package/types/:splat               200
-/example/*        /package/example-data/:splat        200
+/example/*        /template/data/:splat        200
 /content/*        /data/:splat                        301
