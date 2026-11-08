@@ -23,18 +23,22 @@ jobs:
           node-version: 22
       - name: Assemble the starter from template/ and package/
         run: sh package/tools/build-starter.sh "$RUNNER_TEMP/starter"
-      - name: Check out the starter repository
-        uses: actions/checkout@v4
-        with:
-          repository: bristweb/cred-starter
-          ssh-key: ${{ secrets.STARTER_DEPLOY_KEY }}
-          path: starter-repo
-      - name: Commit the generated files if they changed
+      - name: Commit the generated files to the starter if they changed
+        env:
+          STARTER_DEPLOY_KEY: ${{ secrets.STARTER_DEPLOY_KEY }}
         run: |
-          cd starter-repo
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$STARTER_DEPLOY_KEY" > ~/.ssh/starter && chmod 600 ~/.ssh/starter
+          # GitHub's published SSH host keys, not trust-on-first-use.
+          curl -fsS https://api.github.com/meta | jq -r '.ssh_keys[] | "github.com " + .' > ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/starter -o IdentitiesOnly=yes"
+          # Plain clone (not actions/checkout) so the very first publish into the empty repository works too.
+          git clone -q git@github.com:bristweb/cred-starter.git "$RUNNER_TEMP/starter-repo"
+          cd "$RUNNER_TEMP/starter-repo"
+          git checkout -q -B main
           git rm -rq --ignore-unmatch . >/dev/null
           cp -a "$RUNNER_TEMP/starter/." .
           git add -A
           if git diff --cached --quiet; then echo "Starter already up to date."; exit 0; fi
           git -c user.name=Cred -c user.email=cred@localhost commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
-          git push origin HEAD:main
+          git push -q origin main
