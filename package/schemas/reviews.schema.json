@@ -151,7 +151,7 @@
       },
       "example": {
         "type": "boolean",
-        "description": "Optional, and rarely needed: everything in the bundled examples folder (package/example-data/) already counts as example content without it. true marks this review in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
+        "description": "Optional, and rarely needed: everything in the bundled examples folder (template/data/) already counts as example content without it. true marks this review in your own content as an example, so it is left out of everything the widget publishes (cards, counts, averages, JSON-LD) when include_examples is false. See include_examples."
       },
       "duplicate_of": {
         "type": "string",

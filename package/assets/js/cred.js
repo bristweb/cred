@@ -1,8 +1,8 @@
 /* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
  * The code lives in package/ of this repo (hand-edited, served as it is; a fork leaves it alone); everything about a
- * site lives in the top-level data/ folder or a separate data repo. The bundled examples are package/example-data/ (a
+ * site lives in the top-level data/ folder or a separate data repo. The bundled examples are template/data/ (a
  * sample of data/). The data folder is chosen in this order: 1) data-source (or ?source=) if the embed has one;
- * 2) else <site root>/data/ if it has a config.js (a fork's own data); 3) else <site root>/package/example-data/.
+ * 2) else <site root>/data/ if it has a config.js (a fork's own data); 3) else <site root>/template/data/.
  * (site root = the folder holding package/; also right when loaded from /v/<x.y.z>/ or the Cloudflare short URL /assets/.) Folder layout:
  *   <source>config.js            business, platforms, display defaults, languages/defaultLanguage/strings, schema,
  *                                summary card, optional accolades/testimonials, and reviews.years
@@ -39,15 +39,15 @@
   // Build version (kept equal to package.json). config.js `version` may ask for another release: the newest
   // matching one is picked from /versions.json and its immutable /v/<x.y.z>/ copy loads once and takes over,
   // reusing the data already fetched. When this (latest) build satisfies the request, nothing extra loads.
-  const VERSION = '1.2.1';
+  const VERSION = '1.3.0';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   // Site root (where data/, package/, versions.json and v/ live). The code root is one of:
   //   <root>/package/        the real files (/package/assets/js/cred.js; any static host, also a GitHub Pages /<repo>/ path)
   //   <root>/v/<x.y.z>/      an immutable release copy
   //   <root>/                the Cloudflare Pages short URL /assets/js/cred.js (a _redirects rewrite to package/assets/)
   const SITE_ROOT = DEFAULT_BASE.replace(/\/(?:package|v\/[^/]+)\/$/, '/');
-  // The bundled examples (package/example-data/ in the repo), always at their real path.
-  const EXAMPLES = new URL(SITE_ROOT + 'package/example-data/', location.href).href;
+  // The bundled examples (template/data/ in the repo), always at their real path.
+  const EXAMPLES = new URL(SITE_ROOT + 'template/data/', location.href).href;
   // Without data-source / ?source= the data is in this same repo: <site root>/data/ (a fork's own data) when it
   // has a config.js, else the bundled examples.
   const defaultSource = () => (SHARED.defaultSource ??= (async () => {
@@ -559,7 +559,7 @@
 
     // Example content is shown unless config.include_examples is false; then it is left out of every card, count,
     // average and the JSON-LD (the files stay where they are). Everything loaded from the bundled examples folder
-    // (<site root>/package/example-data/) is example content, no tagging needed; elsewhere only
+    // (<site root>/template/data/) is example content, no tagging needed; elsewhere only
     // items marked "example": true (records, testimonials, awards, credentials, summary) count as examples.
     const showExamples = toBool(config.include_examples ?? true);
     const fromExamples = new URL(base, location.href).href === EXAMPLES;

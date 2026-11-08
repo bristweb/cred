@@ -1,0 +1,23 @@
+# Checks your data and the installed widget on every push. Runs on GitHub; nothing to install.
+name: Check
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: for f in package/assets/js/cred.js package/tools/*.mjs; do node --check "$f"; done
+      - run: sh -n package/tools/export-site.sh
+      - name: Validate your data
+        run: node package/tools/validate.mjs data
+      - name: Rating badge is current (open data/badge.json in a PR if this fails, or run Update badge)
+        run: node package/tools/badge.mjs data && git diff --exit-code data/badge.json data/badge.svg

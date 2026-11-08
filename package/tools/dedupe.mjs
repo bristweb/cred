@@ -7,8 +7,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 export const keyOf = r => `${r.platform}-${r.platform_review_id}`;
 export const hid = (r, part) => r.hidden === true || Boolean(r.hidden && typeof r.hidden === 'object' && r.hidden[part] === true);
-// The bundled examples folder (package/example-data/). Everything loaded from it is example content.
-export const examplesDir = fileURLToPath(new URL('../example-data', import.meta.url));
+// The bundled examples folder (template/data/). Everything loaded from it is example content.
+export const examplesDir = fileURLToPath(new URL('../../template/data', import.meta.url));
 export const isExamplesDir = dir => path.resolve(dir) === examplesDir;
 // include_examples: false leaves out example content: everything when the data folder is the bundled examples
 // (inExamples), else only records marked example: true (package/assets/js/cred.js does the same).

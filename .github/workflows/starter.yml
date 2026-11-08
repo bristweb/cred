@@ -1,0 +1,40 @@
+# Publishes the starter repository (bristweb/cred-starter, a GitHub template) from this repo on every push to main:
+# template/ (the demo data, pages, README and workflows) plus package/, assembled by package/tools/build-starter.sh.
+# The starter is generated output: edit template/ or package/ here, never the starter itself.
+# Needs the repo secret STARTER_DEPLOY_KEY: the private half of a write deploy key on bristweb/cred-starter only.
+name: Publish starter
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cred-starter
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'bristweb/cred'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Assemble the starter from template/ and package/
+        run: sh package/tools/build-starter.sh "$RUNNER_TEMP/starter"
+      - name: Check out the starter repository
+        uses: actions/checkout@v4
+        with:
+          repository: bristweb/cred-starter
+          ssh-key: ${{ secrets.STARTER_DEPLOY_KEY }}
+          path: starter-repo
+      - name: Commit the generated files if they changed
+        run: |
+          cd starter-repo
+          git rm -rq --ignore-unmatch . >/dev/null
+          cp -a "$RUNNER_TEMP/starter/." .
+          git add -A
+          if git diff --cached --quiet; then echo "Starter already up to date."; exit 0; fi
+          git -c user.name=Cred -c user.email=cred@localhost commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
+          git push origin HEAD:main
