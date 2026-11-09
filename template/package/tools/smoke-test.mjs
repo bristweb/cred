@@ -57,11 +57,11 @@ async function checkSite(dir, prefix, label) {
   const pkg = existsSync(path.join(dir, 'template/package/assets/js/cred.js')) ? 'template/package'
     : existsSync(path.join(dir, 'package/assets/js/cred.js')) ? 'package' : null;
   try {
-    for (const page of ['site/index.html', 'site/embed.html', 'site/example.html', 'site/robots.txt', '404.html']) {
+    for (const page of ['site/index.html', 'site/example.html', 'site/robots.txt', '404.html', 'template/index.html']) {
       if (!existsSync(path.join(dir, page))) continue;
       const { status, text } = await get(base + page);
       ok(status === 200, `${label}: ${page}`);
-      for (const m of text.matchAll(/(?:src|href)="(\.\.\/(?:template\/)?package\/[^"]+)"/g)) {
+      for (const m of text.matchAll(/(?:src|href)="((?:\.\.\/)?(?:template\/)?package\/[^"]+)"/g)) {
         const url = new URL(m[1], base + page).href;
         ok((await get(url)).status === 200, `${label}: ${page} → ${url.slice(base.length)}`);
       }

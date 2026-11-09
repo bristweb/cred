@@ -1,4 +1,4 @@
-/* Page chrome only. Do not load this on the transparent iframe (embed.html) or third-party host pages. */
+/* Page chrome only. Do not load this on the transparent dual-mode template page (in an iframe) or third-party host pages. */
 :root { color-scheme: light; --cred-page-bg: #ffffff; --cred-page-ink: #222; --cred-page-muted: #555; --cred-page-note: #777; --cred-page-panel: #fff; --cred-page-button: #f6f6f6; --cred-page-hover: #eee; --cred-page-line: #d6d6d6; }
 :root[data-theme="auto"] { color-scheme: light dark; }
 :root[data-theme="dark"] { color-scheme: dark; --cred-page-bg: #0d1117; --cred-page-ink: #e6edf3; --cred-page-muted: #b1bac4; --cred-page-note: #8b949e; --cred-page-panel: #161b22; --cred-page-button: #21262d; --cred-page-hover: #30363d; --cred-page-line: #30363d; }

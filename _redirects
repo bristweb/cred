@@ -2,9 +2,13 @@
 # short public URLs. "200" = served from the real path without changing the address bar.
 # Real paths (work on every static host, also GitHub Pages under /<repo>/):
 #   /site/                     Cred's own pages
+#   /template/                 dual-mode reviews page (also the iframe target)
 #   /template/package/assets/  the widget        /template/data/   the bundled examples
 /                 /site/                              200
-/embed.html       /site/embed                         200
+# Old embed URLs → the dual-mode template page (301; query string preserved).
+/embed.html       /template/                          301
+/site/embed       /template/                          301
+/site/embed.html  /template/                          301
 /example          /example/                           301
 /example/         /site/example                       200
 /robots.txt       /site/robots.txt                    200
