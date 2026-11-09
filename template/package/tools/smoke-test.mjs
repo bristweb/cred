@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Browserless smoke test of the published layout. No dependencies; run from the repo root: node package/tools/smoke-test.mjs
+// Browserless smoke test of the published layout. No dependencies; run from the Cred repo root:
+//   node template/package/tools/smoke-test.mjs
 // 1. Serves the repo with a plain static server under a project subpath (/cred/, like GitHub Pages) and at the root,
 //    and fetches the real paths the pages and the widget use (pages, cred.js, CSS, lang, examples, every review file).
 // 2. Runs the widget's own site-root rule (taken from cred.js) on every script URL form: real path, GitHub subpath,
@@ -29,8 +30,8 @@ function serve(dir, prefix) {
 }
 const get = async url => { const r = await fetch(url); return { status: r.status, text: r.status === 200 ? await r.text() : '' }; };
 
-// The widget's rules, read from cred.js so this test follows the code.
-const src = readFileSync('package/assets/js/cred.js', 'utf8');
+const credJs = existsSync('template/package/assets/js/cred.js') ? 'template/package/assets/js/cred.js' : 'package/assets/js/cred.js';
+const src = readFileSync(credJs, 'utf8');
 const rootRule = src.match(/const SITE_ROOT = DEFAULT_BASE\.replace\((\/.*\/), '\/'\);/);
 ok(rootRule, 'cred.js: SITE_ROOT rule found');
 const siteRoot = scriptUrl => new URL('../../', scriptUrl).href.replace(eval(rootRule[1]), '/');
@@ -41,7 +42,9 @@ ok(!/https?:\/\/[^'"\s]*bristleconeweb\.com[^'"\s]*\.(js|css|json)/.test(src), '
 
 for (const [script, root] of [
   ['https://h.example/package/assets/js/cred.js', 'https://h.example/'],
+  ['https://h.example/template/package/assets/js/cred.js', 'https://h.example/'],
   ['https://u.github.io/cred/package/assets/js/cred.js', 'https://u.github.io/cred/'],
+  ['https://u.github.io/cred/template/package/assets/js/cred.js', 'https://u.github.io/cred/'],
   ['https://h.example/v/1.1.0/assets/js/cred.js', 'https://h.example/'],
   ['https://u.github.io/cred/v/1.2.0/assets/js/cred.js', 'https://u.github.io/cred/'],
   ['https://h.example/assets/js/cred.js', 'https://h.example/'],
@@ -51,20 +54,24 @@ for (const [script, root] of [
 async function checkSite(dir, prefix, label) {
   const server = await serve(dir, prefix);
   const base = `http://127.0.0.1:${server.address().port}${prefix}`;
+  const pkg = existsSync(path.join(dir, 'template/package/assets/js/cred.js')) ? 'template/package'
+    : existsSync(path.join(dir, 'package/assets/js/cred.js')) ? 'package' : null;
   try {
     for (const page of ['site/index.html', 'site/embed.html', 'site/example.html', 'site/robots.txt', '404.html']) {
+      if (!existsSync(path.join(dir, page))) continue;
       const { status, text } = await get(base + page);
       ok(status === 200, `${label}: ${page}`);
-      for (const m of text.matchAll(/(?:src|href)="(\.\.\/package\/[^"]+)"/g)) {
+      for (const m of text.matchAll(/(?:src|href)="(\.\.\/(?:template\/)?package\/[^"]+)"/g)) {
         const url = new URL(m[1], base + page).href;
         ok((await get(url)).status === 200, `${label}: ${page} → ${url.slice(base.length)}`);
       }
     }
-    const code = siteRoot(base + 'package/assets/js/cred.js');
+    ok(pkg, `${label}: package runtime present`);
+    const code = siteRoot(base + pkg + '/assets/js/cred.js');
     ok(code === base, `${label}: widget site root is ${prefix}`);
-    for (const p of ['package/assets/css/cred.css', 'package/lang/en.json', 'package/assets/icons/trophy.svg'])
+    for (const p of [`${pkg}/assets/css/cred.css`, `${pkg}/lang/en.json`, `${pkg}/assets/icons/trophy.svg`])
       ok((await get(code + p)).status === 200, `${label}: ${p}`);
-    const own = existsSync(path.join(dir, 'data/config.js')); // a fork's own data, else (upstream) the examples are the default
+    const own = existsSync(path.join(dir, 'data/config.js'));
     ok((await get(code + 'data/config.js')).status === (own ? 200 : 404), `${label}: data/config.js ${own ? 'served (own data is the default)' : 'absent → examples are the default'}`);
     const ex = code + 'template/data/';
     const cfg = await get(ex + 'config.js');
@@ -80,11 +87,10 @@ async function checkSite(dir, prefix, label) {
 await checkSite('.', '/cred/', 'repo under /cred/ (GitHub Pages project path)');
 await checkSite('.', '/', 'repo at /');
 
-// Export: what a deploy uploads.
 const out = path.join(mkdtempSync(path.join(tmpdir(), 'cred-')), '_publish');
-// Uncommitted (staged or tracked) changes are tested too: git stash create makes a commit of them without touching anything.
 const ref = execSync('git stash create', { encoding: 'utf8' }).trim() || 'HEAD';
-execSync(`sh package/tools/export-site.sh ${out} ${ref}`, { stdio: 'inherit' });
+const exportSh = existsSync('template/package/tools/export-site.sh') ? 'template/package/tools/export-site.sh' : 'package/tools/export-site.sh';
+execSync(`sh ${exportSh} ${out} ${ref}`, { stdio: 'inherit' });
 const top = readdirSync(out).sort();
 ok(!top.some(f => ['.git', 'node_modules', '.github', 'docs'].includes(f)), `export: top level is ${top.join(' ')}`);
 const versions = JSON.parse(readFileSync(path.join(out, 'versions.json'), 'utf8'));
