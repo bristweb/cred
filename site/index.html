@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- cred:setup-page — export-site adds noindex here when data/config.js loads. Remove this marker if replacing the instructions with your own content page. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CRED: open-source reviews, testimonials and credentials widget</title>
@@ -11,18 +10,17 @@
 <meta property="og:title" content="CRED: open-source reviews, testimonials and credentials widget">
 <meta property="og:description" content="CRED is the open-source (MIT) way to showcase reviews, testimonials, awards and credentials from every platform. Unlimited sources and reviews, no tracking or third-party scripts, schema.org JSON-LD built in, and your data stays in your own repo.">
 <meta property="og:type" content="website">
-<script>if (location.search) document.write('<meta name="robots" content="noindex">');</script>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="../package/assets/css/cred.css">
-<style>html,body{margin:0;background:transparent}</style>
+<style>html,body{margin:0;background:transparent}
+.ci a.template-button{display:inline-block;padding:10px 18px;border:1px solid var(--cred-page-line);border-radius:8px;background:var(--cred-page-button);color:var(--cred-page-ink);font-weight:600;text-decoration:none}
+.ci a.template-button:hover{background:var(--cred-page-hover)}
+</style>
 <style>#intro{margin:0;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#222;background:#fafafa}
 .ci{max-width:1100px;margin:0 auto;padding:32px 20px 8px}
 .ci h1{font-size:20px;font-weight:600;margin:0 0 6px}.ci h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#777;margin:28px 0 10px}
 .ci p,.ci li{color:#555;margin:6px 0}.ci ol{padding-left:20px;margin:8px 0}.ci li{margin:8px 0}.ci a{color:inherit}
-.ci ul{padding-left:18px;margin:4px 0;font-size:14px}.ci ul li{margin:2px 0}
-.ci .snip{position:relative;margin:8px 0}.ci pre{background:#fff;border:1px solid #e3e3e3;border-radius:8px;padding:12px 84px 12px 14px;overflow-x:auto;font-size:13px;margin:0}
-.ci .copy{position:absolute;top:8px;right:8px;font:inherit;font-size:12.5px;border:1px solid #d6d6d6;background:#f6f6f6;border-radius:6px;padding:4px 10px;cursor:pointer;color:#333}
-.ci .copy:hover{background:#eee}.ci code{font-size:13px}.ci .note{font-size:13.5px;color:#777}
+.ci code{font-size:13px}.ci .note{font-size:13.5px;color:#777}
 #intro{background:none}</style>
 <script src="../site/page-theme.js"></script>
 <link rel="stylesheet" href="../site/page-theme.css">
@@ -40,26 +38,14 @@
 </script>
 <div id="intro" hidden><div class="ci">
 <h1>CRED reviews widget</h1>
-<p>The open-source widget for reviews, testimonials, awards and credentials. Unlimited, no tracking, your data stays in your own repo. This page shows fictional example data (a bike shop) loaded from <a href="../site/example.html">the examples</a>.</p>
-<h2>How to embed</h2>
-<ol>
-<li><strong>Copy the snippet.</strong>
-<div class="snip"><pre><code>&lt;script src=&quot;https://cred.bristleconeweb.com/assets/js/cred.js&quot; defer&gt;&lt;/script&gt;</code></pre><button type="button" class="copy">Copy</button></div></li>
-<li><strong>Paste it into your site's HTML</strong> where the reviews should appear:
-<ul>
-<li>Framer: Insert → Embed, choose HTML, paste.</li>
-<li>Google Sites: Insert → Embed → Embed code, paste. Add <code>data-constrained="true"</code> and size the box.</li>
-<li>Squarespace: Code block. Wix: Embed code → Custom code / HTML iframe.</li>
-<li>WordPress: Custom HTML block.</li>
-<li>Any other site: paste into the page HTML.</li>
-</ul></li>
-<li><strong>That's it.</strong> The widget adapts to the width it's given. Optional <code>data-*</code> attributes (layout, theme, limit, <code>data-constrained</code> for fixed-height boxes) are listed in the <a href="https://github.com/bristweb/cred#options">options</a>.</li>
-<li><strong>Make your own.</strong> Open the <a href="https://github.com/bristweb/cred-starter">Cred starter</a> and click <strong>Use this template</strong>. Your new repository is this same demo, ready to publish (Cloudflare Pages or GitHub Pages) and to fill with your own data in GitHub; nothing to install. Updates from Cred arrive as pull requests that change only <code>package/</code>.</li>
-</ol>
-<p class="note">Please don't embed or link to this page itself; paste the snippet on your own site.</p>
+<p>Reviews, testimonials, awards and credentials. Open source, no tracking, your data stays with you.</p>
+<p>Try the demo below. It uses fictional reviews for an example bike shop.</p>
+<p><a class="template-button" href="https://github.com/bristweb/cred-starter/generate">Create from template</a></p>
+<p>You get this same working demo in your own repository. Edit the example data in GitHub, then publish and embed it. Nothing to install.</p>
+<p class="note">Need help? <a href="https://github.com/bristweb/cred#make-your-own">Quick start</a> · <a href="https://github.com/bristweb/cred-starter#publish-it">Publishing</a> · <a href="https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed">Embed options</a></p>
 <h2>Preview</h2>
 </div></div>
 <script src="../package/assets/js/cred.js" defer data-overflow="visible"></script>
-<script>document.querySelectorAll('.ci .copy').forEach(function(b){b.addEventListener('click',function(){var t=b.parentNode.querySelector('code').textContent;var done=function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)};if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});else{var r=document.createRange();r.selectNodeContents(b.parentNode.querySelector('code'));getSelection().removeAllRanges();getSelection().addRange(r);document.execCommand('copy');done()}})});</script>
+
 </body>
 </html>

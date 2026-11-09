@@ -1,45 +1,50 @@
 # Reviews
 
-This repository is a reviews site made from the [Cred](https://github.com/bristweb/cred) starter. It already works: it shows the same demo as [cred.bristleconeweb.com](https://cred.bristleconeweb.com/) (a fictional bike shop) until you replace the demo data with your own. Everything is done in the browser on GitHub; nothing needs installing.
+Your [Cred](https://github.com/bristweb/cred) site already works. It starts with the same fictional bike shop demo shown at [cred.bristleconeweb.com](https://cred.bristleconeweb.com/).
 
-## 1. Publish it
+## Make it yours
 
-Pick one (both free):
+Edit these files in GitHub. Nothing needs installing.
 
-- **Cloudflare Pages (Git integration).** In Cloudflare, **Workers & Pages → Create → Pages → Connect to Git**, choose this repository and `main`. Framework: none. Build command: `sh package/tools/export-site.sh _publish`. Output directory: `_publish`. Environment variable `NODE_VERSION` = `22`. Every push then publishes.
-- **Cloudflare Pages (from Actions).** Add the repository secrets `CLOUDFLARE_API_TOKEN` (Pages edit), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (a Direct Upload project). The included **Deploy to Cloudflare Pages** action then publishes every push to `main`.
-- **GitHub Pages.** **Settings → Pages → Source: GitHub Actions**, then **Actions → Deploy to GitHub Pages → Run workflow** (run it again after changes).
+- **Your business:** `data/config.js` holds your name, website and review platforms.
+- **Your reviews:** replace the examples in `data/reviews/`. Keep the year list in `config.js` up to date.
+- **Your look:** add images in `data/assets/` and colors in `data/theme/theme.css`.
+
+Delete the example files you do not use. Do not present the fictional reviews as your own. The **Check** action validates every push and tells you what to fix. [Data format help](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#data-format).
+
+## Publish it
+
+**Cloudflare Pages:** connect this repository in **Workers & Pages → Create → Pages → Connect to Git**. Choose `main`, no framework, build command `sh package/tools/export-site.sh _publish`, and output directory `_publish`. Set `NODE_VERSION` to `22`. Every push then publishes your changes.
 
 A private repository still publishes a public website.
 
-## 2. Replace the demo with your data
+<details>
+<summary>Other publishing options</summary>
 
-Edit the files in [`data/`](data/) in GitHub: your business name and platforms in `data/config.js`, your reviews in `data/reviews/<year>.json`, colors in `data/theme/theme.css` and your logos, photos and avatars in `data/assets/`. Delete the demo files you do not use (and their years in `config.js`). The **Check** action validates every push and tells you what to fix. Format: [Cred's data format](https://github.com/bristweb/cred#data-format).
+- **Cloudflare Pages from Actions:** add the repository secrets `CLOUDFLARE_API_TOKEN` (Pages edit), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (a Direct Upload project). **Deploy to Cloudflare Pages** publishes each push to `main`.
+- **GitHub Pages:** choose **Settings → Pages → Source: GitHub Actions**, then run **Actions → Deploy to GitHub Pages**. Run it again after changes.
 
-## 3. Put it on your website
+</details>
 
-Replace `YOUR-SITE` with your published address (for GitHub Pages, `YOUR-USER.github.io/YOUR-REPO`):
+## Put it on your website
+
+Replace `YOUR-SITE` with your published address. For GitHub Pages, include the repository name: `YOUR-USER.github.io/YOUR-REPO`.
 
 ```html
 <script src="https://YOUR-SITE/package/assets/js/cred.js" defer></script>
 ```
 
-Or an iframe: `https://YOUR-SITE/site/embed.html`. Your reviews page is `https://YOUR-SITE/site/` (on Cloudflare also `https://YOUR-SITE/`). It follows the visitor's light or dark setting; add `?theme=light` or `?theme=dark` to force one. Embed options: [Cred's embed docs](https://github.com/bristweb/cred#embed).
+Your reviews page is `https://YOUR-SITE/site/`. The iframe page is `https://YOUR-SITE/site/embed.html`. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
 
-## 4. Get Cred updates
+## Get Cred updates
 
-**Actions → Update Cred package → Run workflow** with a release tag from [Cred's releases](https://github.com/bristweb/cred/releases). It opens a pull request that changes **only `package/`**. Your `data/`, pages, this README, host settings and workflows are never touched. Review and merge it.
+Run **Actions → Update Cred package** with a tag from [Cred's releases](https://github.com/bristweb/cred/releases). Review and merge the pull request. It changes only `package/`, never your data, pages or README.
 
-If GitHub blocks Actions from opening pull requests, allow it in **Settings → Actions → General → Workflow permissions**, or use the pushed branch's **Compare & pull request** button.
+<details>
+<summary>If GitHub blocks the update pull request</summary>
 
-## What is here
+Allow Actions to create pull requests in **Settings → Actions → General → Workflow permissions**, or open the pushed branch's **Compare & pull request** button yourself. No personal access token is needed.
 
-```
-data/           yours: config, reviews, theme, assets (starts as the demo)
-site/           your reviews page (index.html) and the iframe page (embed.html)
-package/        the Cred widget and tools; updated by "Update Cred package", do not edit
-.github/        Check, Update Cred package, and the two deploy actions
-_headers  _redirects  index.html  404.html  .nojekyll   host settings
-```
+</details>
 
-Cred is MIT licensed ([LICENSE](LICENSE)).
+[Full reference](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md) · [License](LICENSE)
