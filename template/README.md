@@ -38,7 +38,7 @@ Replace `EXAMPLE.COM` with your published address. For GitHub Pages that is usua
 <script src="https://EXAMPLE.COM/package/assets/js/cred.js" defer></script>
 ```
 
-Your reviews page is `https://EXAMPLE.COM/`. The iframe page is `https://EXAMPLE.COM/embed.html`. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
+Your reviews page is `https://EXAMPLE.COM/`. The same URL works in an iframe (it stays transparent so the host page shows through); add `?embed` only if you need to force that mode outside an iframe. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
 
 ## Get Cred updates
 
