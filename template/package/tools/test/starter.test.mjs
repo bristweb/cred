@@ -27,15 +27,17 @@ test('starter is an exact copy of template/', () => {
 });
 
 test('starter is the working demo without Cred project files', () => {
-  for (const f of ['README.md', 'index.html', 'embed.html', '404.html', '_headers', '_redirects', '.nojekyll', '.gitignore', 'LICENSE',
+  for (const f of ['README.md', 'index.html', '404.html', '_headers', '_redirects', '.nojekyll', '.gitignore', 'LICENSE',
     'package.json', 'package-lock.json', 'data/config.js', 'package/assets/js/cred.js',
     '.github/workflows/check.yml', '.github/workflows/update.yml', '.github/workflows/deploy.yml', '.github/workflows/pages.yml'])
     assert.ok(existsSync(path.join(out, f)), `starter has ${f}`);
-  for (const f of ['template', 'docs', 'CHANGELOG.md', 'AGENTS.md', 'site', '.github/workflows/starter.yml'])
+  for (const f of ['template', 'docs', 'CHANGELOG.md', 'AGENTS.md', 'site', 'embed.html', '.github/workflows/starter.yml'])
     assert.ok(!existsSync(path.join(out, f)), `starter excludes ${f}`);
   const page = readFileSync(path.join(out, 'index.html'), 'utf8');
   assert.match(page, /data-theme="auto"/);
   assert.match(page, /src="package\/assets\/js\/cred\.js"/);
+  assert.match(page, /window\.self\s*!==\s*window\.top|self!==window\.top/);
+  assert.match(page, /data-embed/);
   assert.doesNotMatch(page, /location\.replace|http-equiv="refresh"/);
   const readme = readFileSync(path.join(out, 'README.md'), 'utf8');
   assert.match(readme, /^# Reviews\n/);
@@ -62,7 +64,8 @@ test('starter validates, and its export keeps its own page indexable', () => {
   assert.match(page, /data-theme="auto"/);
   assert.match(readFileSync(path.join(work, 'pub/_headers'), 'utf8'), /Access-Control-Allow-Origin: \*/);
   assert.ok(existsSync(path.join(work, 'pub/versions.json')));
-  assert.ok(existsSync(path.join(work, 'pub/embed.html')));
+  assert.ok(existsSync(path.join(work, 'pub/index.html')));
+  assert.ok(!existsSync(path.join(work, 'pub/embed.html')));
   assert.ok(!existsSync(path.join(work, 'pub/.github')));
   assert.ok(!existsSync(path.join(work, 'pub/site')));
 });

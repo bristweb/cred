@@ -41,8 +41,22 @@ test('standalone CSS has system-dark and explicit overrides, without styling the
   assert.equal(css.includes('.rw-'), false);
   const iframe = read('site/embed.html');
   assert.match(iframe, /background:transparent/);
+  assert.match(iframe, /data-embed/);
+  assert.match(iframe, /window\.self\s*!==\s*window\.top|self!==window\.top/);
   assert.equal(iframe.includes('page-theme.'), false);
   assert.match(runtime, /addEventListener\('change', applyTheme\)/, 'existing widget media-change listener is retained');
+});
+
+test('starter reviews page is dual-mode (standalone chrome, transparent when embedded)', () => {
+  const page = read('template/index.html');
+  assert.match(page, /data-theme="auto"/);
+  assert.match(page, /data-embed/);
+  assert.match(page, /window\.self\s*!==\s*window\.top/);
+  assert.match(page, /q\.has\(['"]embed['"]\)/);
+  assert.match(page, /color-scheme:light dark/);
+  assert.match(page, /html\[data-embed\],html\[data-embed\] body\{margin:0;background:transparent\}/);
+  assert.equal(/html\[data-embed\][^\n{]*\{[^}]*color-scheme/.test(page), false);
+  assert.match(page, /src="package\/assets\/js\/cred\.js"/);
 });
 test('standalone pages link theme resources at alias/subpath-safe URLs', () => {
   for (const page of ['index.html', 'example.html', 'heather.html']) {
