@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 22
       - name: Export the committed files and add the /v/ releases
-        run: sh package/tools/export-site.sh _publish
+        run: sh template/package/tools/export-site.sh _publish
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _publish

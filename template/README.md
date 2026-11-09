@@ -14,27 +14,31 @@ Delete the example files you do not use. Do not present the fictional reviews as
 
 ## Publish it
 
-**Cloudflare Pages:** connect this repository in **Workers & Pages → Create → Pages → Connect to Git**. Choose `main`, no framework, build command `sh package/tools/export-site.sh _publish`, and output directory `_publish`. Set `NODE_VERSION` to `22`. Every push then publishes your changes.
+Pick either host. A private repository still publishes a public website.
 
-A private repository still publishes a public website.
+### GitHub Pages
 
-<details>
-<summary>Other publishing options</summary>
+1. In this repository open **Settings → Pages → Source: GitHub Actions**.
+2. Open **Actions → Deploy to GitHub Pages → Run workflow**.
+3. Run it again after you change your reviews or theme.
 
-- **Cloudflare Pages from Actions:** add the repository secrets `CLOUDFLARE_API_TOKEN` (Pages edit), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (a Direct Upload project). **Deploy to Cloudflare Pages** publishes each push to `main`.
-- **GitHub Pages:** choose **Settings → Pages → Source: GitHub Actions**, then run **Actions → Deploy to GitHub Pages**. Run it again after changes.
+Your site will be at `https://YOUR-USER.github.io/YOUR-REPO/` (replace with your GitHub user and repository name).
 
-</details>
+### Cloudflare Pages
+
+**Connect to Git:** in Cloudflare open **Workers & Pages → Create → Pages → Connect to Git**. Choose this repository and `main`, no framework, build command `sh package/tools/export-site.sh _publish`, output directory `_publish`, and set `NODE_VERSION` to `22`. Every push then publishes.
+
+**Or from Actions:** create a Direct Upload project in Cloudflare, then add the repository secrets `CLOUDFLARE_API_TOKEN` (Pages edit), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT`. **Deploy to Cloudflare Pages** publishes each push to `main`.
 
 ## Put it on your website
 
-Replace `YOUR-SITE` with your published address. For GitHub Pages, include the repository name: `YOUR-USER.github.io/YOUR-REPO`.
+Replace `EXAMPLE.COM` with your published address. For GitHub Pages that is usually `YOUR-USER.github.io/YOUR-REPO`.
 
 ```html
-<script src="https://YOUR-SITE/package/assets/js/cred.js" defer></script>
+<script src="https://EXAMPLE.COM/package/assets/js/cred.js" defer></script>
 ```
 
-Your reviews page is `https://YOUR-SITE/site/`. The iframe page is `https://YOUR-SITE/site/embed.html`. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
+Your reviews page is `https://EXAMPLE.COM/`. The iframe page is `https://EXAMPLE.COM/embed.html`. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
 
 ## Get Cred updates
 
