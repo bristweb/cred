@@ -25,6 +25,7 @@ jobs:
       - name: Commit the generated files to the starter if they changed
         env:
           STARTER_DEPLOY_KEY: ${{ secrets.STARTER_DEPLOY_KEY }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "$STARTER_DEPLOY_KEY" > ~/.ssh/starter && chmod 600 ~/.ssh/starter
@@ -39,7 +40,10 @@ jobs:
           cp -a "$RUNNER_TEMP/starter/." .
           git add -A
           if git diff --cached --quiet; then echo "Starter already up to date."; exit 0; fi
-          git -c user.name="$GITHUB_ACTOR" -c user.email="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com" commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
+          name=$(gh api "users/$GITHUB_ACTOR" --jq '.name // empty' 2>/dev/null || true)
+          git config user.name "${name:-$GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+          git commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
           git push -q origin main
       - name: Confirm the starter equals template/
         run: |

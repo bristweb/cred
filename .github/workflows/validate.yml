@@ -29,8 +29,13 @@ jobs:
       - name: Commit badge files
         if: github.ref_name == github.event.repository.default_branch
         working-directory: data
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git add badge.json badge.svg
           git diff --cached --quiet && exit 0
-          git -c user.name="$GITHUB_ACTOR" -c user.email="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com" commit -m "Update rating badge"
+          name=$(gh api "users/$GITHUB_ACTOR" --jq '.name // empty' 2>/dev/null || true)
+          git config user.name "${name:-$GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+          git commit -m "Update rating badge"
           git push
