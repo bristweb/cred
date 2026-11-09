@@ -16,5 +16,4 @@ done
 mkdir "$out"
 # shellcheck disable=SC2086
 git archive "$ref" $paths | tar -x -C "$out"
-node package/tools/docs-indexing.mjs "$out"
 node package/tools/build-versions.mjs "$out"
