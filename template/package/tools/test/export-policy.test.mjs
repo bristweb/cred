@@ -35,10 +35,11 @@ test('starter exports public content by default and preserves explicit client re
   const starter = path.join(dir, 'starter');
   const ref = cmd(['git', 'stash', 'create']).trim() || 'HEAD';
   cmd(['sh', 'template/package/tools/build-starter.sh', starter, ref]);
-  for (const f of ['index.html', 'embed.html', '_headers'])
+  for (const f of ['index.html', '_headers'])
     assert.doesNotMatch(read(starter, f), /noindex|nofollow|noarchive|X-Robots-Tag/i, f);
   assert.ok(!existsSync(path.join(starter, 'docs')));
   assert.ok(!existsSync(path.join(starter, 'site')));
+  assert.ok(!existsSync(path.join(starter, 'embed.html')));
   assert.ok(!existsSync(path.join(starter, 'robots.txt')), 'absent robots.txt does not restrict crawling');
   const rules = 'User-agent: *\nDisallow: /\n';
   const headers = '/*\n  Access-Control-Allow-Origin: *\n  X-Robots-Tag: noindex\n';

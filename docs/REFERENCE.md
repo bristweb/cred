@@ -48,7 +48,7 @@ cred/
 │   │   ├── schemas/  types/  JSON Schemas and editor typings for config.js
 │   │   └── tools/            Node tools: validate, badge, export-site, build-starter, update-package, …
 │   ├── data/                 the demo: config.js, reviews/, theme/, lang/, assets/ (what this site shows)
-│   ├── index.html            the starter's reviews page; embed.html the iframe page
+│   ├── index.html            the starter's reviews page (also the iframe page; transparent when embedded)
 │   ├── README.md             the starter's own README
 │   └── .github/workflows/    Check, Update Cred package, Deploy to Cloudflare Pages, Deploy to GitHub Pages
 ├── site/                     Cred's own host pages: index.html (demo), embed.html (iframe), example.html, robots.txt, sitemap.xml
@@ -60,7 +60,7 @@ cred/
 └── README.md, CHANGELOG.md, AGENTS.md, LICENSE, package.json
 ```
 
-`template/data/` is exactly the `data/` folder of a starter copy: the same folder names and nesting. Its records carry no `example: true`; here everything in it is example content because of where it is. In a starter, pages live at the repository root (`index.html`, `embed.html`); Cred's own pages stay in `site/`.
+`template/data/` is exactly the `data/` folder of a starter copy: the same folder names and nesting. Its records carry no `example: true`; here everything in it is example content because of where it is. In a starter, the reviews page is root `index.html` (standalone or iframe); Cred's own pages stay in `site/`.
 
 **Where files go: one `assets/` folder, sorted by kind** (same in a starter's `data/` and `template/data/`):
 
@@ -80,7 +80,7 @@ How `package/` stays untouched but still customizable: your `config.js` lists it
 | Cred provides (`package/`, updated by pull request) | Yours (in your starter copy) |
 |---|---|
 | `package/assets/`, `package/lang/`: the widget, its default icons and English wording | `data/`: `config.js`, `reviews/`, `assets/`, `theme/`, `lang/` overrides |
-| `package/schemas/`, `package/types/`, `package/tools/`: validate, badge and release tooling | Root host files and pages (`index.html`, `embed.html`, …) |
+| `package/schemas/`, `package/types/`, `package/tools/`: validate, badge and release tooling | Root host files and pages (`index.html`, …) |
 | `template/` in this repo (published verbatim as the starter) | Your own import scripts, sync jobs and secrets |
 | This repo's `site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` (not in the starter) | Either hosting workflow (`pages.yml` or `deploy.yml`) |
 
@@ -183,7 +183,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-In the Cred project, `site/embed.html` is the bare, transparent iframe page and `site/index.html` introduces the demo (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` on hosts without rewrites). In a starter, the reviews page is root `index.html` and the iframe page is root `embed.html`. With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
+In the Cred project, `site/index.html` introduces the demo and `site/embed.html` is the public `/embed.html` entry (same dual-mode page: transparent in an iframe or with `?embed`, Canvas chrome when opened alone). In a starter, root `index.html` is that one page — use it standalone or as the iframe `src`. With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
 
 ---
 
@@ -448,7 +448,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 - Without `data-source` / `?source=`, reads `<site root>/data/` (if it has a `config.js`) or `<site root>/template/data/` on the script's site; if neither loads, shows the unavailable message.
 - Fixed-height mode: host height 100% or viewport remainder; card text scrolls without blocking horizontal swipe.
 - Icons: data-repo SVG, then Simple Icons CDN fallback.
-- Local preview: serve the repo root with any static server (e.g. `npx serve .`) and open `/site/index.html` (Cred) or `/` (a starter), or point `data-source` at a local URL. `npm test` runs the same check without a browser.
+- Local preview: serve the repo root with any static server (e.g. `npx serve .`) and open `/site/index.html` (Cred) or `/` (a starter; add `?embed` or load it in an iframe for the transparent mode), or point `data-source` at a local URL. `npm test` runs the same check without a browser.
 
 Review text belongs to its authors; platform marks belong to their owners.
 
