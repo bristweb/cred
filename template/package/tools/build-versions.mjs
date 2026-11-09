@@ -1,10 +1,10 @@
 // Adds every tagged release (git tags vX.Y.Z) to a publish folder. This is the one generated part of a deploy:
-//   <out>/v/X.Y.Z/assets/, <out>/v/X.Y.Z/lang/   immutable copy of that tag's widget, taken from package/ (this
-//                                               layout), src/ (1.2.0 pre-release layout) or the repo root (1.0.x–1.1.x)
+//   <out>/v/X.Y.Z/assets/, <out>/v/X.Y.Z/lang/   immutable copy of that tag's widget, taken from template/package/
+//                                               (current), package/ (pre-move), src/ (1.2.0) or the repo root (1.0–1.1)
 //   <out>/versions.json                         { latest, versions } read by the widget for config `version`
 //   cache rules appended to <out>/_headers.
 // <out> is a clean export of the tracked files, as they are (see export-site.sh); nothing else is copied or moved.
-// Usage: node package/tools/build-versions.mjs <out>   (needs the tags: actions/checkout fetch-depth 0)
+// Usage: node package/tools/build-versions.mjs <out>   (or template/package/tools/…; needs tags: fetch-depth 0)
 import { execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, appendFileSync } from 'node:fs';
 import { widgetVersion } from './widget-version.mjs';
@@ -20,9 +20,10 @@ let headers = '\n';
 for (const v of versions) {
   const dir = `${out}/v/${v}`;
   mkdirSync(dir, { recursive: true });
-  const prefix = ['package', 'src'].find(p => has(`v${v}`, `${p}/assets`)); // undefined: widget at the tag's root
+  const prefix = ['template/package', 'package', 'src'].find(p => has(`v${v}`, `${p}/assets`)); // undefined: widget at root
   const paths = prefix ? `${prefix}/assets ${prefix}/lang` : 'assets lang';
-  execSync(`git archive v${v} ${paths} | tar -x -C ${dir}${prefix ? ' --strip-components=1' : ''}`);
+  const strip = prefix ? ` --strip-components=${prefix.split('/').length}` : '';
+  execSync(`git archive v${v} ${paths} | tar -x -C ${dir}${strip}`);
   headers += `/v/${v}/*\n  Cache-Control: public, max-age=31536000, immutable\n`;
 }
 const latest = widgetVersion();

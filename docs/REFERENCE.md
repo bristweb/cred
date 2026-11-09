@@ -34,32 +34,33 @@ With `false`, example content is left out of the cards, counts, averages, summar
 
 ## Repository layout
 
-The demo above **is** the starter template. Its source is the inner template [`template/`](../template/) in this repo: `template/data/` is the demo content this site shows, and `template/` also holds the starter's own pages, README and workflows. On every push to `main`, the **Publish starter** action assembles `template/` plus the widget package (`package/`) into [**bristweb/cred-starter**](https://github.com/bristweb/cred-starter), a GitHub template repository. That repository is generated output, never edited by hand, so it always matches this demo. It contains no Cred project site, docs, changelog or history.
+The demo above **is** the starter template. Its source is the inner template [`template/`](../template/) in this repo: that folder is published verbatim as [**bristweb/cred-starter**](https://github.com/bristweb/cred-starter) on every push to `main` (no assembly). `template/data/` is the demo content this site shows; `template/package/` is the widget runtime; the starter's pages, README and workflows live beside them. The starter repository is generated output, never edited by hand, so it always matches `template/` exactly. It contains no Cred project site, docs, changelog or history.
 
 
 Nothing in Cred is compiled. The files you edit are the files the browser loads, and the repo is published as it is: there is no `dist/` and no build step.
 
 ```
 cred/
-├── package/                  the product: the only folder a starter copy receives updates for
-│   ├── assets/               the widget: js/cred.js, css/cred.css, default icons/
-│   ├── lang/                 the widget's built-in English wording (en.json); used by every embed
-│   ├── schemas/  types/      JSON Schemas and editor typings for config.js
-│   └── tools/                Node tools: validate, badge, dedupe, config-to-js, build-versions, export-site.sh, build-starter.sh, update-package, smoke-test
-├── template/                 the inner starter template (published as bristweb/cred-starter)
+├── template/                 the starter, published verbatim as bristweb/cred-starter
+│   ├── package/              the product: the only folder a starter copy receives updates for
+│   │   ├── assets/           the widget: js/cred.js, css/cred.css, default icons/
+│   │   ├── lang/             the widget's built-in English wording (en.json); used by every embed
+│   │   ├── schemas/  types/  JSON Schemas and editor typings for config.js
+│   │   └── tools/            Node tools: validate, badge, export-site, build-starter, update-package, …
 │   ├── data/                 the demo: config.js, reviews/, theme/, lang/, assets/ (what this site shows)
-│   ├── site/index.html       the starter's reviews page;  README.md  the starter's own README
-│   └── .github/workflows/    the starter's Check and Update Cred package actions
+│   ├── index.html            the starter's reviews page; embed.html the iframe page
+│   ├── README.md             the starter's own README
+│   └── .github/workflows/    Check, Update Cred package, Deploy to Cloudflare Pages, Deploy to GitHub Pages
 ├── site/                     Cred's own host pages: index.html (demo), embed.html (iframe), example.html, robots.txt, sitemap.xml
 ├── docs/                     screenshots, COMPARISON.md, data-repo-workflows/ (samples for a standalone data repo)
-├── .github/workflows/        check, deploy (Cloudflare Pages), pages (GitHub Pages), starter (publishes the starter), validate (reusable)
-├── _headers  _redirects      host config for Cloudflare Pages (CORS, cache, short URLs)
+├── .github/workflows/        check, deploy, pages, starter (publishes template/ verbatim), validate (reusable)
+├── _headers  _redirects      host config (CORS, cache, short URLs for Cloudflare Pages)
 ├── 404.html                  the not-found page (hosts look for it at the root)
-├── .nojekyll                 GitHub Pages: serve files as they are
+├── .nojekyll                 tell GitHub Pages to serve files as they are
 └── README.md, CHANGELOG.md, AGENTS.md, LICENSE, package.json
 ```
 
-`template/data/` is exactly the `data/` folder of a starter copy: the same folder names and nesting. Its records carry no `example: true`; here everything in it is example content because of where it is. `data/` holds data only; pages go in `site/`.
+`template/data/` is exactly the `data/` folder of a starter copy: the same folder names and nesting. Its records carry no `example: true`; here everything in it is example content because of where it is. In a starter, pages live at the repository root (`index.html`, `embed.html`); Cred's own pages stay in `site/`.
 
 **Where files go: one `assets/` folder, sorted by kind** (same in a starter's `data/` and `template/data/`):
 
@@ -74,14 +75,14 @@ assets/
 
 Paths in `config.js` and `reviews/*.json` are relative to the data folder, e.g. `assets/icons/google.svg`, `assets/images/reviewers/google-1.svg`, `assets/video/clip.mp4`. With no `icon` set, a platform looks for `assets/icons/<platform>.svg`.
 
-How `package/` stays untouched but still customizable: your `config.js` lists its own platform icons, `data/theme/theme.css` sets fonts and colours, `data/lang/<code>.json` overrides wording (partial files are fine; listed in `config.languages`), and everything you add lives under `data/assets/`. Your own landing page, `robots.txt`, `sitemap.xml` or `CNAME` go in `site/` (or the root host files) of your copy.
+How `package/` stays untouched but still customizable: your `config.js` lists its own platform icons, `data/theme/theme.css` sets fonts and colours, `data/lang/<code>.json` overrides wording (partial files are fine; listed in `config.languages`), and everything you add lives under `data/assets/`. Your own landing page, `robots.txt`, `sitemap.xml` or `CNAME` go at the root of your starter copy.
 
 | Cred provides (`package/`, updated by pull request) | Yours (in your starter copy) |
 |---|---|
 | `package/assets/`, `package/lang/`: the widget, its default icons and English wording | `data/`: `config.js`, `reviews/`, `assets/`, `theme/`, `lang/` overrides |
-| `package/schemas/`, `package/types/`, `package/tools/`: validate, badge and release tooling | `site/` and the root host files, if you want your own pages |
-| `template/`: the starter (demo `data/`, reviews page, README, workflows), copied once | Your own import scripts, sync jobs and secrets |
-| This repo's `site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` (not in the starter) | Your choice of hosting workflow (`deploy.yml` or `pages.yml`) |
+| `package/schemas/`, `package/types/`, `package/tools/`: validate, badge and release tooling | Root host files and pages (`index.html`, `embed.html`, …) |
+| `template/` in this repo (published verbatim as the starter) | Your own import scripts, sync jobs and secrets |
+| This repo's `site/` demo pages, `docs/`, `README.md`, `CHANGELOG.md` (not in the starter) | Either hosting workflow (`pages.yml` or `deploy.yml`) |
 
 #### Search indexing
 
@@ -94,24 +95,24 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 | Real path (every host, also GitHub Pages under `/<repo>/`) | Cloudflare Pages short URL |
 |---|---|
 | `/site/index.html`, `/site/embed.html`, `/site/example.html` | `/`, `/embed.html`, `/example/` |
-| `/package/assets/js/cred.js` (and `css/`, `icons/`) | `/assets/js/cred.js` |
-| `/package/lang/en.json` | `/lang/en.json` |
-| `/package/schemas/`, `/package/types/` | `/schemas/`, `/types/` |
+| `/template/package/assets/js/cred.js` (Cred) · `/package/assets/js/cred.js` (starter) | `/assets/js/cred.js` |
+| `/template/package/lang/en.json` (Cred) · `/package/lang/en.json` (starter) | `/lang/en.json` |
+| `/template/package/schemas/`, `/template/package/types/` | `/schemas/`, `/types/` |
 | `/template/data/` | `/example/` (data files, e.g. `/example/config.js`) |
 | `/data/` | `/data/` (old `/content/…` redirects here) |
 | `/v/<x.y.z>/assets/js/cred.js`, `/versions.json` (generated at deploy) | same |
 
-GitHub Pages ignores `_redirects`: use the real paths there (for example `https://<user>.github.io/<repo>/package/assets/js/cred.js` and `…/<repo>/site/`; a starter's root `index.html` forwards to `site/`; here the bare `/<repo>/` shows `404.html`, which links to `site/`). The widget works out its site root from its own URL either way (`…/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
+GitHub Pages ignores `_redirects`: use the real paths there. On Cred, for example `https://YOUR-USER.github.io/cred/template/package/assets/js/cred.js` and `…/cred/site/`. On a starter, the reviews page is at the repository root and the widget at `…/package/assets/js/cred.js`. The widget works out its site root from its own URL (`…/package/`, `…/template/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
 
-**What a deploy uploads.** `package/tools/export-site.sh _publish` writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — the root host files (including a starter's `index.html`), `site/`, `data/`, `template/data/` (the demo), `package/` — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json` (`package/tools/build-versions.mjs`). Nothing is renamed or moved; it is an export, not a build. Both deploy workflows run it.
+**What a deploy uploads.** `package/tools/export-site.sh _publish` (in Cred: `template/package/tools/export-site.sh`) writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — root host files, `site/` (Cred), `data/`, `template/data/` and `template/package/` (Cred) or `package/` (starter) — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json`. Nothing is renamed or moved; it is an export, not a build. Both deploy workflows run it.
 
 Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a copy can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
 
 ```sh
-npm ci                                       # once: development dependencies (zod) for the tools
-node package/tools/validate.mjs data         # schema and file checks
-node package/tools/badge.mjs data            # optional rating badge files
-npm test                                     # validator tests and static HTTP smoke test of the real paths
+npm ci                                              # once: development dependencies (zod) for the tools
+node package/tools/validate.mjs data                # in a starter (Cred: template/package/tools/… template/data)
+node package/tools/badge.mjs data                   # optional rating badge files
+npm test                                            # Cred repo: validator tests and static HTTP smoke test
 ```
 
 ---
@@ -125,7 +126,7 @@ Try the [live demo](https://cred.bristleconeweb.com/). For a real site, point th
 The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and the rest from a data folder. It picks the folder in this order:
 
 1. **`data-source`** (or `?source=`), if the embed has one: that folder is used, and nothing else is tried. Set `data-source="https://…/"` (trailing `/` added if missing) to read content from a different folder, site or repo.
-2. **`data/`**, if it has content: the widget looks for `<site root>/data/config.js`. The site root is the folder that holds `package/` (worked out from the script URL: `…/package/assets/js/cred.js`, `…/v/<x.y.z>/assets/js/cred.js` or the Cloudflare short URL `…/assets/js/cred.js`). This is your own content.
+2. **`data/`**, if it has content: the widget looks for `<site root>/data/config.js`. The site root is the folder that holds `package/` or `template/package/` (worked out from the script URL: `…/package/assets/js/cred.js`, `…/template/package/assets/js/cred.js`, `…/v/<x.y.z>/assets/js/cred.js` or the Cloudflare short URL `…/assets/js/cred.js`). This is your own content.
 3. **The bundled examples** (`<site root>/template/data/`) when `data/` is empty.
 
 So `data-source` is **optional**: a starter copy needs no attribute, and the upstream demo (whose `data/` is empty) works with the bare snippet. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
@@ -182,7 +183,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-`site/embed.html` is the bare, transparent iframe page. In a starter copy, `site/index.html` is your reviews page; in the Cred project, it also introduces the demo. They live in `site/` (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` everywhere). With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
+In the Cred project, `site/embed.html` is the bare, transparent iframe page and `site/index.html` introduces the demo (served at `/` and `/embed.html` on Cloudflare Pages, `/site/…` on hosts without rewrites). In a starter, the reviews page is root `index.html` and the iframe page is root `embed.html`. With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
 
 ---
 
@@ -433,7 +434,10 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 [The starter](../README.md#make-your-own) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `template/data/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `theme/`, `assets/`, and then add the host files and workflows a standalone repo needs: add a `_headers` with `/*` → `Access-Control-Allow-Origin: *` (and an empty `.nojekyll` for GitHub Pages) at the repo root, and copy `docs/data-repo-workflows/validate.yml` (and `deploy.yml`) to `.github/workflows/`. Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
 
-**Hosting.** Recommended: Cloudflare Pages. The sample `docs/data-repo-workflows/deploy.yml` publishes the committed files on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS. Backup: GitHub Pages through `.github/workflows/pages.yml` (Settings → Pages → Source: *GitHub Actions*, then run it).
+**Hosting.** Use either GitHub Pages or Cloudflare Pages.
+
+- **GitHub Pages:** copy `docs/data-repo-workflows/` samples as needed, add an empty `.nojekyll`, then Settings → Pages → Source: *GitHub Actions* and run the pages workflow.
+- **Cloudflare Pages:** the sample `docs/data-repo-workflows/deploy.yml` publishes the committed files on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS.
 
 
 ---
@@ -444,7 +448,7 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 - Without `data-source` / `?source=`, reads `<site root>/data/` (if it has a `config.js`) or `<site root>/template/data/` on the script's site; if neither loads, shows the unavailable message.
 - Fixed-height mode: host height 100% or viewport remainder; card text scrolls without blocking horizontal swipe.
 - Icons: data-repo SVG, then Simple Icons CDN fallback.
-- Local preview: serve the repo root with any static server (e.g. `npx serve .`) and open `/site/index.html`, or point `data-source` at a local URL. `npm test` runs the same check without a browser.
+- Local preview: serve the repo root with any static server (e.g. `npx serve .`) and open `/site/index.html` (Cred) or `/` (a starter), or point `data-source` at a local URL. `npm test` runs the same check without a browser.
 
 Review text belongs to its authors; platform marks belong to their owners.
 

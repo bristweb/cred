@@ -1,0 +1,13 @@
+{
+  "name": "cred-site",
+  "private": true,
+  "type": "module",
+  "description": "Reviews site built from the Cred starter (https://github.com/bristweb/cred)",
+  "scripts": {
+    "validate": "node package/tools/validate.mjs data",
+    "badge": "node package/tools/badge.mjs data"
+  },
+  "devDependencies": {
+    "zod": "^4.6.7"
+  }
+}

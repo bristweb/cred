@@ -4,8 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 
-const root = path.resolve(import.meta.dirname, '../../..');
-// These documentation checks belong to the project, not a generated client repository.
+const root = path.resolve(import.meta.dirname, '../../../..');
 const project = existsSync(path.join(root, 'template/README.md'));
 const read = f => readFileSync(path.join(root, f), 'utf8');
 const create = 'https://github.com/bristweb/cred-starter/generate';
@@ -27,6 +26,8 @@ test('quick start shows the demo, template button and editing before optional de
   assert.match(text, /Make your changes in GitHub/);
   assert.match(text, /data\/config\.js/);
   assert.match(text, /docs\/REFERENCE\.md/);
+  assert.match(text, /EXAMPLE\.COM/);
+  assert.doesNotMatch(text, /YOUR-SITE/);
   assert.doesNotMatch(text, /git merge|git rebase|\bfork(?:ing)?\b|Publish starter|build-starter\.sh/i);
 });
 
@@ -36,7 +37,7 @@ test('demo pages point directly to the starter creation form without changing wi
     assert.ok(text.includes(`class="template-button" href="${create}"`));
     assert.match(text, /Edit the example data in GitHub/);
     assert.doesNotMatch(text, /\bfork(?:ing)?\b|How to embed/i);
-    assert.ok(text.includes('../package/assets/js/cred.js'));
+    assert.ok(text.includes('../template/package/assets/js/cred.js'));
     assert.ok(text.includes('../site/page-theme.js'));
   }
   assert.match(read('site/example.html'), /data-source="\.\.\/template\/data\/"/);
@@ -58,10 +59,18 @@ test('full reference and active local documentation links survive the move', { s
       else if (/^[a-z]+:/i.test(link)) continue;
       const [target, hash] = link.split('#');
       if (!target?.endsWith('.md') && target !== '') continue;
-      // A template's LICENSE link is resolved in the generated repository; all markdown destinations are shared.
       const dest = !target ? path.join(root, file) : target.startsWith('/') ? path.join(root, target) : path.resolve(root, path.dirname(file), target);
       assert.ok(existsSync(dest), `${file} → ${link}`);
       if (hash) assert.ok(anchors(readFileSync(dest, 'utf8')).includes(hash), `${file} → ${link} heading exists`);
     }
   }
+});
+
+test('starter README presents GitHub Pages and Cloudflare Pages as equal first-class options', { skip: !project }, () => {
+  const text = read('template/README.md');
+  const gh = text.indexOf('GitHub Pages');
+  const cf = text.indexOf('Cloudflare Pages');
+  assert.ok(gh > 0 && cf > 0);
+  assert.doesNotMatch(text, /Other publishing options|fallback|also works|Recommended:|Backup:/i);
+  assert.match(text, /EXAMPLE\.COM/);
 });

@@ -9,7 +9,7 @@ import path from 'node:path';
 import { z } from 'zod';
 
 const tools = path.resolve(import.meta.dirname, '..');
-const examples = path.resolve(tools, '../../template/data');
+const examples = path.resolve(tools, '../../data');
 const schema = name => z.fromJSONSchema(JSON.parse(readFileSync(path.resolve(tools, '../schemas', name), 'utf8')), { defaultTarget: 'draft-7' });
 const configSchema = schema('config.schema.json'), reviewsSchema = schema('reviews.schema.json');
 const folders = [examples, ...(process.env.CRED_TEST_DATA || '').split(':').filter(Boolean)];

@@ -1,5 +1,5 @@
 /* Reviews widget — static, no dependencies, no site-specific code. https://github.com/bristweb/cred
- * The code lives in package/ of this repo (hand-edited, served as it is; a fork leaves it alone); everything about a
+ * The code lives in package/ (in the starter) or template/package/ (in the Cred project); a starter leaves it alone. Everything about a
  * site lives in the top-level data/ folder or a separate data repo. The bundled examples are template/data/ (a
  * sample of data/). The data folder is chosen in this order: 1) data-source (or ?source=) if the embed has one;
  * 2) else <site root>/data/ if it has a config.js (a fork's own data); 3) else <site root>/template/data/.
@@ -42,10 +42,11 @@
   const VERSION = '1.3.1';
   const VERSIONED = /\/v\/[^/]+\/$/.test(DEFAULT_BASE); // this copy is itself a /v/… build: never switch again
   // Site root (where data/, package/, versions.json and v/ live). The code root is one of:
-  //   <root>/package/        the real files (/package/assets/js/cred.js; any static host, also a GitHub Pages /<repo>/ path)
-  //   <root>/v/<x.y.z>/      an immutable release copy
-  //   <root>/                the Cloudflare Pages short URL /assets/js/cred.js (a _redirects rewrite to package/assets/)
-  const SITE_ROOT = DEFAULT_BASE.replace(/\/(?:package|v\/[^/]+)\/$/, '/');
+  //   <root>/package/               starter real path (/package/assets/js/cred.js)
+  //   <root>/template/package/      Cred project real path (/template/package/assets/js/cred.js)
+  //   <root>/v/<x.y.z>/             an immutable release copy
+  //   <root>/                       Cloudflare short URL /assets/js/cred.js (rewrites to the real package assets)
+  const SITE_ROOT = DEFAULT_BASE.replace(/\/(?:(?:template\/)?package|v\/[^/]+)\/$/, '/');
   // The bundled examples (template/data/ in the repo), always at their real path.
   const EXAMPLES = new URL(SITE_ROOT + 'template/data/', location.href).href;
   // Without data-source / ?source= the data is in this same repo: <site root>/data/ (a fork's own data) when it

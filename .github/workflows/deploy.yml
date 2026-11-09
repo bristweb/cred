@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: 22
       - name: Export the committed files and add the /v/ releases
-        run: sh package/tools/export-site.sh _publish
+        run: sh template/package/tools/export-site.sh _publish
       - name: Deploy
         if: steps.config.outputs.enabled == 'true'
         env:

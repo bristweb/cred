@@ -7,9 +7,9 @@
     "example": "template/data"
   },
   "scripts": {
-    "validate": "node package/tools/validate.mjs template/data",
-    "types": "npx --yes json-schema-to-typescript@15 -i package/schemas/config.schema.json -o package/types/config.d.ts --bannerComment \"// Generated from package/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.\" && cp package/types/config.d.ts template/data/cred-config.d.ts",
-    "test": "node --test \"package/tools/test/*.test.mjs\" && node package/tools/smoke-test.mjs"
+    "validate": "node template/package/tools/validate.mjs template/data",
+    "types": "npx --yes json-schema-to-typescript@15 -i template/package/schemas/config.schema.json -o template/package/types/config.d.ts --bannerComment \"// Generated from template/package/schemas/config.schema.json (npm run types). Types for a CRED data repo config.js.\" && cp template/package/types/config.d.ts template/data/cred-config.d.ts",
+    "test": "node --test --test-concurrency=1 \"template/package/tools/test/*.test.mjs\" && node template/package/tools/smoke-test.mjs"
   },
   "repository": {
     "type": "git",

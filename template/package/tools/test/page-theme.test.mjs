@@ -4,10 +4,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { runInNewContext } from 'node:vm';
 
-const root = path.resolve(import.meta.dirname, '../../..');
+const root = path.resolve(import.meta.dirname, '../../../..');
 const read = p => readFileSync(path.join(root, p), 'utf8');
 const script = read('site/page-theme.js');
-const runtime = read('package/assets/js/cred.js');
+const runtime = read(existsSync(path.join(root, 'template/package/assets/js/cred.js')) ? 'template/package/assets/js/cred.js' : 'package/assets/js/cred.js');
 const detect = runtime.slice(runtime.indexOf('  function detectHostTheme() {'), runtime.indexOf('\n  function ', runtime.indexOf('  function detectHostTheme() {') + 10));
 // Exercise the widget's existing host-theme function, not a second implementation of it.
 function host(search, dark) {
