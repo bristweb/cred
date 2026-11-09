@@ -4,7 +4,8 @@ All notable changes to CRED. Versions follow [semantic versioning](https://semve
 
 ## Unreleased
 
-- Removed Cred's `site/embed.html`. The dual-mode reviews page is only `template/index.html` (root `index.html` in a starter). `/embed.html` and `/site/embed` 301 to `/template/` (query preserved). Docs iframe snippets use `https://EXAMPLE.COM/`.
+- Removed Cred's `site/embed.html`. The dual-mode reviews page is only `template/index.html` (root `index.html` in a starter). `/embed.html` and `/site/embed` 301 to `/template/` (query preserved). Docs iframe snippets use `https://reviews.EXAMPLE.COM/`.
+- Docs advise a dedicated subdomain for real sites (`reviews.EXAMPLE.COM`, or `store1.reviews.EXAMPLE.COM` for several stores), with short Cloudflare Pages and GitHub Pages custom domain steps. `*.pages.dev` and `*.github.io` are for demos and testing.
 
 
 ## 1.3.1 (2026-11-07)

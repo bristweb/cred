@@ -30,15 +30,22 @@ Your site will be at `https://YOUR-USER.github.io/YOUR-REPO/` (replace with your
 
 **Or use GitHub Actions:** create a Direct Upload project in Cloudflare, then add the repository secrets `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name). **Deploy to Cloudflare Pages** publishes each push to `main`.
 
+### Use your own subdomain
+
+The `*.github.io` and `*.pages.dev` addresses are fine for demos and testing. Real sites should use their own subdomain, such as `reviews.EXAMPLE.COM`, or `store1.reviews.EXAMPLE.COM`, `store2.reviews.EXAMPLE.COM` for several stores.
+
+- **GitHub Pages:** in **Settings → Pages → Custom domain** enter `reviews.EXAMPLE.COM` and save. At your DNS provider add a `CNAME` record from `reviews` to `YOUR-USER.github.io`. Then turn on **Enforce HTTPS**.
+- **Cloudflare Pages:** in your project open **Custom domains → Set up a custom domain** and enter `reviews.EXAMPLE.COM`. At your DNS provider add a `CNAME` record from `reviews` to `YOUR-PROJECT.pages.dev` (Cloudflare adds it for you when the domain is on Cloudflare). HTTPS turns on by itself.
+
 ## Put it on your website
 
-Replace `EXAMPLE.COM` with your published address. For GitHub Pages that is usually `YOUR-USER.github.io/YOUR-REPO`.
+Replace `reviews.EXAMPLE.COM` with [your subdomain](#use-your-own-subdomain). While testing, use `YOUR-USER.github.io/YOUR-REPO` or `YOUR-PROJECT.pages.dev`.
 
 ```html
-<script src="https://EXAMPLE.COM/package/assets/js/cred.js" defer></script>
+<script src="https://reviews.EXAMPLE.COM/package/assets/js/cred.js" defer></script>
 ```
 
-Your reviews page is `https://EXAMPLE.COM/`. The same URL works in an iframe, where it becomes transparent so the host page shows through. Add `?embed` only to force that mode outside an iframe. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
+Your reviews page is `https://reviews.EXAMPLE.COM/`. The same URL works in an iframe, where it becomes transparent so the host page shows through. Add `?embed` only to force that mode outside an iframe. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
 
 ## Get Cred updates
 

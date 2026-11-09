@@ -77,9 +77,9 @@ test('starter README presents GitHub Pages and Cloudflare Pages as equal first-c
   assert.doesNotMatch(text, /EXAMPLE\.COM\/embed\.html/);
 });
 
-test('docs iframe snippet uses the single page at EXAMPLE.COM', { skip: !project }, () => {
+test('docs iframe snippet uses the single page at reviews.EXAMPLE.COM', { skip: !project }, () => {
   const ref = read('docs/REFERENCE.md');
-  assert.match(ref, /src="https:\/\/EXAMPLE\.COM\/"/);
+  assert.match(ref, /src="https:\/\/reviews\.EXAMPLE\.COM\/"/);
   assert.doesNotMatch(ref, /cred\.bristleconeweb\.com\/embed\.html/);
   assert.doesNotMatch(ref, /site\/embed\.html is the/);
   const redirects = read('_redirects');

@@ -4,7 +4,7 @@
 
 Use this guide when you need more than the working demo. You can edit your site entirely in GitHub.
 
-- [Embed](#embed) and [options](#options)
+- [Embed](#embed), [your own subdomain](#your-own-subdomain) and [options](#options)
 - [Data format](#data-format), [hiding and duplicates](#hiding-and-duplicates), and [updating data](#updating-data)
 - [Validation](#json-schema-and-validation) and [rating badge](#rating-badge)
 - [Get Cred updates](#get-cred-updates) and [versions](#versions)
@@ -118,7 +118,19 @@ npm test                                            # Cred repo: validator tests
 
 ## Embed
 
-Try the [live demo](https://cred.bristleconeweb.com/). For your own site, point the script `src` at your published widget ([Make your own](../README.md#make-your-own)). Set `data-source` (or the iframe `?source=`) only when your content is hosted elsewhere. The demo `src` below also works while you try things out.
+Try the [live demo](https://cred.bristleconeweb.com/). For your own site, point the script `src` at your published widget on [your own subdomain](#your-own-subdomain) ([Make your own](../README.md#make-your-own)). Set `data-source` (or the iframe `?source=`) only when your content is hosted elsewhere. The demo `src` below also works while you try things out.
+
+### Your own subdomain
+
+The `*.pages.dev` and `*.github.io` addresses are fine for demos and testing. Real sites should publish their Cred site at a dedicated subdomain of their own domain:
+
+- One site: `https://reviews.EXAMPLE.COM/`, embedded with `<script src="https://reviews.EXAMPLE.COM/package/assets/js/cred.js" defer></script>`.
+- Several stores or brands, one Cred site each: `https://store1.reviews.EXAMPLE.COM/`, `https://store2.reviews.EXAMPLE.COM/`.
+
+The address then stays the same if you change hosts, and it reads as yours to visitors and search engines.
+
+- **Cloudflare Pages:** in the project open **Custom domains → Set up a custom domain** and enter `reviews.EXAMPLE.COM`. Add a `CNAME` record from `reviews` to `YOUR-PROJECT.pages.dev` (Cloudflare adds it when the domain is on Cloudflare). The certificate is issued automatically.
+- **GitHub Pages:** in **Settings → Pages → Custom domain** enter `reviews.EXAMPLE.COM`. Add a `CNAME` record from `reviews` to `YOUR-USER.github.io`, then turn on **Enforce HTTPS**. The site is then served at the root of the subdomain, without the `/YOUR-REPO/` path.
 
 ### Data source
 
@@ -171,7 +183,7 @@ If your host places embeds in a fixed-size box (Google Sites: *Insert → Embed 
 
 ```html
 <iframe id="reviews-widget"
-        src="https://EXAMPLE.COM/"
+        src="https://reviews.EXAMPLE.COM/"
         title="Reviews" loading="lazy" scrolling="no"
         style="width:100%;border:0;height:420px"></iframe>
 <script>
