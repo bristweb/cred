@@ -39,7 +39,7 @@ Columns: **CRED** first; other products sorted by score (✅×2 + 🟡) on that 
 8. 30+ review sources.
 9. Google, Facebook, Trustpilot, Yelp, and more.
 11. Trustpilot-first; third-party re-embeds are restricted.
-12. Plain JSON + JS you can fork; no account required.
+12. Plain JSON + JS you can edit and host yourself; no service account required.
 14. No built-in inbox or reply UI — but you keep the full review records (including stored owner replies), so you can build your own response / follow-up workflows on top of that data.
 
 ### Review / social platforms you can show

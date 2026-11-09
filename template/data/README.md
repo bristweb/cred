@@ -2,7 +2,7 @@
 
 Everything the widget shows comes from this folder. It starts as the **Cred demo**: sample content for an invented bike shop, not a real business. It is the same data shown at [cred.bristleconeweb.com](https://cred.bristleconeweb.com/). **Replace it with your own before you publish**: do not present the sample as real reviews or testimonials.
 
-Edit these files in GitHub (pencil icon, or **Add file → Upload files**); every push is checked by the Check action. Updates from Cred change only `package/`, never this folder. The format is documented in [Cred's README](https://github.com/bristweb/cred#data-format).
+Edit these files in GitHub (pencil icon, or **Add file → Upload files**); every push is checked by the Check action. Updates from Cred change only `package/`, never this folder. The format is documented in [Cred's data format guide](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#data-format).
 
 Demo platforms: **Google**, **Yelp**, and **Facebook** (common review sources). The business and review text are fictional.
 
