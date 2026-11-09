@@ -54,7 +54,7 @@ test('starter exports public content by default and preserves explicit client re
     writeFileSync(path.join(starter, f), value);
   cmd(['git', 'init', '-q'], starter);
   cmd(['git', 'add', '-A'], starter);
-  cmd(['git', '-c', 'user.name=Cred', '-c', 'user.email=cred@localhost', 'commit', '-qm', 'Client content and explicit policies'], starter);
+  cmd(['git', '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'Client content and explicit policies'], starter);
   const out = path.join(dir, 'published');
   cmd(['sh', 'package/tools/export-site.sh', out], starter);
   assert.equal(read(out, 'robots.txt'), rules);

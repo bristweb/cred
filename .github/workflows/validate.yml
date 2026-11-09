@@ -32,5 +32,5 @@ jobs:
         run: |
           git add badge.json badge.svg
           git diff --cached --quiet && exit 0
-          git -c user.name=github-actions[bot] -c user.email=41898193+github-actions[bot]@users.noreply.github.com commit -m "Update rating badge"
+          git -c user.name="$GITHUB_ACTOR" -c user.email="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com" commit -m "Update rating badge"
           git push

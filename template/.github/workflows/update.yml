@@ -31,8 +31,8 @@ jobs:
         run: node package/tools/update-package.mjs
       - name: Check the new tools and your data
         run: |
-          git config user.name Cred
-          git config user.email cred@localhost
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
           git add -- package
           for f in package/assets/js/cred.js package/tools/*.mjs; do node --check "$f"; done
           sh -n package/tools/export-site.sh
@@ -47,9 +47,9 @@ jobs:
             echo "This package is already installed. No pull request needed."
             exit 0
           fi
-          git config user.name Cred
-          git config user.email cred@localhost
-          branch="cred-update-$CRED_RELEASE"
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+          branch="package-update-$CRED_RELEASE"
           git switch -c "$branch"
           git add package
           git commit -m "Update CRED to $CRED_RELEASE"

@@ -39,7 +39,7 @@ jobs:
           cp -a "$RUNNER_TEMP/starter/." .
           git add -A
           if git diff --cached --quiet; then echo "Starter already up to date."; exit 0; fi
-          git -c user.name=Cred -c user.email=cred@localhost commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
+          git -c user.name="$GITHUB_ACTOR" -c user.email="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com" commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
           git push -q origin main
       - name: Confirm the starter equals template/
         run: |
