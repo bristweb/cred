@@ -4,7 +4,7 @@ An open-source widget for reviews, testimonials, awards and credentials. Unlimit
 
 ## See it in action
 
-[**Live demo**](https://cred.bristleconeweb.com/) · [Light](https://cred.bristleconeweb.com/?theme=light) · [Dark](https://cred.bristleconeweb.com/?theme=dark) · [Iframe](https://cred.bristleconeweb.com/embed.html)
+[**Live demo**](https://cred.bristleconeweb.com/) · [Light](https://cred.bristleconeweb.com/?theme=light) · [Dark](https://cred.bristleconeweb.com/?theme=dark) · [Iframe](https://cred.bristleconeweb.com/template/)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/example-widget-dark-v7.png" />

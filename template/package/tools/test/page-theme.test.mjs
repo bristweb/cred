@@ -39,11 +39,7 @@ test('standalone CSS has system-dark and explicit overrides, without styling the
   assert.match(css, /@media \(prefers-color-scheme: dark\)\s*\{\s*:root\[data-theme="auto"\] \{ --cred-page-bg: #0d1117;/);
   assert.match(css, /:root \{ color-scheme: light; --cred-page-bg: #ffffff;/);
   assert.equal(css.includes('.rw-'), false);
-  const iframe = read('site/embed.html');
-  assert.match(iframe, /background:transparent/);
-  assert.match(iframe, /data-embed/);
-  assert.match(iframe, /window\.self\s*!==\s*window\.top|self!==window\.top/);
-  assert.equal(iframe.includes('page-theme.'), false);
+  assert.equal(existsSync(path.join(root, 'site/embed.html')), false, 'Cred no longer ships site/embed.html');
   assert.match(runtime, /addEventListener\('change', applyTheme\)/, 'existing widget media-change listener is retained');
 });
 

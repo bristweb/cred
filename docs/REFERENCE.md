@@ -51,7 +51,7 @@ cred/
 │   ├── index.html            the starter's reviews page (also the iframe page; transparent when embedded)
 │   ├── README.md             the starter's own README
 │   └── .github/workflows/    Check, Update Cred package, Deploy to Cloudflare Pages, Deploy to GitHub Pages
-├── site/                     Cred's own host pages: index.html (demo), embed.html (iframe), example.html, robots.txt, sitemap.xml
+├── site/                     Cred's own host pages: index.html (demo), example.html, robots.txt, sitemap.xml
 ├── docs/                     screenshots, COMPARISON.md, data-repo-workflows/ (samples for a standalone data repo)
 ├── .github/workflows/        check, deploy, pages, starter (publishes template/ verbatim), validate (reusable)
 ├── _headers  _redirects      host config (CORS, cache, short URLs for Cloudflare Pages)
@@ -94,7 +94,7 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 
 | Real path (every host, also GitHub Pages under `/<repo>/`) | Cloudflare Pages short URL |
 |---|---|
-| `/site/index.html`, `/site/embed.html`, `/site/example.html` | `/`, `/embed.html`, `/example/` |
+| `/site/index.html`, `/site/example.html`, `/template/` (dual-mode reviews page) | `/`, `/example/`; old `/embed.html` → `/template/` (301) |
 | `/template/package/assets/js/cred.js` (Cred) · `/package/assets/js/cred.js` (starter) | `/assets/js/cred.js` |
 | `/template/package/lang/en.json` (Cred) · `/package/lang/en.json` (starter) | `/lang/en.json` |
 | `/template/package/schemas/`, `/template/package/types/` | `/schemas/`, `/types/` |
@@ -104,7 +104,7 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 
 GitHub Pages ignores `_redirects`: use the real paths there. On Cred, for example `https://YOUR-USER.github.io/cred/template/package/assets/js/cred.js` and `…/cred/site/`. On a starter, the reviews page is at the repository root and the widget at `…/package/assets/js/cred.js`. The widget works out its site root from its own URL (`…/package/`, `…/template/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
 
-**What a deploy uploads.** `package/tools/export-site.sh _publish` (in Cred: `template/package/tools/export-site.sh`) writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — root host files, `site/` (Cred), `data/`, `template/data/` and `template/package/` (Cred) or `package/` (starter) — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json`. Nothing is renamed or moved; it is an export, not a build. Both deploy workflows run it.
+**What a deploy uploads.** `package/tools/export-site.sh _publish` (in Cred: `template/package/tools/export-site.sh`) writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — root host files, `site/` (Cred), `data/`, `template/index.html`, `template/data/` and `template/package/` (Cred) or `package/` (starter) — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json`. Nothing is renamed or moved; it is an export, not a build. Both deploy workflows run it.
 
 Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a copy can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
 
@@ -172,7 +172,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 
 ```html
 <iframe id="reviews-widget"
-        src="https://cred.bristleconeweb.com/embed.html"
+        src="https://EXAMPLE.COM/"
         title="Reviews" loading="lazy" scrolling="no"
         style="width:100%;border:0;height:420px"></iframe>
 <script>
@@ -183,7 +183,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-In the Cred project, `site/index.html` introduces the demo and `site/embed.html` is the public `/embed.html` entry (same dual-mode page: transparent in an iframe or with `?embed`, Canvas chrome when opened alone). In a starter, root `index.html` is that one page — use it standalone or as the iframe `src`. With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
+In the Cred project, `site/index.html` introduces the demo; the dual-mode reviews page is `template/index.html` (served at `/template/`). Old `/embed.html` and `/site/embed` URLs 301 to `/template/`. In a starter, root `index.html` is that same page — use it standalone or as the iframe `src`. With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
 
 ---
 
