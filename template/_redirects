@@ -1,4 +1,4 @@
 # Cloudflare Pages short URLs (GitHub Pages ignores this file and uses the real paths).
-# The reviews page and iframe page are at the root (index.html, embed.html).
+# The reviews page is at the root (index.html); open it in an iframe (or with ?embed) for the transparent embed.
 /assets/*         /package/assets/:splat       200
 /lang/*           /package/lang/:splat         200

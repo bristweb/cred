@@ -4,8 +4,9 @@ All notable changes to CRED. Versions follow [semantic versioning](https://semve
 
 ## Unreleased
 
-- Starter is a verbatim copy of `template/`: the widget runtime lives at `template/package/`, the reviews page is root `template/index.html`, and the iframe page is `template/embed.html` (`template/site/` removed). Cred's own `site/` is unchanged.
+- One reviews page for standalone and iframe: `template/index.html` (and Cred's `site/embed.html` for the public `/embed.html` URL). In an iframe or with `?embed` the page stays transparent and does not set `color-scheme` (avoids an opaque iframe backdrop); standalone keeps the Canvas chrome. `?theme=light|dark` still overrides. `template/embed.html` is removed.
 - Docs present GitHub Pages and Cloudflare Pages as equal first-class hosting options. Example embed URLs use `https://EXAMPLE.COM/…`.
+
 
 ## 1.3.1 (2026-11-07)
 

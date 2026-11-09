@@ -73,4 +73,6 @@ test('starter README presents GitHub Pages and Cloudflare Pages as equal first-c
   assert.ok(gh > 0 && cf > 0);
   assert.doesNotMatch(text, /Other publishing options|fallback|also works|Recommended:|Backup:/i);
   assert.match(text, /EXAMPLE\.COM/);
+  assert.match(text, /iframe/);
+  assert.doesNotMatch(text, /EXAMPLE\.COM\/embed\.html/);
 });
