@@ -17,16 +17,21 @@ test('Cred export leaves public HTML, robots rules and sitemap unchanged', { ski
   const out = path.join(dir, 'published');
   const ref = cmd(['git', 'stash', 'create']).trim() || 'HEAD';
   cmd(['sh', 'template/package/tools/export-site.sh', out, ref]);
-  for (const f of ['site/index.html', 'site/example.html', 'site/embed.html', 'site/robots.txt', 'site/sitemap.xml']) {
+  for (const f of ['site/index.html', 'site/example.html', 'site/robots.txt', 'site/sitemap.xml']) {
     assert.equal(read(out, f), read(root, f), `no rewriting ${f}`);
     assert.doesNotMatch(read(out, f), /noindex|nofollow|noarchive|Disallow:\s*\//i);
   }
+  assert.ok(!existsSync(path.join(out, 'site/embed.html')));
+  assert.ok(existsSync(path.join(out, 'template/index.html')));
   assert.doesNotMatch(read(out, '_headers'), /X-Robots-Tag/i);
   assert.match(read(out, 'site/robots.txt'), /Allow: \//);
   assert.match(read(out, 'site/sitemap.xml'), /https:\/\/cred\.bristleconeweb\.com\//);
   assert.doesNotMatch(read(root, 'template/package/assets/js/cred.js'), /noindex|robots/i, 'widget never controls the host page indexing');
   assert.ok(existsSync(path.join(out, 'template/package/assets/js/cred.js')));
   assert.ok(existsSync(path.join(out, 'template/data/config.js')));
+  const redirects = read(out, '_redirects');
+  assert.match(redirects, /\/embed\.html\s+\/template\/\s+301/);
+  assert.match(redirects, /\/site\/embed\s+\/template\/\s+301/);
 });
 
 test('starter exports public content by default and preserves explicit client restrictions', { skip: !project }, t => {
