@@ -14,7 +14,7 @@ Use this guide when you need more than the working demo. You can edit your site 
 
 ## Examples and the `include_examples` switch
 
-Everything in `template/data/` is example content. You do not tag anything: the widget knows from where the data is loaded (the bundled examples folder, `template/data/`), and `validate.mjs` and `badge.mjs` know from the folder path. The files carry no `example: true` markers.
+Everything in `template/data/` is example content. The widget recognizes it by its location; `validate.mjs` and `badge.mjs` use the same folder path. No `example: true` markers are needed there.
 
 `include_examples` is a top-level key in `config.js`. It defaults to `true`, so the upstream demo shows its examples:
 
@@ -28,18 +28,17 @@ export default {
 With `false`, example content is left out of the cards, counts, averages, summary card, JSON-LD and rating badge, the same way `hidden: true` works on a review. Nothing is deleted. In practice:
 
 - **This repo's demo:** `include_examples` in `template/data/config.js` controls all of it at once, because everything loaded from `template/data/` is example content.
-- **Your starter copy:** its `data/` starts as a byte-for-byte copy of the demo but is your content: the widget no longer treats it as examples. Replace it. To keep a few placeholder items for now, mark just those with `example: true` (accepted on reviews, `summary`, accolades, credentials and testimonials) and set `include_examples: false` in `data/config.js`.
+- **Your starter copy:** its `data/` starts as a copy of the demo but is treated as your content, not as examples. Replace it. To keep a few placeholders without displaying them, mark those items with `example: true` (accepted on reviews, `summary`, accolades, credentials and testimonials) and set `include_examples: false` in `data/config.js`.
 
 `include_examples` needs widget 1.2.0 or later.
 
 ## Repository layout
 
-The demo above **is** the starter template. Its source is the inner template [`template/`](../template/) in this repo: that folder is published verbatim as [**bristweb/cred-starter**](https://github.com/bristweb/cred-starter) on every push to `main` (no assembly). `template/data/` is the demo content this site shows; `template/package/` is the widget runtime; the starter's pages, README and workflows live beside them. The starter repository is generated output, never edited by hand, so it always matches `template/` exactly. It contains no Cred project site, docs, changelog or history.
+The demo is also the starter template. Its source is [`template/`](../template/) in this repo, published unchanged as [**bristweb/cred-starter**](https://github.com/bristweb/cred-starter) on every push to `main`. `template/data/` holds the demo content; `template/package/` holds the widget runtime; the starter's pages, README and workflows live beside them. Make starter changes here, not in the generated repository. The starter contains no Cred project site, docs, changelog or history.
 
+Nothing in Cred is compiled. The files you edit are the files the browser loads: there is no `dist/` and no build step.
 
-Nothing in Cred is compiled. The files you edit are the files the browser loads, and the repo is published as it is: there is no `dist/` and no build step.
-
-```
+```text
 cred/
 ├── template/                 the starter, published verbatim as bristweb/cred-starter
 │   ├── package/              the product: the only folder a starter copy receives updates for
@@ -60,11 +59,11 @@ cred/
 └── README.md, CHANGELOG.md, AGENTS.md, LICENSE, package.json
 ```
 
-`template/data/` is exactly the `data/` folder of a starter copy: the same folder names and nesting. Its records carry no `example: true`; here everything in it is example content because of where it is. In a starter, the reviews page is root `index.html` (standalone or iframe); Cred's own pages stay in `site/`.
+In a starter, the reviews page is root `index.html` (standalone or iframe); Cred's own pages stay in `site/`.
 
 **Where files go: one `assets/` folder, sorted by kind** (same in a starter's `data/` and `template/data/`):
 
-```
+```text
 assets/
 ├── icons/            platform logos, award and credential badges, company marks (SVG)
 ├── images/           photos, posters, thumbnails; images/reviewers/ holds reviewer avatars
@@ -75,7 +74,7 @@ assets/
 
 Paths in `config.js` and `reviews/*.json` are relative to the data folder, e.g. `assets/icons/google.svg`, `assets/images/reviewers/google-1.svg`, `assets/video/clip.mp4`. With no `icon` set, a platform looks for `assets/icons/<platform>.svg`.
 
-How `package/` stays untouched but still customizable: your `config.js` lists its own platform icons, `data/theme/theme.css` sets fonts and colours, `data/lang/<code>.json` overrides wording (partial files are fine; listed in `config.languages`), and everything you add lives under `data/assets/`. Your own landing page, `robots.txt`, `sitemap.xml` or `CNAME` go at the root of your starter copy.
+Customize the widget without editing `package/`: set platform icons in `config.js`, fonts and colours in `data/theme/theme.css`, and wording in `data/lang/<code>.json` (partial files are fine; list them in `config.languages`). Keep media under `data/assets/`. Your own landing page, `robots.txt`, `sitemap.xml` or `CNAME` go at the root of your starter copy.
 
 | Cred provides (`package/`, updated by pull request) | Yours (in your starter copy) |
 |---|---|
@@ -104,9 +103,9 @@ The files are served at their real paths on every static host. Cloudflare Pages 
 
 GitHub Pages ignores `_redirects`: use the real paths there. On Cred, for example `https://YOUR-USER.github.io/cred/template/package/assets/js/cred.js` and `…/cred/site/`. On a starter, the reviews page is at the repository root and the widget at `…/package/assets/js/cred.js`. The widget works out its site root from its own URL (`…/package/`, `…/template/package/`, `…/v/<x.y.z>/` or the short `…/assets/`), so `data/`, the examples and `versions.json` are found on both hosts and under a project subpath.
 
-**What a deploy uploads.** `package/tools/export-site.sh _publish` (in Cred: `template/package/tools/export-site.sh`) writes the committed files of `HEAD` (`git archive`: no `.git`, `node_modules`, untracked or ignored files) for the served paths only — root host files, `site/` (Cred), `data/`, `template/index.html`, `template/data/` and `template/package/` (Cred) or `package/` (starter) — at the same paths as in the repo, then adds the generated `/v/` release copies and `versions.json`. Nothing is renamed or moved; it is an export, not a build. Both deploy workflows run it.
+**What a deploy uploads.** `package/tools/export-site.sh _publish` (in Cred: `template/package/tools/export-site.sh`) exports committed files from `HEAD` using `git archive`: no `.git`, `node_modules`, untracked or ignored files. It includes only served paths — root host files, `site/` (Cred), `data/`, `template/index.html`, `template/data/` and `template/package/` (Cred) or `package/` (starter) — then adds generated `/v/` release copies and `versions.json`. Paths stay unchanged; it is an export, not a build. Both deploy workflows run it.
 
-Upstream **provides** the tooling; the widget does not require it. The widget only reads the files in your data folder (`data-source` if set, else `data/` when it has a `config.js`, else the examples), so a copy can fill them however it likes: by hand, with its own sync job, or with the validator and badge tools here, which only check and tidy what you produce:
+The widget does not require the Node tools. You can maintain your data by hand or with your own sync jobs, and optionally use these tools to check it and generate a badge:
 
 ```sh
 npm ci                                              # once: development dependencies (zod) for the tools
@@ -119,17 +118,17 @@ npm test                                            # Cred repo: validator tests
 
 ## Embed
 
-Try the [live demo](https://cred.bristleconeweb.com/). For a real site, point the script `src` at your own site ([Make your own](../README.md#make-your-own)); `data-source` (or the iframe `?source=`) is optional and only needed when your content is somewhere else. The demo `src` also works while you try things out.
+Try the [live demo](https://cred.bristleconeweb.com/). For your own site, point the script `src` at your published widget ([Make your own](../README.md#make-your-own)). Set `data-source` (or the iframe `?source=`) only when your content is hosted elsewhere. The demo `src` below also works while you try things out.
 
 ### Data source
 
-The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and the rest from a data folder. It picks the folder in this order:
+The widget reads `config.js`, `reviews/<year>.json`, `theme/theme.css` and other content from a data folder. It chooses that folder in this order:
 
-1. **`data-source`** (or `?source=`), if the embed has one: that folder is used, and nothing else is tried. Set `data-source="https://…/"` (trailing `/` added if missing) to read content from a different folder, site or repo.
-2. **`data/`**, if it has content: the widget looks for `<site root>/data/config.js`. The site root is the folder that holds `package/` or `template/package/` (worked out from the script URL: `…/package/assets/js/cred.js`, `…/template/package/assets/js/cred.js`, `…/v/<x.y.z>/assets/js/cred.js` or the Cloudflare short URL `…/assets/js/cred.js`). This is your own content.
-3. **The bundled examples** (`<site root>/template/data/`) when `data/` is empty.
+1. **`data-source`** (or `?source=`): uses that folder without trying another source. Set `data-source="https://…/"` to load content from a different folder, site or repo. A missing trailing slash is added automatically.
+2. **`data/`**: looks for `<site root>/data/config.js`. The site root is the folder holding `package/` or `template/package/`, inferred from the script URL (`…/package/assets/js/cred.js`, `…/template/package/assets/js/cred.js`, `…/v/<x.y.z>/assets/js/cred.js` or the Cloudflare short URL `…/assets/js/cred.js`).
+3. **Bundled examples** (`<site root>/template/data/`) when `data/` has no config.
 
-So `data-source` is **optional**: a starter copy needs no attribute, and the upstream demo (whose `data/` is empty) works with the bare snippet. A pinned release (`/v/<x.y.z>/assets/js/cred.js`) looks at the site root as well.
+A starter needs no `data-source` attribute. The upstream demo also works without one because its `data/` is empty. Pinned releases use the same site-root lookup.
 
 ### JavaScript (recommended)
 
@@ -159,14 +158,14 @@ Paste the script into your site's HTML or embed block:
 
 ### Google Sites / Similar
 
-If your host gives you a box with limited ability to adjust sizing and responsiveness (Google Sites: *Insert → Embed → Embed code*), turn on **one** toggle:
+If your host places embeds in a fixed-size box (Google Sites: *Insert → Embed → Embed code*), enable constrained mode:
 
 ```html
 <script src="https://cred.bristleconeweb.com/assets/js/cred.js"
         data-constrained="true"></script>
 ```
 
-`data-constrained="true"` packs the widget into that box: fill the height, arrows inside, nothing drawn outside the box, no hover lift, focus rings drawn inside. It is named “constrained” (not “fixed proportions”) because it follows the box you give it rather than locking an aspect ratio. Stretch the box full width and about **420px** tall; on your own site the same tag reads your `data/` folder. See [Header behavior](#header-behavior) for short heights (tested down to 140px). Extra fitting tweaks (beyond this preset) are CSS classes — see [Options](#options).
+`data-constrained="true"` fills the box, keeps arrows and focus rings inside, clips overflow and disables the hover lift. It follows the box's dimensions rather than locking an aspect ratio. Make the box full width and about **420px** tall; on your own site the same tag reads your `data/` folder. See [Header behavior](#header-behavior) for shorter boxes (tested down to 140px) and [Options](#options) for individual CSS controls.
 
 ### Iframe
 
@@ -183,7 +182,7 @@ If your host gives you a box with limited ability to adjust sizing and responsiv
 </script>
 ```
 
-In the Cred project, `site/index.html` introduces the demo; the dual-mode reviews page is `template/index.html` (served at `/template/`). Old `/embed.html` and `/site/embed` URLs 301 to `/template/`. In a starter, root `index.html` is that same page — use it standalone or as the iframe `src`. With no `?source=` they use the default data folder (`data/` if it has a `config.js`, else `template/data/`).
+In the Cred project, `site/index.html` introduces the demo; the reviews page is `template/index.html` (served at `/template/`). Old `/embed.html` and `/site/embed` URLs redirect there (301). In a starter, the same page is root `index.html` — use it standalone or as the iframe `src`. Without `?source=`, both use the default [data source](#data-source).
 
 ---
 
@@ -211,9 +210,9 @@ Each option below is set as `data-<name>` on the script (or target element) and/
 
 ## Data format
 
-Plain files at the data root, served over HTTPS with CORS open enough for your pages to fetch them (Cloudflare Pages with the included `_headers`, or GitHub Pages by default; any static host works). The widget reads only these paths; other folders (e.g. your own `scripts/`) are never loaded.
+Plain files at the data root, served over HTTPS with CORS enabled for your pages to fetch them (Cloudflare Pages with the included `_headers`, or GitHub Pages by default; any static host works). The widget reads only these paths; other folders, such as your own `scripts/`, are never loaded.
 
-```
+```text
 config.js                business, platforms, display, languages, defaultLanguage, strings, schema, summary, accolades, credentials, testimonials, reviews.years, …
 lang/<code>.json         optional UI wording (listed in config.languages; partial OK)
 reviews/<year>.json      reviews dated that year (array, newest first)
@@ -226,7 +225,7 @@ theme/fonts/             optional self-hosted fonts
 
 ### `config.js`
 
-An ES module whose default export is the config object, so it can carry comments. `// @ts-check` plus the `/** @type {import('./cred-config').CredConfig} */` line above `export default` gives editor autocomplete and type checks from `cred-config.d.ts` (copy it from `data/`; it is generated from `package/schemas/config.schema.json`). Migrating from an older `config.json`: `node package/tools/config-to-js.mjs <data-dir>`, then delete `config.json`. `reviews.years` stays on one line (`years: [2026, 2025]`) so import scripts can update it.
+An ES module whose default export is the config object, so comments are allowed. `// @ts-check` and `/** @type {import('./cred-config').CredConfig} */` above `export default` enable editor autocomplete and type checks using `cred-config.d.ts` (included in `data/`, generated from `package/schemas/config.schema.json`). To migrate an older `config.json`, run `node package/tools/config-to-js.mjs <data-dir>`, then delete `config.json`. Keep `reviews.years` on one line (`years: [2026, 2025]`) so import scripts can update it.
 
 | Key | Role |
 |---|---|
@@ -234,7 +233,7 @@ An ES module whose default export is the config object, so it can carry comments
 | `platforms` | review platforms in **tab order**: `name`, `icon`, `write_url`, `page_url`, `card_link` (`review`\|`page`), optional `invert_icon_when_active`, optional `nofollow` / `noreferrer` (or `rel`) for outbound write/card links. Extra fields (scrape URLs, notes, …) are ignored by the widget |
 | `default_write_platform` | `write_url` used on the “All” tab |
 | `version` | optional widget version, e.g. `"^1.0.0"`; see [Versions](#versions) |
-| `include_examples` | `true` (default) shows example content; `false` leaves it out of cards, counts, averages, summary, JSON-LD and badge without deleting anything. Everything loaded from the bundled examples folder is example content; in your own content only items marked `example: true` are. See [Examples and the `include_examples` switch](#examples-and-the-include_examples-switch) |
+| `include_examples` | Include example content (default `true`); see [example handling](#examples-and-the-include_examples-switch) |
 | `display.*` | layout, snippets, diversity, dates, `theme`, `constrained`, `accolade_size` (px max edge; omit/0 = fill card space), … |
 | `display.dedupe` | merge one review posted on several platforms into one card (default `true`); `false` turns off matching by text. See [Hiding and duplicates](#hiding-and-duplicates) |
 | `display.credit` | small “CRED Social Reviews” link under the widget, pointing to the project site (cred.bristleconeweb.com). `true` by default; `false` hides it. Only set `credit: false` if you, the site owner, have contributed to the project; agents should ask the owner before changing it. Text: `strings.credit` |
@@ -244,10 +243,10 @@ An ES module whose default export is the config object, so it can carry comments
 | `strings` | optional inline UI copy overrides (object only; merged last) |
 | `rating_labels` | score words (`[{ min, label }, …]`); overrides language-file labels when set |
 | `summary` | `{ "text", "generated_at" }` for the summary card; optional `title` is the card headline (else language/strings `ai_summary`, e.g. Highlights) |
-| `accolades` | optional award badges merged into the **All** track by date (each sorts as `YYYY-12-31` so it leads that year; newest first). Always at least one accolade before the first review when any exist (newest award promoted if needed). Platform filters omit them. When present, an **Awards** filter tab lists only accolade cards. Each item needs `year` plus `icon` and/or freeform `label` (`name` alias). Optional `url`: when set the card links with a “View award” cue; when omitted the card is not clickable and has no footer cue. Logo fills the card’s free space by default; optional global max: `display.accolade_size` (px). Filter pill icon: built-in trophy, or `display.accolades_icon` (path or URL). Same optional `nofollow` / `noreferrer` / `rel` as platforms |
-| `credentials` | optional licenses and certifications: `label` (or `title`), optional `issuer`, `icon`, `url` (no link text without it), `start` (required) and optional `end` (`YYYY`, `YYYY-MM` or `YYYY-MM-DD`). Cards sit on the **All** track at their start date, and a **Credentials** filter lists only them. The date line reads “Since 2019” or “2019–2024”. Not counted in ratings or the JSON-LD. Filter pill icon: built-in badge, or `display.credentials_icon` |
-| `testimonials` | optional testimonial cards (review-like) merged into the **All** track by date, newest first. No required platform/source. When present, a **Testimonials** filter tab lists only these cards; platform filters omit them. Each item needs `title` (shown like a reviewer name, not abbreviated), `text`, `date`; optional `subtitle` is a smaller line under the title (e.g. role and company). Filter pill icon: built-in quote bubble, or `display.testimonials_icon` (path or URL). Optional `url`, `link_text` (footer cue; default **Learn more** / `strings.view_testimonial`), `rating`, `reviewer_image`. Optional `source` (`name` required when set; `logo` shown in the avatar slot, reviewer image secondary; `name` is used in the accessible label, not as a visible line). Same optional `nofollow` / `noreferrer` / `rel` Optional `media` list: `{ type: image | audio | video | link, url, thumbnail, poster, caption, alt }`. With media, the first item's image is the card's content and the quote text is kept only as hidden text and alt text; extra items are small image chips. Images and videos open in a lightbox, audio plays below its image, links open the post. `caption` / `alt` label each item for screen readers and tooltips; audio, video and link fall back to a neutral image without `thumbnail` / `poster`. A card with media is not itself a link; its `url` becomes the footer link. Optional `excerpt` as for reviews |
-| `example` (on `summary`, an accolade, credential or testimonial) | `true` marks bundled sample content; see `include_examples` |
+| `accolades` | optional award badges merged into **All** by date (each sorts as `YYYY-12-31`, newest first). At least one award appears before the first review; the newest is promoted if needed. An **Awards** tab shows only awards; platform filters omit them. Each item needs `year` plus `icon` and/or `label` (`name` alias). Optional `url` makes the card clickable with a “View award” cue; without it, neither is shown. Logos fill the available space unless capped by `display.accolade_size` (px). Filter icon: built-in trophy, or `display.accolades_icon` (path or URL). Supports the same optional `nofollow` / `noreferrer` / `rel` as platforms |
+| `credentials` | optional licenses and certifications: `label` (or `title`), optional `issuer`, `icon`, `url` (no link text without it), required `start` and optional `end` (`YYYY`, `YYYY-MM` or `YYYY-MM-DD`). Cards appear in **All** at their start date; a **Credentials** tab shows only credentials. The date line reads “Since 2019” or “2019–2024”. Not counted in ratings or JSON-LD. Filter icon: built-in badge, or `display.credentials_icon` |
+| `testimonials` | optional testimonial cards merged into **All** by date, newest first. No platform/source is required. A **Testimonials** tab shows only testimonials; platform filters omit them. Each item needs `title` (not abbreviated), `text` and `date`; optional `subtitle` appears below the title (e.g. role and company). Filter icon: built-in quote bubble, or `display.testimonials_icon` (path or URL). Optional `url`, `link_text` (footer cue; default **Learn more** / `strings.view_testimonial`), `rating`, `reviewer_image` and `excerpt` (as for reviews). Optional `source` requires `name`; its `logo` takes the avatar slot, with the reviewer image secondary. The source name is an accessible label, not a visible line. Supports `nofollow` / `noreferrer` / `rel`. Optional `media` list: `{ type: image \| audio \| video \| link, url, thumbnail, poster, caption, alt }`. With media, the first item's image replaces the visible quote; the text remains as hidden text and alt text. Extra items appear as small image chips. Images and videos open in a lightbox, audio plays below its image, and links open the post. `caption` / `alt` label items for screen readers and tooltips; audio, video and link items use a neutral image without `thumbnail` / `poster`. A media card is not itself a link; its `url` becomes the footer link |
+| `example` (on `summary`, an accolade, credential or testimonial) | `true` marks example content; see `include_examples` |
 | `reviews.years` | year files to fetch, newest first, e.g. `[2026, 2025]` |
 
 Formal shape: `package/schemas/config.schema.json` in this repo.
@@ -330,9 +329,9 @@ Formal shape: `package/schemas/reviews.schema.json` in this repo.
 | `package/schemas/config.schema.json` | `config.js` |
 | `package/schemas/reviews.schema.json` | each `reviews/<year>.json` array |
 
-Optional check: from a checkout of this repo, run `node package/tools/validate.mjs <data-dir>` (install the development dependency, Zod, with `npm ci` first). It checks the JSON schemas (with Zod, without changing the data) plus light filesystem rules (icons and media files exist, relative `reviewer_image` paths resolve, `reviews.years` matches files, newest-first, dates in the right year file, unique `platform` + `platform_review_id`, `duplicate_of` names another review) and reports how many duplicates count once.
+Optional local check: run `node package/tools/validate.mjs <data-dir>` from a starter checkout (install the development dependency, Zod, with `npm ci` first). In this repo, use `npm run validate` for the bundled examples. Validation does not change your data. It checks schema fields, local icons and media, relative reviewer image paths, year files against `reviews.years`, newest-first ordering, dates in the right year file, unique `platform` + `platform_review_id` pairs, and valid `duplicate_of` references. It also reports how many duplicates count once.
 
-A data repo can run the same check on every push. The sample at `docs/data-repo-workflows/validate.yml` is that thin caller; copy it to `.github/workflows/validate.yml` at the data repo's root:
+A data repo can run the same check on every push. Copy `docs/data-repo-workflows/validate.yml` to `.github/workflows/validate.yml` at the data repo's root:
 
 ```yaml
 # .github/workflows/validate.yml
@@ -361,7 +360,7 @@ After validating, the same workflow writes `badge.json` and `badge.svg` at the d
 
 ## Updating data
 
-Edit your repository’s `data/` folder in GitHub: add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add a year file, adjust `config.js` / `assets/` / theme as needed, then publish. Optionally run `node package/tools/validate.mjs <data-dir>` from a reviews-widget checkout before you push.
+Edit your repository's `data/` folder in GitHub: add or change records in `reviews/<year>.json` (newest first), update `reviews.years` when you add or remove a year file, and adjust `config.js`, assets or theme as needed. Then publish. Optionally run `node package/tools/validate.mjs <data-dir>` from a starter checkout before pushing.
 
 ---
 
@@ -432,12 +431,12 @@ Releases follow [semantic versioning](https://semver.org/): breaking changes to 
 
 ## Alternative: a separate data repo
 
-[The starter](../README.md#make-your-own) is the recommended path. If you would rather keep content in its own repo (for example one widget shared by many sites), copy this repo’s `template/data/` folder into a new repo and replace the example content with yours — `config.js`, `reviews/`, `theme/`, `assets/`, and then add the host files and workflows a standalone repo needs: add a `_headers` with `/*` → `Access-Control-Allow-Origin: *` (and an empty `.nojekyll` for GitHub Pages) at the repo root, and copy `docs/data-repo-workflows/validate.yml` (and `deploy.yml`) to `.github/workflows/`. Publish it (see below). Point the widget’s `data-source` at that published URL (needed here, since the content is not on the script's own site).
+[The starter](../README.md#make-your-own) is recommended. To keep content in a separate repo instead, copy the contents of `template/data/` into a new repo's root and replace the examples. Copy `docs/data-repo-workflows/validate.yml` into `.github/workflows/`, then publish using either host below. Set the widget's `data-source` to the published URL; it is needed here because the content and script are hosted separately.
 
 **Hosting.** Use either GitHub Pages or Cloudflare Pages.
 
-- **GitHub Pages:** copy `docs/data-repo-workflows/` samples as needed, add an empty `.nojekyll`, then Settings → Pages → Source: *GitHub Actions* and run the pages workflow.
-- **Cloudflare Pages:** the sample `docs/data-repo-workflows/deploy.yml` publishes the committed files on every push to `main` once you add three repo secrets: `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name; create it once in the Cloudflare dashboard as a Direct Upload project). `_headers` opens CORS.
+- **GitHub Pages:** add an empty `.nojekyll` at the root. In **Settings → Pages**, choose **Deploy from a branch**, then `main` and `/ (root)`. Cross-origin access is enabled by default.
+- **Cloudflare Pages:** create a Direct Upload project and copy `docs/data-repo-workflows/deploy.yml` into `.github/workflows/`. Add repository secrets `CLOUDFLARE_API_TOKEN` (Pages edit permission), `CLOUDFLARE_ACCOUNT_ID` and `CF_PAGES_PROJECT` (project name). Each push to `main` publishes the committed files. Add a root `_headers` file with `/*` followed by an indented `Access-Control-Allow-Origin: *` to enable cross-origin access.
 
 
 ---

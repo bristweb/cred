@@ -1,6 +1,6 @@
 # Comparison
 
-Side-by-side look at this open, static reviews widget versus common **hosted review-widget** products, **reputation / review-management** suites, and **review platforms** that sell their own badges/widgets (e.g. Trustpilot, ProvenExpert). Source networks like Google and Yelp appear as **rows** in the platform-support table, not as product columns. Features and plans change — check each vendor’s docs for the current product.
+A comparison of Cred's open-source, static reviews widget with hosted review widgets, reputation-management suites, and review platforms that sell their own badges and widgets (such as Trustpilot and ProvenExpert). Google and Yelp appear as source rows in the platform table, not as product columns. Features and plans change; check each vendor's current documentation.
 
 **Key**
 
@@ -44,7 +44,7 @@ Columns: **CRED** first; other products sorted by score (✅×2 + 🟡) on that 
 
 ### Review / social platforms you can show
 
-Because this widget is self-hosted, **any platform is supported**: you can gather the records however you like (automation or by hand), so nothing depends on a vendor’s connector catalog (including sources other services may not offer). The table below is about *built-in connectors / official integrations* for the other products (including whether a review platform only “connects” to itself). Rows cover 100+ common review, directory, marketplace, app-store, B2B, vertical, and social surfaces.
+Cred can display records from **any platform** if you supply them in its data format, manually or through your own tools. Its checkmarks mean display support, not built-in collection or sync. For other products, the table covers built-in connectors and official integrations across 100+ review, directory, marketplace, app-store, B2B and social sources.
 
 | Platform | **CRED** | Birdeye | SociableKIT | Reputation.com | Elfsight | Podium | Tagembed | EmbedSocial | ProvenExpert | Trustpilot |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -190,15 +190,15 @@ Because this widget is self-hosted, **any platform is supported**: you can gathe
 16. Amazon often needs a manual / CSV-style import on several hosted widgets; not always a full live API sync.
 17. Trustpilot generally does not allow third-party widgets to re-embed Trustpilot reviews; use Trustpilot’s own embeds or store a copy yourself (as with this widget).
 
-Marks for other vendors are based on their public docs and connector lists (and may change). Treat 🟡 as “partial, plan-gated, manual import, monitoring-only, or limited API.” **CRED** is ✅ on every row because any source you can turn into the data format can be displayed. Elfsight also offers a custom/manual source for platforms without a connector — that is still not a live connector, so unlisted rows stay ❌ here.
+Vendor entries are based on public documentation and connector lists and may change. Here, 🟡 can mean partial support, a paid tier, manual import, monitoring only or an API limit. Elfsight also offers a custom/manual source; unlisted connectors remain ❌ because manual entry is not live sync.
 
 ### Reading the columns
 
-Each matrix sorts competitor columns by its own score: **✅ × 2 + 🟡** (CRED always first). Feature-matrix order and platform-support order can differ. Google Business Profile and Yelp are **not** product columns — they are review platforms / source networks listed as **rows** under platform support.
+Each table sorts competitor columns by its own score (**✅ × 2 + 🟡**), so their order can differ. CRED is always first.
 
-- **CRED** is only the on-site display layer plus a data format. Collection (scrapers, hand entry, …) and any owner-reply / response automation live in each data store’s own tooling if you want them — there is no native inbox, but the data you own makes those workflows possible.
-- **Birdeye**, **Reputation.com**, **Podium** — reputation / review-management / messaging suites: widgets exist, but the core product is listing management, outreach, and inbox across many sources.
-- **Trustpilot**, **ProvenExpert** — review platforms that also sell first-party badges/widgets (still not self-hosted multi-source carousels).
-- **Elfsight**, **EmbedSocial**, **SociableKIT**, **Tagembed** — hosted multi-source review embeds (pull from networks like Google/Yelp into a vendor widget).
+- **CRED** is the on-site display layer and data format. Collection and owner-reply workflows belong in your own tooling; there is no built-in inbox.
+- **Birdeye**, **Reputation.com**, **Podium** — reputation-management and messaging suites. They include widgets, but focus on listings, outreach and a shared inbox.
+- **Trustpilot**, **ProvenExpert** — review platforms that sell their own badges and widgets, rather than self-hosted multi-source carousels.
+- **Elfsight**, **EmbedSocial**, **SociableKIT**, **Tagembed** — hosted widgets that combine reviews from sources such as Google and Yelp.
 
 Corrections welcome via PR.
