@@ -1,6 +1,5 @@
 # Publishes the starter repository (bristweb/cred-starter, a GitHub template) from this repo on every push to main:
-# template/ (the demo data, pages, README and workflows) plus package/, assembled by package/tools/build-starter.sh.
-# The starter is generated output: edit template/ or package/ here, never the starter itself.
+# a verbatim copy of template/ (no assembly). The starter is generated output: edit template/ here, never the starter.
 # Needs the repo secret STARTER_DEPLOY_KEY: the private half of a write deploy key on bristweb/cred-starter only.
 name: Publish starter
 on:
@@ -21,8 +20,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Assemble the starter from template/ and package/
-        run: sh package/tools/build-starter.sh "$RUNNER_TEMP/starter"
+      - name: Publish template/ verbatim as the starter
+        run: sh template/package/tools/build-starter.sh "$RUNNER_TEMP/starter"
       - name: Commit the generated files to the starter if they changed
         env:
           STARTER_DEPLOY_KEY: ${{ secrets.STARTER_DEPLOY_KEY }}
@@ -42,3 +41,8 @@ jobs:
           if git diff --cached --quiet; then echo "Starter already up to date."; exit 0; fi
           git -c user.name=Cred -c user.email=cred@localhost commit -qm "Starter from bristweb/cred@${GITHUB_SHA::7}"
           git push -q origin main
+      - name: Confirm the starter equals template/
+        run: |
+          rm -rf "$RUNNER_TEMP/starter-check"
+          sh template/package/tools/build-starter.sh "$RUNNER_TEMP/starter-check"
+          diff -qr "$RUNNER_TEMP/starter-check" "$RUNNER_TEMP/starter"

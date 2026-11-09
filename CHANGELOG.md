@@ -2,6 +2,11 @@
 
 All notable changes to CRED. Versions follow [semantic versioning](https://semver.org/); see [Versions](README.md#versions).
 
+## Unreleased
+
+- Starter is a verbatim copy of `template/`: the widget runtime lives at `template/package/`, the reviews page is root `template/index.html`, and the iframe page is `template/embed.html` (`template/site/` removed). Cred's own `site/` is unchanged.
+- Docs present GitHub Pages and Cloudflare Pages as equal first-class hosting options. Example embed URLs use `https://EXAMPLE.COM/…`.
+
 ## 1.3.1 (2026-11-07)
 
 - A relative `data-source` (such as the example page's `../template/data/`) is resolved against the page. `import()` resolved it against `cred.js`, so the example preview showed "Reviews are unavailable".

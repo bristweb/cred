@@ -20,10 +20,10 @@ The demo is the starter. You get the same working widget, example reviews, photo
 
 1. **Create your repository** with the button above. Choose a name and public or private.
 2. **Make your changes in GitHub.** Edit `data/config.js` for your business, replace the example reviews in `data/reviews/`, and add your images and colors in `data/assets/` and `data/theme/`. No local install.
-3. **Publish and embed.** Follow [your starter's publishing guide](https://github.com/bristweb/cred-starter#publish-it), then paste this into your website with your published address:
+3. **Publish and embed.** Follow [your starter's publishing guide](https://github.com/bristweb/cred-starter#publish-it), then paste this into your website with your published address (replace `EXAMPLE.COM`):
 
 ```html
-<script src="https://YOUR-SITE/package/assets/js/cred.js" defer></script>
+<script src="https://EXAMPLE.COM/package/assets/js/cred.js" defer></script>
 ```
 
 The bike shop and its reviews are fictional. Replace the examples before using them as your business's reviews.
@@ -34,7 +34,7 @@ In your repository, run **Actions → Update Cred package** with a [release tag]
 
 ## Need a little more help?
 
-- [Publishing](https://github.com/bristweb/cred-starter#publish-it) — Cloudflare Pages or GitHub Pages, including private repositories.
+- [Publishing](https://github.com/bristweb/cred-starter#publish-it) — GitHub Pages or Cloudflare Pages, including private repositories.
 - [Data format](docs/REFERENCE.md#data-format) — business details, reviews, images and themes.
 - [Embed and options](docs/REFERENCE.md#embed) — website builders, iframes, layouts and light or dark mode.
 - [Full reference](docs/REFERENCE.md) — validation, updates, structured data and advanced settings.

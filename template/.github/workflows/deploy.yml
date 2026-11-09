@@ -1,0 +1,44 @@
+# Publish with Cloudflare Pages (same export as GitHub Pages).
+name: Deploy to Cloudflare Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: cf-pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check optional Actions deployment configuration
+        id: config
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
+        run: |
+          if test -n "$TOKEN" && test -n "$ACCOUNT" && test -n "$PROJECT"; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          elif test -z "$TOKEN$ACCOUNT$PROJECT"; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Actions deployment is not configured. Use the Cloudflare Git integration, or add all three documented deployment secrets. This workflow did not deploy the site."
+          else
+            echo "::error::Configure all three deployment secrets, or remove the partial configuration and use Cloudflare Git integration."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags, for /v/ builds
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Export the committed files and add the /v/ releases
+        run: sh package/tools/export-site.sh _publish
+      - name: Deploy
+        if: steps.config.outputs.enabled == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
+        run: npx --yes wrangler@4 pages deploy _publish --project-name "$CF_PAGES_PROJECT" --branch main

@@ -1,5 +1,6 @@
 // Fetch a published release tag from the fixed upstream; copy ONLY package/ into a clean checkout.
-// No archives are extracted: regular Git blobs are inspected before any writes, so symlinks/traversal cannot escape.
+// In Cred, the runtime lives at template/package/; older tags used top-level package/. Either way the client
+// receives files under package/. No archives are extracted: regular Git blobs are inspected before any writes.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
 import path from 'node:path';
@@ -49,18 +50,26 @@ export function update(dir, tag) {
   if (!git(['ls-remote', '--tags', UPSTREAM, `refs/tags/${tag}`]).trim()) throw new Error(`No published Cred tag ${tag}. See https://github.com/bristweb/cred/tags`);
   git(['fetch', '--no-tags', '--depth=1', UPSTREAM, `refs/tags/${tag}`]);
   const sha = git(['rev-parse', 'FETCH_HEAD^{commit}']).trim();
-  const manifest = JSON.parse(git(['show', `${sha}:package.json`]));
-  const current = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
-  // Check layout before the root manifest to explain why legacy v1.0/v1.1 tags are unsupported.
-  const records = git(['ls-tree', '-rz', '--full-tree', sha, '--', 'package/']).split('\0').filter(Boolean);
-  if (!records.length) throw new Error('This tag predates package/. It is not a compatible template update. No files changed.');
   if (!git(['ls-tree', '--name-only', sha, '--', 'template/data/config.js']).trim()) throw new Error('This tag predates the starter layout (v1.3.0). No files changed.');
+  // Current Cred tags keep the runtime under template/package/; v1.3.0–1.3.1 used top-level package/.
+  const source = git(['ls-tree', '--name-only', sha, '--', 'template/package/assets/js/cred.js']).trim()
+    ? 'template/package' : 'package';
+  const records = git(['ls-tree', '-rz', '--full-tree', sha, '--', `${source}/`]).split('\0').filter(Boolean);
+  if (!records.length) throw new Error('This tag has no package runtime. It is not a compatible template update. No files changed.');
+  // Starter manifest lives at template/package.json; older tags compared against the Cred root package.json.
+  const manifestPath = git(['ls-tree', '--name-only', sha, '--', 'template/package.json']).trim()
+    ? 'template/package.json' : 'package.json';
+  const manifest = JSON.parse(git(['show', `${sha}:${manifestPath}`]));
+  const current = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
+  const prefix = source + '/';
   const entries = records.map(line => {
     const separator = line.indexOf('\t');
-    const head = line.slice(0, separator), file = line.slice(separator + 1);
+    const head = line.slice(0, separator), remote = line.slice(separator + 1);
     const [mode, kind, blob] = head.split(' ');
+    if (!remote.startsWith(prefix)) throw new Error(`Unexpected release path: ${remote}`);
+    const file = 'package/' + remote.slice(prefix.length);
     packagePath(file, mode);
-    if (kind !== 'blob' || !/^[a-f0-9]{40}$/.test(blob)) throw new Error(`Unsupported Git entry: ${file}`);
+    if (kind !== 'blob' || !/^[a-f0-9]{40}$/.test(blob)) throw new Error(`Unsupported Git entry: ${remote}`);
     return { file, mode, bytes: execFileSync('git', ['cat-file', 'blob', blob], {cwd:dir, maxBuffer:32*1024*1024}) };
   });
   const version = replacePackage(dir, entries, current, manifest, tag.slice(1));
