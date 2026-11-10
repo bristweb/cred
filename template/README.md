@@ -47,6 +47,12 @@ Replace `reviews.EXAMPLE.COM` with [your subdomain](#use-your-own-subdomain). Wh
 
 Your reviews page is `https://reviews.EXAMPLE.COM/`. The same URL works in an iframe, where it becomes transparent so the host page shows through. Add `?embed` only to force that mode outside an iframe. Both follow the visitor's light or dark setting. [More embed options](https://github.com/bristweb/cred/blob/main/docs/REFERENCE.md#embed).
 
+If your website has only a light or only a dark look, choose that theme so the reviews always match it. Add `data-theme="light"` (or `"dark"`) to the script tag, and use `https://reviews.EXAMPLE.COM/?theme=light` for iframes and for your repo's description and website link:
+
+```html
+<script src="https://reviews.EXAMPLE.COM/package/assets/js/cred.js" data-theme="light" defer></script>
+```
+
 ## Get Cred updates
 
 Run **Actions → Update Cred package** with a tag from [Cred's releases](https://github.com/bristweb/cred/releases). Review and merge the pull request. It changes only `package/`, never your data, pages or README.
