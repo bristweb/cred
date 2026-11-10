@@ -62,7 +62,8 @@ test('review list must not be empty', () => assert.equal(reviewsSchema.safeParse
 
 test('config rules', async () => {
   const base = await loadConfig(examples);
-  const ok = edit => { const c = structuredClone(base); edit(c); return configSchema.safeParse(c).success; };
+  // Client data may have no testimonials, so give the testimonial checks one to edit.
+  const ok = edit => { const c = structuredClone(base); c.testimonials ||= [{ title: 'T', text: 'Text', date: '2024-01-01T00:00Z' }]; edit(c); return configSchema.safeParse(c).success; };
   assert.equal(ok(() => {}), true);
   assert.equal(ok(c => { c.unknown_top_level = 1; }), true, 'unknown keys allowed');
   assert.equal(ok(c => { delete c.business.name; }), false);
@@ -94,7 +95,10 @@ const copy = () => { const dir = path.join(mkdtempSync(path.join(tmpdir(), 'cred
 
 test('validate.mjs: accolades and credentials need one of their name keys', async () => {
   const dir = copy(), f = path.join(dir, 'config.js');
-  writeFileSync(f, readFileSync(f, 'utf8').replace('  accolades: [', '  accolades: [{ year: 2024 },').replace('  credentials: [', '  credentials: [{ start: "2020" },'));
+  const c = await loadConfig(dir);
+  c.accolades = [{ year: 2024 }, ...(c.accolades || [])];
+  c.credentials = [{ start: '2020' }, ...(c.credentials || [])];
+  writeFileSync(f, 'export default ' + JSON.stringify(c, null, 2) + ';\n');
   const r = validate(dir);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /accolades\/0 needs one of icon, name, label/);
