@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
-      - run: for f in template/package/assets/js/cred.js site/*.js template/package/tools/*.mjs template/package/tools/test/*.mjs; do node --check "$f"; done
+      - run: for f in template/package/assets/js/cred.js site/*.js template/package/tools/*.mjs template/package/tools/test/*.mjs tests/*.mjs; do node --check "$f"; done
       - run: sh -n template/package/tools/export-site.sh
       - name: Widget declares a release version
         run: node template/package/tools/widget-version.mjs

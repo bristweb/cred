@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 
-const root = path.resolve(import.meta.dirname, '../../../..');
+const root = path.resolve(import.meta.dirname, '..');
 const project = existsSync(path.join(root, 'template/README.md'));
 const read = f => readFileSync(path.join(root, f), 'utf8');
 const create = 'https://github.com/bristweb/cred-starter/generate';

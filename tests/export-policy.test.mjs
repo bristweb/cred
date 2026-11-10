@@ -6,7 +6,7 @@ import { mkdtempSync, readFileSync, writeFileSync, rmSync, existsSync } from 'no
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-const root = path.resolve(import.meta.dirname, '../../../..');
+const root = path.resolve(import.meta.dirname, '..');
 const project = existsSync(path.join(root, 'template/README.md'));
 const cmd = (args, cwd = root) => execFileSync(args[0], args.slice(1), { cwd, encoding: 'utf8' });
 const read = (dir, file) => readFileSync(path.join(dir, file), 'utf8');
