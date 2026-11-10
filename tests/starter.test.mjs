@@ -5,9 +5,9 @@ import assert from 'node:assert/strict';
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, rmSync, mkdtempSync, writeFileSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { replacePackage } from '../update-package.mjs';
+import { replacePackage } from '../template/package/tools/update-package.mjs';
 
-const root = path.resolve(import.meta.dirname, '../../../..');
+const root = path.resolve(import.meta.dirname, '..');
 const sh = (c, cwd = root) => execSync(c, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const walk = (dir, base = dir) => readdirSync(dir).flatMap(f => {
   const p = path.join(dir, f);
